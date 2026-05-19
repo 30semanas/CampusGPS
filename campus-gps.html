@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Campus GPS — Igreja da Cidade</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap');
+
+  :root {
+    --bg: #0a0c10;
+    --surface: #13161d;
+    --surface2: #1c2030;
+    --border: #2a2f3e;
+    --accent: #00e5a0;
+    --accent2: #4f8cff;
+    --warn: #ff6b35;
+    --text: #e8ecf4;
+    --muted: #6b7490;
+    --radius: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'Space Grotesk', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100dvh;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* ========= SCREENS ========= */
+  .screen { position: absolute; inset: 0; display: none; flex-direction: column; }
+  .screen.active { display: flex; }
+
+  /* ========= HOME SCREEN ========= */
+  #home {
+    background: radial-gradient(ellipse at 60% 20%, #1a2540 0%, #0a0c10 70%);
+    padding: 24px 20px 20px;
+    gap: 0;
+  }
+
+  .home-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 28px;
+  }
+  .logo { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; color: var(--accent); letter-spacing: -0.5px; }
+  .logo span { color: var(--text); }
+  .manage-btn {
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--muted); font-size: 13px; font-family: 'Space Grotesk', sans-serif;
+    padding: 8px 14px; border-radius: 20px; cursor: pointer; transition: all .2s;
+  }
+  .manage-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .search-wrap {
+    position: relative; margin-bottom: 20px;
+  }
+  .search-wrap input {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text); font-family: 'Space Grotesk', sans-serif; font-size: 15px;
+    padding: 14px 16px 14px 44px; border-radius: var(--radius); outline: none;
+    transition: border-color .2s;
+  }
+  .search-wrap input::placeholder { color: var(--muted); }
+  .search-wrap input:focus { border-color: var(--accent); }
+  .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 18px; pointer-events: none; }
+
+  .cat-tabs {
+    display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px;
+    scrollbar-width: none; margin-bottom: 16px;
+  }
+  .cat-tabs::-webkit-scrollbar { display: none; }
+  .cat-tab {
+    flex-shrink: 0; padding: 7px 16px; border-radius: 20px;
+    font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid var(--border);
+    background: var(--surface2); color: var(--muted); transition: all .2s;
+  }
+  .cat-tab.active { background: var(--accent); color: #000; border-color: var(--accent); }
+
+  .locations-list {
+    flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;
+    scrollbar-width: thin; scrollbar-color: var(--border) transparent; padding-right: 2px;
+  }
+  .loc-item {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px 16px;
+    display: flex; align-items: center; gap: 14px; cursor: pointer;
+    transition: all .2s; position: relative; overflow: hidden;
+  }
+  .loc-item:hover { border-color: var(--accent2); background: var(--surface2); }
+  .loc-num {
+    width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center;
+    justify-content: center; font-weight: 700; font-size: 13px; flex-shrink: 0;
+  }
+  .loc-info { flex: 1; min-width: 0; }
+  .loc-name { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .loc-cat { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .loc-floor { font-size: 11px; color: var(--muted); background: var(--surface2); padding: 2px 8px; border-radius: 10px; flex-shrink: 0; }
+  .nav-arrow-btn {
+    width: 36px; height: 36px; border-radius: 10px; background: var(--accent2);
+    color: #fff; border: none; cursor: pointer; display: flex; align-items: center;
+    justify-content: center; font-size: 16px; flex-shrink: 0; transition: all .2s;
+  }
+  .nav-arrow-btn:hover { background: var(--accent); color: #000; }
+
+  /* category colors */
+  .cat-auditorio { background: #1e2a4a; color: var(--accent2); }
+  .cat-sanitario { background: #1a2e2e; color: #00c9a7; }
+  .cat-sac { background: #2e1e2e; color: #c084fc; }
+  .cat-praca { background: #2e2a1a; color: #fbbf24; }
+  .cat-outras { background: #2e1e1a; color: var(--warn); }
+
+  /* ========= CAMERA / AR SCREEN ========= */
+  #camera {
+    background: #000;
+  }
+
+  #videoEl {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  }
+  .cam-overlay {
+    position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, transparent 30%, transparent 70%, rgba(0,0,0,0.7) 100%);
+  }
+
+  .cam-top {
+    position: absolute; top: 0; left: 0; right: 0;
+    padding: 16px 16px 12px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .back-btn {
+    width: 40px; height: 40px; border-radius: 12px;
+    background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15);
+    color: #fff; font-size: 20px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px);
+  }
+  .dest-pill {
+    flex: 1; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 12px; padding: 8px 14px; backdrop-filter: blur(8px);
+  }
+  .dest-pill-label { font-size: 10px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; }
+  .dest-pill-name { font-size: 14px; font-weight: 600; color: #fff; }
+
+  /* BIG DIRECTION ARROW */
+  .direction-container {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-60%);
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+  }
+  .big-arrow {
+    width: 120px; height: 120px;
+    filter: drop-shadow(0 0 30px rgba(0,229,160,0.8));
+    transition: transform .4s cubic-bezier(.34,1.56,.64,1);
+  }
+  .big-arrow svg { width: 100%; height: 100%; }
+
+  .direction-label {
+    background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+    border: 1px solid rgba(0,229,160,0.4); border-radius: 20px;
+    padding: 6px 18px; font-size: 14px; font-weight: 600; color: var(--accent);
+    letter-spacing: 0.5px;
+  }
+
+  /* DISTANCE + INFO BAR */
+  .cam-bottom {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 0 16px 32px;
+  }
+
+  .info-card {
+    background: rgba(13,16,23,0.85); backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 20px;
+    padding: 18px 20px;
+  }
+  .info-row { display: flex; align-items: center; justify-content: space-between; }
+  .dist-big { font-family: 'Syne', sans-serif; font-size: 42px; font-weight: 800; color: var(--accent); line-height: 1; }
+  .dist-unit { font-size: 14px; color: var(--muted); margin-top: 4px; }
+  .bearing-info { text-align: right; }
+  .bearing-deg { font-size: 22px; font-weight: 700; color: var(--text); }
+  .bearing-label { font-size: 12px; color: var(--muted); }
+
+  .steps-row {
+    margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border);
+    display: flex; gap: 8px; align-items: center;
+  }
+  .step-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  .step-text { font-size: 13px; color: var(--text); flex: 1; }
+
+  /* compass */
+  .compass-wrap {
+    position: absolute; top: 80px; right: 16px;
+    width: 56px; height: 56px;
+  }
+  .compass-wrap svg { width: 100%; height: 100%; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5)); }
+
+  /* GPS no signal notice */
+  .no-gps {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    text-align: center; color: #fff;
+  }
+  .no-gps h3 { font-size: 18px; margin-bottom: 8px; }
+  .no-gps p { font-size: 13px; color: rgba(255,255,255,0.6); max-width: 260px; }
+
+  /* ========= MANAGE SCREEN ========= */
+  #manage {
+    background: var(--bg);
+    padding: 0;
+  }
+
+  .manage-header {
+    padding: 20px 20px 16px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .manage-header h2 { font-family: 'Syne', sans-serif; font-size: 20px; flex: 1; }
+  .add-loc-btn {
+    background: var(--accent); color: #000; border: none;
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 13px;
+    padding: 8px 16px; border-radius: 20px; cursor: pointer;
+  }
+
+  .manage-list {
+    flex: 1; overflow-y: auto; padding: 12px 16px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .manage-item {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 12px 14px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .manage-num { font-weight: 700; font-size: 13px; color: var(--muted); width: 24px; flex-shrink: 0; }
+  .manage-info { flex: 1; min-width: 0; }
+  .manage-name { font-weight: 600; font-size: 14px; }
+  .manage-cat { font-size: 11px; color: var(--muted); }
+  .manage-actions { display: flex; gap: 6px; }
+  .edit-btn, .del-btn {
+    width: 32px; height: 32px; border-radius: 8px; border: none;
+    cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center;
+  }
+  .edit-btn { background: rgba(79,140,255,0.15); color: var(--accent2); }
+  .del-btn { background: rgba(255,107,53,0.15); color: var(--warn); }
+
+  /* ========= MODAL ========= */
+  .modal-bg {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+    z-index: 100; display: none; align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal-bg.open { display: flex; }
+  .modal {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
+    padding: 24px; width: 100%; max-width: 400px;
+  }
+  .modal h3 { font-family: 'Syne', sans-serif; font-size: 20px; margin-bottom: 20px; }
+  .form-group { margin-bottom: 14px; }
+  .form-group label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .form-group input, .form-group select {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text); font-family: 'Space Grotesk', sans-serif; font-size: 14px;
+    padding: 10px 12px; border-radius: 10px; outline: none;
+  }
+  .form-group input:focus, .form-group select:focus { border-color: var(--accent); }
+  .form-group select option { background: var(--surface2); }
+  .form-row { display: flex; gap: 10px; }
+  .form-row .form-group { flex: 1; }
+  .modal-btns { display: flex; gap: 10px; margin-top: 20px; }
+  .modal-cancel {
+    flex: 1; background: var(--surface2); border: 1px solid var(--border);
+    color: var(--muted); font-family: 'Space Grotesk', sans-serif; font-size: 14px;
+    padding: 12px; border-radius: 10px; cursor: pointer;
+  }
+  .modal-save {
+    flex: 1; background: var(--accent); color: #000;
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 14px;
+    padding: 12px; border-radius: 10px; cursor: pointer; border: none;
+  }
+
+  /* ========= TOAST ========= */
+  .toast {
+    position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--surface2); border: 1px solid var(--border); color: var(--text);
+    padding: 10px 20px; border-radius: 20px; font-size: 14px; z-index: 200;
+    opacity: 0; transition: all .3s; white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ========= ARRIVED BANNER ========= */
+  .arrived-banner {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%) scale(0);
+    background: var(--accent); color: #000; border-radius: 20px; padding: 24px 32px;
+    text-align: center; z-index: 50; transition: transform .4s cubic-bezier(.34,1.56,.64,1);
+  }
+  .arrived-banner.show { transform: translate(-50%,-50%) scale(1); }
+  .arrived-banner h2 { font-family: 'Syne', sans-serif; font-size: 28px; }
+  .arrived-banner p { font-size: 14px; margin-top: 6px; }
+  .arrived-banner button {
+    margin-top: 16px; background: #000; color: var(--accent);
+    border: none; border-radius: 10px; padding: 10px 24px;
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700; cursor: pointer;
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  /* permissions panel */
+  .perm-panel {
+    position: absolute; inset: 0; background: rgba(10,12,16,0.95);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 16px; padding: 40px; z-index: 10; text-align: center;
+  }
+  .perm-icon { font-size: 56px; }
+  .perm-panel h2 { font-family: 'Syne', sans-serif; font-size: 22px; }
+  .perm-panel p { color: var(--muted); font-size: 14px; line-height: 1.6; }
+  .perm-btn {
+    background: var(--accent); color: #000; border: none;
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 15px;
+    padding: 14px 32px; border-radius: 14px; cursor: pointer; margin-top: 8px;
+  }
+  .skip-btn {
+    background: transparent; border: 1px solid var(--border); color: var(--muted);
+    font-family: 'Space Grotesk', sans-serif; font-size: 13px;
+    padding: 10px 24px; border-radius: 10px; cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<!-- ======== HOME SCREEN ======== -->
+<div id="home" class="screen active">
+  <div class="home-header">
+    <div class="logo">Campus<span>GPS</span></div>
+    <button class="manage-btn" onclick="showScreen('manage')">⚙ Gerenciar</button>
+  </div>
+
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="searchInput" placeholder="Buscar local..." oninput="filterLocations()">
+  </div>
+
+  <div class="cat-tabs" id="catTabs"></div>
+
+  <div class="locations-list" id="locationsList"></div>
+</div>
+
+<!-- ======== CAMERA SCREEN ======== -->
+<div id="camera" class="screen">
+  <video id="videoEl" autoplay playsinline muted></video>
+  <div class="cam-overlay"></div>
+
+  <!-- Top bar -->
+  <div class="cam-top">
+    <button class="back-btn" onclick="stopCamera()">←</button>
+    <div class="dest-pill">
+      <div class="dest-pill-label">Destino</div>
+      <div class="dest-pill-name" id="destName">—</div>
+    </div>
+  </div>
+
+  <!-- Compass -->
+  <div class="compass-wrap" id="compassWrap">
+    <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="28" cy="28" r="26" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+      <text x="28" y="14" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="8" font-family="Space Grotesk">N</text>
+      <text x="28" y="46" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="8" font-family="Space Grotesk">S</text>
+      <text x="8"  y="31" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="8" font-family="Space Grotesk">O</text>
+      <text x="48" y="31" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="8" font-family="Space Grotesk">L</text>
+      <g id="compassNeedle" style="transform-origin:28px 28px">
+        <polygon points="28,10 31,28 28,26 25,28" fill="#ff4444"/>
+        <polygon points="28,46 31,28 28,30 25,28" fill="rgba(255,255,255,0.6)"/>
+      </g>
+    </svg>
+  </div>
+
+  <!-- Big directional arrow -->
+  <div class="direction-container" id="dirContainer">
+    <div class="big-arrow" id="bigArrow">
+      <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="60" cy="60" r="56" fill="rgba(0,229,160,0.15)" stroke="rgba(0,229,160,0.4)" stroke-width="2"/>
+        <path d="M60 25L90 80H30L60 25Z" fill="#00e5a0"/>
+      </svg>
+    </div>
+    <div class="direction-label" id="dirLabel">Calculando...</div>
+  </div>
+
+  <!-- Arrived banner -->
+  <div class="arrived-banner" id="arrivedBanner">
+    <h2>✅ Chegou!</h2>
+    <p id="arrivedName"></p>
+    <button onclick="stopCamera()">Voltar ao mapa</button>
+  </div>
+
+  <!-- Permissions panel -->
+  <div class="perm-panel" id="permPanel" style="display:none">
+    <div class="perm-icon">📍</div>
+    <h2>Permissões necessárias</h2>
+    <p>Para funcionar o GPS precisa de acesso à câmera e à sua localização GPS.</p>
+    <button class="perm-btn" onclick="requestPermissions()">Permitir acesso</button>
+    <button class="skip-btn" onclick="startWithoutGPS()">Usar sem GPS</button>
+  </div>
+
+  <!-- Bottom info card -->
+  <div class="cam-bottom">
+    <div class="info-card">
+      <div class="info-row">
+        <div>
+          <div class="dist-big" id="distNum">—</div>
+          <div class="dist-unit">metros</div>
+        </div>
+        <div class="bearing-info">
+          <div class="bearing-deg" id="bearingNum">—°</div>
+          <div class="bearing-label">direção</div>
+        </div>
+      </div>
+      <div class="steps-row">
+        <div class="step-dot"></div>
+        <div class="step-text" id="stepText">Aguardando GPS...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======== MANAGE SCREEN ======== -->
+<div id="manage" class="screen">
+  <div class="manage-header">
+    <button class="back-btn" style="background:var(--surface2);border-color:var(--border);color:var(--text)" onclick="showScreen('home')">←</button>
+    <h2>Gerenciar Locais</h2>
+    <button class="add-loc-btn" onclick="openModal()">+ Adicionar</button>
+  </div>
+  <div class="manage-list" id="manageList"></div>
+</div>
+
+<!-- ======== MODAL ======== -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3 id="modalTitle">Novo Local</h3>
+    <input type="hidden" id="editId">
+    <div class="form-group">
+      <label>Nome do Local</label>
+      <input type="text" id="fName" placeholder="Ex: Aud. Principal">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Número</label>
+        <input type="number" id="fNum" placeholder="1">
+      </div>
+      <div class="form-group">
+        <label>Categoria</label>
+        <select id="fCat">
+          <option value="Auditório">Auditório</option>
+          <option value="Sanitário">Sanitário</option>
+          <option value="SAC">SAC</option>
+          <option value="Praça de Alimentação">Praça Alimentação</option>
+          <option value="Outras">Outras</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Latitude</label>
+        <input type="text" id="fLat" placeholder="-23.1940">
+      </div>
+      <div class="form-group">
+        <label>Longitude</label>
+        <input type="text" id="fLng" placeholder="-45.8601">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Andar / Localização</label>
+      <input type="text" id="fFloor" placeholder="Térreo">
+    </div>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="modal-save" onclick="saveLocation()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// DATA — parse DMS to decimal
+// ============================================================
+function dmsToDecimal(str) {
+  // "23°11'38.46\"S" or "45°51'36.40\"W"
+  const m = str.match(/(\d+)°(\d+)'([\d.]+)"([NSEW])/);
+  if (!m) return parseFloat(str);
+  let deg = parseFloat(m[1]) + parseFloat(m[2])/60 + parseFloat(m[3])/3600;
+  if (m[4] === 'S' || m[4] === 'W') deg = -deg;
+  return deg;
+}
+function parseCoords(str) {
+  // "23°11'38.46\"S 45°51'36.40\"W"
+  const parts = str.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    return { lat: dmsToDecimal(parts[0]), lng: dmsToDecimal(parts[1]) };
+  }
+  return null;
+}
+
+const RAW = [
+  [1,"Auditório","Aud. Principal","23°11'38.46\"S 45°51'36.40\"W","Térreo"],
+  [2,"Auditório","Aud. Estações","23°11'38.81\"S 45°51'33.95\"W","3 andar"],
+  [3,"Auditório","Aud. Oliveiras","23°11'38.81\"S 45°51'33.95\"W","2 andar"],
+  [4,"Auditório","Aud. Gerações","23°11'39.51\"S 45°51'35.12\"W","2 andar"],
+  [5,"Auditório","Aud. Nações","23°11'39.51\"S 45°51'35.12\"W","3 andar"],
+  [6,"Auditório","Sala Martin L. King Jr.","23°11'39.29\"S 45°51'36.84\"W","3 andar"],
+  [7,"Auditório","Sala William Wilberforce","23°11'38.73\"S 45°51'37.16\"W","3 andar"],
+  [8,"Auditório","Sala Corrie T. Boom","23°11'38.16\"S 45°51'37.53\"W","3 andar"],
+  [9,"Auditório","Aud. Billy Graham","23°11'38.08\"S 45°51'37.51\"W","1 andar"],
+  [10,"Auditório","Aud. Comunidade","23°11'35.16\"S 45°51'34.04\"W","Térreo"],
+  [11,"Auditório","Aud. Shine","23°11'40.35\"S 45°51'34.71\"W","Térreo"],
+  [12,"Auditório","Aud. Kids","23°11'41.77\"S 45°51'33.92\"W","Térreo"],
+  [13,"Auditório","Aud. Inspiração","23°11'41.21\"S 45°51'32.68\"W","Térreo"],
+  [14,"Sanitário","Banheiro Aud. Principal W/M e Família","23°11'39.57\"S 45°51'34.97\"W","Térreo"],
+  [15,"Sanitário","Banheiro Aud. Comunidade W/F","23°11'35.58\"S 45°51'35.19\"W","Térreo"],
+  [15,"Sanitário","Banheiro Aud. Comunidade W/H","23°11'34.94\"S 45°51'35.53\"W","Térreo"],
+  [25,"Sanitário","Banheiro Batistério W/M","23°11'35.31\"S 45°51'36.20\"W","Térreo"],
+  [16,"SAC","Central de Atendimento","23°11'37.80\"S 45°51'34.75\"W","Térreo"],
+  [17,"SAC","Check-in","23°11'41.09\"S 45°51'32.54\"W","Térreo"],
+  [18,"SAC","Enfermaria","23°11'39.47\"S 45°51'35.61\"W","Térreo"],
+  [19,"Praça de Alimentação","Praça Gourmet","23°11'41.44\"S 45°51'35.66\"W","Térreo"],
+  [20,"Praça de Alimentação","Restaurante Comunidade","23°11'33.91\"S 45°51'34.32\"W","Térreo"],
+  [21,"Praça de Alimentação","Restaurante Farol","23°11'38.69\"S 45°51'33.83\"W","Térreo"],
+  [22,"Praça de Alimentação","Praça de Alimentação","23°11'33.51\"S 45°51'34.47\"W","Térreo"],
+  [23,"Praça de Alimentação","Café Oliveiras","23°11'38.81\"S 45°51'33.95\"W","2 andar"],
+  [24,"Outras","Colégio Inspire","23°11'39.25\"S 45°51'32.09\"W","Térreo"],
+  [25,"Outras","Batistério","23°11'35.73\"S 45°51'36.08\"W","Térreo"],
+  [26,"Outras","Espaço Amamentação","23°11'41.24\"S 45°51'33.69\"W","Térreo"],
+  [27,"Outras","Espaço Shine","23°11'41.35\"S 45°51'34.63\"W","Térreo"],
+  [28,"Outras","Complexo Esportivo","23°11'44.28\"S 45°51'34.19\"W","Térreo"],
+  [29,"Outras","Casa Betel de Oração","23°11'40.87\"S 45°51'36.72\"W","Térreo"],
+  [30,"Outras","Praça Videira","23°11'39.99\"S 45°51'35.87\"W","Térreo"],
+  [31,"Outras","Livraria Inspire","23°11'39.00\"S 45°51'34.13\"W","Térreo"],
+  [32,"Outras","Use Eleve","23°11'39.06\"S 45°51'33.33\"W","Térreo"],
+  [33,"Outras","Jardim Koinonia","23°11'35.75\"S 45°51'37.01\"W","Térreo"],
+  [34,"Outras","Jardim Panorâmico","23°11'39.93\"S 45°51'37.99\"W","Térreo"],
+  [35,"Outras","Espaço Aliança","23°11'34.45\"S 45°51'37.17\"W","Térreo"],
+  [36,"Outras","Quadra","23°11'42.41\"S 45°51'32.71\"W","Térreo"],
+  [37,"Outras","Prefeitura","23°11'49.82\"S 45°51'28.07\"W","Térreo"],
+  [38,"Outras","Stands","23°11'40.73\"S 45°51'33.48\"W","Térreo"],
+  [40,"Outras","Mirante da Cruz do Calvário","23°11'26.56\"S 45°51'37.51\"W","Térreo"],
+  [41,"Outras","Sala de Projeção","23°11'37.94\"S 45°51'37.60\"W","2 andar"],
+];
+
+let locations = JSON.parse(localStorage.getItem('campusLocations') || 'null') || RAW.map((r,i) => {
+  const c = parseCoords(r[3]);
+  return { id: i+1, num: r[0], cat: r[1], name: r[2], lat: c ? c.lat : 0, lng: c ? c.lng : 0, floor: r[4] };
+});
+
+function saveToStorage() {
+  localStorage.setItem('campusLocations', JSON.stringify(locations));
+}
+
+// ============================================================
+// CATEGORIES
+// ============================================================
+const CATS = ['Todos','Auditório','Sanitário','SAC','Praça de Alimentação','Outras'];
+const CAT_CLASS = {
+  'Auditório':'cat-auditorio','Sanitário':'cat-sanitario',
+  'SAC':'cat-sac','Praça de Alimentação':'cat-praca','Outras':'cat-outras'
+};
+const CAT_EMOJI = {
+  'Auditório':'🎭','Sanitário':'🚻','SAC':'ℹ️','Praça de Alimentação':'🍽️','Outras':'📍'
+};
+let activeFilter = 'Todos';
+
+function buildCatTabs() {
+  const el = document.getElementById('catTabs');
+  el.innerHTML = CATS.map(c => `<div class="cat-tab ${c===activeFilter?'active':''}" onclick="setFilter('${c}')">${c}</div>`).join('');
+}
+function setFilter(cat) { activeFilter = cat; buildCatTabs(); filterLocations(); }
+
+// ============================================================
+// LOCATION LIST
+// ============================================================
+function filterLocations() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const list = locations.filter(l => {
+    const matchCat = activeFilter === 'Todos' || l.cat === activeFilter;
+    const matchQ = l.name.toLowerCase().includes(q) || l.cat.toLowerCase().includes(q) || String(l.num).includes(q);
+    return matchCat && matchQ;
+  });
+  renderList(list);
+}
+
+function renderList(list) {
+  const el = document.getElementById('locationsList');
+  if (!list.length) { el.innerHTML = '<div style="text-align:center;color:var(--muted);padding:40px">Nenhum local encontrado</div>'; return; }
+  el.innerHTML = list.map(l => `
+    <div class="loc-item" onclick="startNavTo(${l.id})">
+      <div class="loc-num ${CAT_CLASS[l.cat]||'cat-outras'}">${CAT_EMOJI[l.cat]||'📍'}</div>
+      <div class="loc-info">
+        <div class="loc-name">${l.name}</div>
+        <div class="loc-cat">${l.cat}</div>
+      </div>
+      <div class="loc-floor">${l.floor}</div>
+      <button class="nav-arrow-btn" onclick="event.stopPropagation();startNavTo(${l.id})">→</button>
+    </div>
+  `).join('');
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+let destLoc = null;
+let watchId = null;
+let userLat = null, userLng = null;
+let heading = 0;
+let cameraStream = null;
+let simulMode = false;
+
+function startNavTo(id) {
+  destLoc = locations.find(l => l.id === id);
+  if (!destLoc) return;
+  document.getElementById('destName').textContent = destLoc.name;
+  showScreen('camera');
+  document.getElementById('permPanel').style.display = 'flex';
+}
+
+async function requestPermissions() {
+  document.getElementById('permPanel').style.display = 'none';
+  // Camera
+  try {
+    cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+    document.getElementById('videoEl').srcObject = cameraStream;
+  } catch(e) {
+    console.warn('Camera denied', e);
+  }
+  // GPS
+  if (navigator.geolocation) {
+    watchId = navigator.geolocation.watchPosition(onPosition, onPosErr, { enableHighAccuracy: true, maximumAge: 2000 });
+  } else { startWithoutGPS(); }
+  // Compass
+  if (window.DeviceOrientationEvent) {
+    if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+      try { await DeviceOrientationEvent.requestPermission(); } catch(e) {}
+    }
+    window.addEventListener('deviceorientationabsolute', onOrientation, true);
+    window.addEventListener('deviceorientation', onOrientation, true);
+  }
+}
+
+function startWithoutGPS() {
+  document.getElementById('permPanel').style.display = 'none';
+  simulMode = true;
+  // Try camera anyway
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+    .then(s => { cameraStream = s; document.getElementById('videoEl').srcObject = s; })
+    .catch(() => {});
+  // Simulate position at campus center
+  userLat = -23.1940; userLng = -45.8601;
+  updateNav();
+  document.getElementById('stepText').textContent = 'Modo sem GPS — posição simulada';
+}
+
+function onPosition(pos) {
+  userLat = pos.coords.latitude;
+  userLng = pos.coords.longitude;
+  updateNav();
+}
+function onPosErr(e) {
+  document.getElementById('stepText').textContent = 'Sem sinal GPS — verificando...';
+}
+
+function onOrientation(e) {
+  let h = e.alpha || 0;
+  if (e.webkitCompassHeading !== undefined) h = e.webkitCompassHeading;
+  heading = h;
+  updateCompass(h);
+}
+
+function stopCamera() {
+  if (watchId) navigator.geolocation.clearWatch(watchId);
+  if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
+  window.removeEventListener('deviceorientationabsolute', onOrientation, true);
+  window.removeEventListener('deviceorientation', onOrientation, true);
+  document.getElementById('arrivedBanner').classList.remove('show');
+  destLoc = null; userLat = null; userLng = null;
+  showScreen('home');
+}
+
+// ============================================================
+// NAV MATH
+// ============================================================
+function haversine(lat1, lng1, lat2, lng2) {
+  const R = 6371000;
+  const dLat = (lat2-lat1)*Math.PI/180;
+  const dLng = (lng2-lng1)*Math.PI/180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function bearing(lat1, lng1, lat2, lng2) {
+  const dLng = (lng2-lng1)*Math.PI/180;
+  const y = Math.sin(dLng)*Math.cos(lat2*Math.PI/180);
+  const x = Math.cos(lat1*Math.PI/180)*Math.sin(lat2*Math.PI/180) - Math.sin(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.cos(dLng);
+  return (Math.atan2(y,x)*180/Math.PI + 360) % 360;
+}
+
+function cardinalDir(deg) {
+  const dirs = ['Norte','Nordeste','Leste','Sudeste','Sul','Sudoeste','Oeste','Noroeste'];
+  return dirs[Math.round(deg/45) % 8];
+}
+
+function updateNav() {
+  if (!destLoc || userLat === null) return;
+  const dist = haversine(userLat, userLng, destLoc.lat, destLoc.lng);
+  const bear = bearing(userLat, userLng, destLoc.lat, destLoc.lng);
+  // relative arrow angle (bearing minus device heading)
+  const relAngle = (bear - heading + 360) % 360;
+
+  document.getElementById('distNum').textContent = Math.round(dist);
+  document.getElementById('bearingNum').textContent = Math.round(bear) + '°';
+  document.getElementById('dirLabel').textContent = cardinalDir(bear);
+
+  // Rotate arrow
+  document.getElementById('bigArrow').style.transform = `rotate(${relAngle}deg)`;
+
+  // Step instruction
+  let step;
+  if (dist < 15) {
+    step = `Você chegou em ${destLoc.name}!`;
+    if (!document.getElementById('arrivedBanner').classList.contains('show')) {
+      document.getElementById('arrivedName').textContent = destLoc.name + (destLoc.floor !== 'Térreo' ? ' — ' + destLoc.floor : '');
+      document.getElementById('arrivedBanner').classList.add('show');
+    }
+  } else if (dist < 50) { step = `Quase lá! ${destLoc.name} está a ${Math.round(dist)}m`; }
+  else { step = `Siga para ${cardinalDir(bear)} — ${Math.round(dist)}m até ${destLoc.name}`; }
+  document.getElementById('stepText').textContent = step;
+}
+
+function updateCompass(h) {
+  document.getElementById('compassNeedle').style.transform = `rotate(${-h}deg)`;
+}
+
+// ============================================================
+// MANAGE
+// ============================================================
+function renderManage() {
+  const el = document.getElementById('manageList');
+  el.innerHTML = locations.map(l => `
+    <div class="manage-item">
+      <div class="manage-num">${l.num}</div>
+      <div class="manage-info">
+        <div class="manage-name">${l.name}</div>
+        <div class="manage-cat">${l.cat} · ${l.floor}</div>
+      </div>
+      <div class="manage-actions">
+        <button class="edit-btn" onclick="openModal(${l.id})">✏️</button>
+        <button class="del-btn" onclick="deleteLocation(${l.id})">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function deleteLocation(id) {
+  if (!confirm('Remover este local?')) return;
+  locations = locations.filter(l => l.id !== id);
+  saveToStorage(); renderManage(); filterLocations();
+  showToast('Local removido');
+}
+
+let editingId = null;
+function openModal(id) {
+  editingId = id || null;
+  const modal = document.getElementById('modalBg');
+  modal.classList.add('open');
+  if (id) {
+    const l = locations.find(x => x.id === id);
+    document.getElementById('modalTitle').textContent = 'Editar Local';
+    document.getElementById('fName').value = l.name;
+    document.getElementById('fNum').value = l.num;
+    document.getElementById('fCat').value = l.cat;
+    document.getElementById('fLat').value = l.lat;
+    document.getElementById('fLng').value = l.lng;
+    document.getElementById('fFloor').value = l.floor;
+  } else {
+    document.getElementById('modalTitle').textContent = 'Novo Local';
+    document.getElementById('fName').value = '';
+    document.getElementById('fNum').value = '';
+    document.getElementById('fCat').value = 'Outras';
+    document.getElementById('fLat').value = '';
+    document.getElementById('fLng').value = '';
+    document.getElementById('fFloor').value = 'Térreo';
+  }
+}
+function closeModal() { document.getElementById('modalBg').classList.remove('open'); }
+function saveLocation() {
+  const name = document.getElementById('fName').value.trim();
+  const num = parseInt(document.getElementById('fNum').value) || 0;
+  const cat = document.getElementById('fCat').value;
+  const lat = parseFloat(document.getElementById('fLat').value) || 0;
+  const lng = parseFloat(document.getElementById('fLng').value) || 0;
+  const floor = document.getElementById('fFloor').value.trim() || 'Térreo';
+  if (!name) { showToast('Nome obrigatório'); return; }
+  if (editingId) {
+    const l = locations.find(x => x.id === editingId);
+    Object.assign(l, { name, num, cat, lat, lng, floor });
+  } else {
+    locations.push({ id: Date.now(), num, cat, name, lat, lng, floor });
+  }
+  saveToStorage(); closeModal(); renderManage(); filterLocations();
+  showToast(editingId ? 'Local atualizado' : 'Local adicionado');
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (id === 'manage') renderManage();
+  if (id === 'home') { buildCatTabs(); filterLocations(); }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+buildCatTabs();
+filterLocations();
+</script>
+</body>
+</html>
