@@ -317,17 +317,17 @@ function kalman(raw,prev,P){
 // ── GPS ──
 function startGPS(){
   if(!navigator.geolocation)return;
-  navigator.geolocation.watchPosition(p=>{
+  navigator.geolocation.watchPosition(function(p){
     uAcc=Math.round(p.coords.accuracy);
-    const rL=kalman(p.coords.latitude,kLat,kP);
-    const rO=kalman(p.coords.longitude,kLng,kP);
+    var rL=kalman(p.coords.latitude,kLat,kP);
+    var rO=kalman(p.coords.longitude,kLng,kP);
     kLat=rL.val;kLng=rO.val;kP=rL.P;
     uLat=kLat;uLng=kLng;
     document.getElementById('gdot').className='gdot on';
     document.getElementById('gtxt').textContent='GPS · ±'+uAcc+'m';
     refreshHUD();renderList();
     updateRouteProgress();
-  },()=>{
+  },function(){
     document.getElementById('gdot').className='gdot warn';
     document.getElementById('gtxt').textContent='GPS indisponível';
   },{enableHighAccuracy:true,maximumAge:0,timeout:5000});
@@ -341,10 +341,9 @@ function startBaro(){
   if('PressureSensor' in window){
     try{
       const ps=new PressureSensor({frequency:1});
-      ps.addEventListener('reading',()=>{
-        const p=ps.pressure; // hPa
-        // Fórmula barométrica: altitude = 44330*(1-(p/1013.25)^0.1903)
-        const alt=44330*(1-Math.pow(p/1013.25,0.1903));
+      ps.addEventListener('reading',function(){
+        var p=ps.pressure;
+        var alt=44330*(1-Math.pow(p/1013.25,0.1903));
         updateBaro(alt);
       });
       ps.start();
@@ -352,11 +351,11 @@ function startBaro(){
     }catch(e){}
   }
   // Fallback: DeviceOrientationEvent não tem pressão; usa GPS altitude se disponível
-  navigator.geolocation.watchPosition(p=>{
+  navigator.geolocation.watchPosition(function(p){
     if(p.coords.altitude!==null&&p.coords.altitudeAccuracy!==null&&p.coords.altitudeAccuracy<30){
       updateBaro(p.coords.altitude);
     }
-  },{enableHighAccuracy:true,maximumAge:0});
+  },function(){},{enableHighAccuracy:true,maximumAge:0});
 }
 
 function updateBaro(alt){
@@ -559,7 +558,7 @@ function updateRouteProgress(){
 function startCanvas(){
   const cv=document.getElementById('cvs');
   const ctx=cv.getContext('2d');
-  const resize=()=>{cv.width=window.innerWidth;cv.height=window.innerHeight;};
+  function resize(){cv.width=window.innerWidth;cv.height=window.innerHeight;}
   resize();window.addEventListener('resize',resize);
   function frame(){
     raf=requestAnimationFrame(frame);
