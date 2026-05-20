@@ -860,24 +860,25 @@ function renderList(){
   let fl=locs.filter(l=>(activeCat==="Todos"||l.category===activeCat)&&
     (!q||l.name.toLowerCase().includes(q)||l.category.toLowerCase().includes(q)));
   if(uLat!=null)fl.sort((a,b)=>gdist(uLat,uLng,a.lat,a.lng)-gdist(uLat,uLng,b.lat,b.lng));
-  document.getElementById("llist").innerHTML=fl.map(loc=>{
-    const c=CC[loc.category]||CC["Outras"];
+  const listEl=document.getElementById("llist");
+  listEl.innerHTML=fl.map(loc=>{
+    const cfg=CC[loc.category]||CC["Outras"];
     const d=uLat!=null?fdist(gdist(uLat,uLng,loc.lat,loc.lng)):"";
-    return `<div class="lcard" data-id="${loc.id}" style="--lc:${c.color}">
-      <div class="lic" style="background:${c.color}22;color:${c.color}">${CI[loc.category]||"📍"}</div>
+    return `<div class="lcard" data-id="${loc.id}" style="--lc:${cfg.color}">
+      <div class="lic" style="background:${cfg.color}22;color:${cfg.color}">${CI[loc.category]||"📍"}</div>
       <div class="linf"><div class="lname">${loc.name}</div><div class="lmeta">${loc.category} · ${loc.floor}</div></div>
       <div class="ldist">${d}</div></div>`;
   }).join("");
-  document.getElementById("llist").querySelectorAll(".lcard").forEach(c=>c.addEventListener("click",()=>{
-    const loc=locs.find(l=>String(l.id)===c.dataset.id);if(loc)startNav(loc);
+  listEl.querySelectorAll(".lcard").forEach(card=>card.addEventListener("click",()=>{
+    const loc=locs.find(l=>String(l.id)===card.dataset.id);if(loc)startNav(loc);
   }));
 }
 function renderAdmin(q=""){
   const fl=q?locs.filter(l=>l.name.toLowerCase().includes(q.toLowerCase())):locs;
   document.getElementById("alist").innerHTML=fl.map(loc=>{
-    const c=CC[loc.category]||CC["Outras"];
+    const cfg=CC[loc.category]||CC["Outras"];
     return `<div class="aitem">
-      <div class="aic" style="background:${c.color}22;color:${c.color}">${CI[loc.category]||"📍"}</div>
+      <div class="aic" style="background:${cfg.color}22;color:${cfg.color}">${CI[loc.category]||"📍"}</div>
       <div class="ainf"><div class="aname">${loc.name}</div><div class="acat">${loc.category} · ${loc.floor}</div></div>
       <div class="abtns"><button class="ebtn" data-id="${loc.id}">✏️</button><button class="dbtn" data-id="${loc.id}">🗑️</button></div>
     </div>`;
