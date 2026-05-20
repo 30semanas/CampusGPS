@@ -742,7 +742,7 @@ function drawAR(ctx,W,H){
   var gy=H*0.70,hz=H*0.38;
   var py=(gy-(gy-hz)*prog)-(fh/18)*(H*0.22)*sc*(1-prog*0.5);
   var col=CAT_COLOR[dest.category]||'#a855f7';
-  var [r,g,b]=hexRGB(col);
+  var _rgb=hexRGB(col);var r=_rgb[0],g=_rgb[1],b=_rgb[2];
   var pulse=0.5+0.5*Math.sin(animT*2.4);
   // Rota
   drawRoute(ctx,W,H,camH,col,r,g,b);
@@ -810,7 +810,7 @@ function drawArrowsAlongPath(ctx,pts,r,g,b,col){
 function drawRoute(ctx,W,H,camH,col,r,g,b){
   var ox=W/2,oy=H*0.88;
   var routeColor=routeOptions[selectedRoute]?routeOptions[selectedRoute].color:col;
-  var [rr2,gg2,bb2]=hexRGB(routeColor);
+  var _rgb2=hexRGB(routeColor);var rr2=_rgb2[0],gg2=_rgb2[1],bb2=_rgb2[2];
 
   if(activeRoute.length>=2){
     // Projeta pontos da rota
@@ -825,7 +825,7 @@ function drawRoute(ctx,W,H,camH,col,r,g,b){
       ctx.save();
       ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);
       for(var i=1;i<pts.length;i++)ctx.lineTo(pts[i].x,pts[i].y);
-      ctx.strokeStyle='rgba('+rr2+',' +gg2+',' +bb2+',' +0.12+')';
+      ctx.strokeStyle='rgba('+rr2+','+gg2+','+bb2+',0.12)';
       ctx.lineWidth=16;ctx.lineCap='round';ctx.lineJoin='round';
       ctx.filter='blur(8px)';ctx.stroke();
       // Linha guia suave (fina, semi-transparente)
@@ -850,7 +850,7 @@ function drawRoute(ctx,W,H,camH,col,r,g,b){
     var cpx=(ox+dx)/2,cpy=Math.min(oy,dy)-H*0.15;
     ctx.save();
     ctx.beginPath();ctx.moveTo(ox,oy);ctx.quadraticCurveTo(cpx,cpy,dx,dy);
-    ctx.strokeStyle='rgba('+rr2+',' +gg2+',' +bb2+',' +0.12+')';ctx.lineWidth=14;
+    ctx.strokeStyle='rgba('+rr2+','+gg2+','+bb2+',0.12)';ctx.lineWidth=14;
     ctx.filter='blur(7px)';ctx.stroke();
     ctx.filter='none';
     ctx.beginPath();ctx.moveTo(ox,oy);ctx.quadraticCurveTo(cpx,cpy,dx,dy);
@@ -990,7 +990,7 @@ function drawEdge(ctx,relDeg,W,H,col){
 // Called from drawAR when onscreen=true, to show direction cue above pin
 function drawDirectionArrow(ctx,x,y,col){
   var pulse=0.6+0.4*Math.sin(animT*2.8);
-  var [r,g,b]=hexRGB(col);
+  var _rgb3=hexRGB(col);var r=_rgb3[0],g=_rgb3[1],b=_rgb3[2];
   // Small neon chevron above the pin pointing toward it
   ctx.save();
   ctx.translate(x,y-10);
