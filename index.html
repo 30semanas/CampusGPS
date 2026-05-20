@@ -654,6 +654,61 @@ function drawAR(ctx,W,H){
 
 }
 
+// Draws animated small arrow-chevrons along a path toward destination
+function drawArrowsAlongPath(ctx,pts,r,g,b,col){
+  if(pts.length<2)return;
+  // Total path length
+  var lengths=[0];
+  for(var i=1;i<pts.length;i++){
+    var dx=pts[i].x-pts[i-1].x, dy=pts[i].y-pts[i-1].y;
+    lengths.push(lengths[i-1]+Math.sqrt(dx*dx+dy*dy));
+  }
+  var totalLen=lengths[lengths.length-1];
+  if(totalLen<10)return;
+
+  var arrowSpacing=38;   // px between arrows
+  var arrowSize=10;
+  var speed=28;          // px/s scroll speed toward destination
+  var offset=(animT*speed)%arrowSpacing;
+
+  for(var d=offset;d<totalLen;d+=arrowSpacing){
+    // Find segment at distance d
+    var seg=0;
+    for(var s=1;s<lengths.length;s++){if(lengths[s]>=d){seg=s;break;}}
+    if(seg===0||seg>=pts.length)continue;
+    var segLen=lengths[seg]-lengths[seg-1];
+    if(segLen<0.001)continue;
+    var t=(d-lengths[seg-1])/segLen;
+    var px=pts[seg-1].x+(pts[seg].x-pts[seg-1].x)*t;
+    var py=pts[seg-1].y+(pts[seg].y-pts[seg-1].y)*t;
+    // Direction angle at this point
+    var adx=pts[seg].x-pts[seg-1].x, ady=pts[seg].y-pts[seg-1].y;
+    var angle=Math.atan2(ady,adx);
+
+    // Fade by position on path (fade near start and end)
+    var relPos=d/totalLen;
+    var fade=Math.min(relPos*5, 1)*Math.min((1-relPos)*5, 1);
+    if(fade<0.05)continue;
+
+    ctx.save();
+    ctx.translate(px,py);
+    ctx.rotate(angle);
+    // Chevron pointing in direction of travel (right = forward along path)
+    var hw=arrowSize, hh=arrowSize*0.55;
+    // Glow
+    ctx.shadowColor=col;ctx.shadowBlur=10;
+    ctx.strokeStyle='rgba('+r+','+g+','+b+','+(fade*0.4)+')';
+    ctx.lineWidth=3.5;ctx.lineCap='round';ctx.lineJoin='round';
+    ctx.beginPath();ctx.moveTo(-hw/2,-hh/2);ctx.lineTo(hw/2,0);ctx.lineTo(-hw/2,hh/2);ctx.stroke();
+    // Core
+    ctx.shadowBlur=4;
+    ctx.strokeStyle='rgba('+r+','+g+','+b+','+fade+')';
+    ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(-hw/2,-hh/2);ctx.lineTo(hw/2,0);ctx.lineTo(-hw/2,hh/2);ctx.stroke();
+    ctx.restore();
+  }
+}
+
 function drawRoute(ctx,W,H,camH,col,r,g,b){
   const ox=W/2,oy=H*0.88;
   const routeColor=routeOptions[selectedRoute]?routeOptions[selectedRoute].color:col;
@@ -675,22 +730,19 @@ function drawRoute(ctx,W,H,camH,col,r,g,b){
       ctx.strokeStyle=`rgba(${rr2},${gg2},${bb2},0.12)`;
       ctx.lineWidth=16;ctx.lineCap='round';ctx.lineJoin='round';
       ctx.filter='blur(8px)';ctx.stroke();
-      // Linha principal
+      // Linha guia suave (fina, semi-transparente)
       ctx.filter='none';
       ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);
-      for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i].x,pts[i].y);
-      const lg=ctx.createLinearGradient(pts[0].x,pts[0].y,pts[pts.length-1].x,pts[pts.length-1].y);
-      lg.addColorStop(0,`rgba(${rr2},${gg2},${bb2},0)`);
-      lg.addColorStop(0.1,`rgba(${rr2},${gg2},${bb2},0.7)`);
-      lg.addColorStop(0.9,`rgba(${rr2},${gg2},${bb2},0.8)`);
-      lg.addColorStop(1,`rgba(${rr2},${gg2},${bb2},0)`);
-      ctx.strokeStyle=lg;ctx.lineWidth=3;
-      ctx.setLineDash([10,12]);ctx.lineDashOffset=-animT*14;ctx.stroke();ctx.setLineDash([]);
-      // Waypoints
-      for(let i=1;i<pts.length-1;i++){
-        ctx.beginPath();ctx.arc(pts[i].x,pts[i].y,3,0,Math.PI*2);
-        ctx.fillStyle=`rgba(${rr2},${gg2},${bb2},0.5)`;ctx.fill();
-      }
+      for(var ri=1;ri<pts.length;ri++)ctx.lineTo(pts[ri].x,pts[ri].y);
+      var lg=ctx.createLinearGradient(pts[0].x,pts[0].y,pts[pts.length-1].x,pts[pts.length-1].y);
+      lg.addColorStop(0,'rgba('+rr2+','+gg2+','+bb2+',0)');
+      lg.addColorStop(0.15,'rgba('+rr2+','+gg2+','+bb2+',0.35)');
+      lg.addColorStop(0.85,'rgba('+rr2+','+gg2+','+bb2+',0.45)');
+      lg.addColorStop(1,'rgba('+rr2+','+gg2+','+bb2+',0)');
+      ctx.strokeStyle=lg;ctx.lineWidth=2;ctx.lineCap='round';ctx.stroke();
+
+      // Setinhas animadas ao longo do caminho
+      drawArrowsAlongPath(ctx,pts,rr2,gg2,bb2,routeColor);
       ctx.restore();
     }
   } else {
@@ -708,8 +760,17 @@ function drawRoute(ctx,W,H,camH,col,r,g,b){
     lg2.addColorStop(0,`rgba(${rr2},${gg2},${bb2},0)`);
     lg2.addColorStop(0.2,`rgba(${rr2},${gg2},${bb2},0.65)`);
     lg2.addColorStop(1,`rgba(${rr2},${gg2},${bb2},0)`);
-    ctx.strokeStyle=lg2;ctx.lineWidth=2.5;
-    ctx.setLineDash([8,10]);ctx.lineDashOffset=-animT*12;ctx.stroke();ctx.setLineDash([]);
+    ctx.strokeStyle=lg2;ctx.lineWidth=2;ctx.stroke();
+    // Setinhas na linha direta curva
+    var curvePts=[];
+    var steps=20;
+    for(var ci=0;ci<=steps;ci++){
+      var t2=ci/steps;
+      var qx=(1-t2)*(1-t2)*ox+2*(1-t2)*t2*cpx+t2*t2*dx;
+      var qy=(1-t2)*(1-t2)*oy+2*(1-t2)*t2*cpy+t2*t2*dy;
+      curvePts.push({x:qx,y:qy});
+    }
+    drawArrowsAlongPath(ctx,curvePts,rr2,gg2,bb2,routeColor);
     ctx.restore();
   }
   // Dot usuário + anel pulsante
@@ -766,53 +827,64 @@ function drawPin(ctx,x,y,sc,d,col,r,g,b,pulse){
 }
 
 function drawEdge(ctx,relDeg,W,H,col){
-  // Neon chevrons on left or right edge pointing toward destination
+  // relDeg: angle to target. Rotate chevrons to point AT target direction.
   var pulse=0.55+0.45*Math.sin(animT*3.5);
   var goR=relDeg>0;
-  var ex=goR?W-60:60, ey=H*0.42;
-  var [r,g,b]=hexRGB(col);
+  var ex=goR?W-64:64, ey=H*0.40;
+  var rgb=hexRGB(col);
+  var r=rgb[0],g=rgb[1],b=rgb[2];
+
+  // Rotation: relDeg=0 → up (0), relDeg=90 → right (90°), relDeg=-90 → left (-90°)
+  // Clamp so it never points fully backward
+  var clampedDeg=Math.max(-150,Math.min(150,relDeg));
+  var rotRad=clampedDeg*Math.PI/180;
 
   ctx.save();
   ctx.translate(ex,ey);
+  ctx.rotate(rotRad);  // rotate entire group toward target
 
-  // 4 vertical neon chevrons stacked (like the reference image)
-  // Each chevron: V shape pointing UP (toward destination)
-  var chW=36, chH=18, spacing=26;
-  for(var i=3;i>=0;i--){
-    var y=i*spacing - spacing*1.5;
-    var alpha=(0.25+(3-i)*0.22)*pulse;
-    var lw=2.5+(3-i)*0.6;
+  var chW=34, chH=17, spacing=24;
+  var numChev=4;
+  for(var i=0;i<numChev;i++){
+    // Chevrons stack FROM bottom (i=0) to top (i=numChev-1)
+    // Bottom = oldest, top = newest (brighter, pointing direction)
+    var y=-(i*spacing - (numChev-1)*spacing/2);
+    var alpha=(0.2+i*0.22)*pulse;
+    var lw=1.8+i*0.65;
 
-    // Outer glow
+    // Glow layer
     ctx.save();
-    ctx.shadowColor=col;ctx.shadowBlur=18;
-    ctx.strokeStyle='rgba('+r+','+g+','+b+','+alpha*0.5+')';
+    ctx.shadowColor=col;ctx.shadowBlur=16+i*4;
+    ctx.strokeStyle='rgba('+r+','+g+','+b+','+alpha*0.45+')';
     ctx.lineWidth=lw+4;ctx.lineCap='round';ctx.lineJoin='round';
     ctx.beginPath();
-    ctx.moveTo(-chW/2,y+chH/2);
-    ctx.lineTo(0,y-chH/2);
-    ctx.lineTo(chW/2,y+chH/2);
+    ctx.moveTo(-chW/2, y+chH/2);
+    ctx.lineTo(0,      y-chH/2);
+    ctx.lineTo( chW/2, y+chH/2);
     ctx.stroke();ctx.restore();
 
-    // Core neon line
+    // Bright layer
     ctx.save();
-    ctx.shadowColor=col;ctx.shadowBlur=8;
+    ctx.shadowColor=col;ctx.shadowBlur=7;
     ctx.strokeStyle='rgba('+r+','+g+','+b+','+alpha+')';
     ctx.lineWidth=lw;ctx.lineCap='round';ctx.lineJoin='round';
     ctx.beginPath();
-    ctx.moveTo(-chW/2,y+chH/2);
-    ctx.lineTo(0,y-chH/2);
-    ctx.lineTo(chW/2,y+chH/2);
+    ctx.moveTo(-chW/2, y+chH/2);
+    ctx.lineTo(0,      y-chH/2);
+    ctx.lineTo( chW/2, y+chH/2);
     ctx.stroke();ctx.restore();
   }
+  ctx.restore(); // end rotation
 
-  // Arrow label below
-  ctx.globalAlpha=0.85*pulse;
+  // Label — NOT rotated, always readable
+  ctx.save();
+  ctx.translate(ex,ey);
+  ctx.globalAlpha=0.9*pulse;
   ctx.fillStyle=col;
   ctx.font='bold 11px Orbitron,monospace';
   ctx.textAlign='center';ctx.textBaseline='top';
   ctx.shadowColor=col;ctx.shadowBlur=8;
-  ctx.fillText(goR?'► DIREITA':'◄ ESQUERDA',0,spacing*2+4);
+  ctx.fillText(goR?'► DIREITA':'◄ ESQUERDA', 0, numChev*spacing/2+6);
   ctx.restore();
 }
 
