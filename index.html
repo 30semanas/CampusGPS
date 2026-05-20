@@ -876,7 +876,7 @@ function drawRoute(ctx,W,H,camH,col,r,g,b){
   ctx.beginPath();ctx.arc(ox,oy,6,0,Math.PI*2);
   ctx.fillStyle='rgba('+rr2+',' +gg2+',' +bb2+',' +0.85+')';ctx.shadowColor=routeColor;ctx.shadowBlur=14;ctx.fill();ctx.shadowBlur=0;
   ctx.beginPath();ctx.arc(ox,oy,10+4*Math.sin(animT*3),0,Math.PI*2);
-  ctx.strokeStyle='rgba('+rr2+',' +gg2+',' +bb2+',' +${0.3+0.2*Math.sin(animT*3)}+')';ctx.lineWidth=2;ctx.stroke();
+  ctx.strokeStyle='rgba('+rr2+','+gg2+','+bb2+','+(0.3+0.2*Math.sin(animT*3))+')';ctx.lineWidth=2;ctx.stroke();
   ctx.restore();
 }
 
@@ -886,12 +886,12 @@ function drawPin(ctx,x,y,sc,d,col,r,g,b,pulse){
   // sombra chão
   ctx.save();ctx.scale(1,0.28);
   var sg=ctx.createRadialGradient(0,sz*1.65/0.28,0,0,sz*1.65/0.28,sz*0.8);
-  sg.addColorStop(0,'rgba('+r+',' +g+',' +b+',' +${0.55*sc}+')');sg.addColorStop(1,'transparent');
+  sg.addColorStop(0,'rgba('+r+','+g+','+b+','+(0.55*sc)+')');sg.addColorStop(1,'transparent');
   ctx.fillStyle=sg;ctx.beginPath();ctx.ellipse(0,sz*1.65/0.28,sz*0.75,sz*0.5,0,0,Math.PI*2);ctx.fill();ctx.restore();
   // anel chão
   ctx.save();ctx.scale(1,0.32);
   ctx.beginPath();ctx.arc(0,sz*1.65/0.32,sz*(0.5+pulse*0.35),0,Math.PI*2);
-  ctx.strokeStyle='rgba('+r+',' +g+',' +b+',' +${(1-pulse)*0.5}+')';ctx.lineWidth=2*sc;ctx.stroke();ctx.restore();
+  ctx.strokeStyle='rgba('+r+','+g+','+b+','+((1-pulse)*0.5)+')';ctx.lineWidth=2*sc;ctx.stroke();ctx.restore();
   // gota
   var pinH=sz*1.6,cr=sz*0.52,topY=-pinH,circY=topY+cr;
   var grad=ctx.createLinearGradient(0,topY,0,0);
