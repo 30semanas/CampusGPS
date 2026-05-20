@@ -300,6 +300,7 @@ const DEFAULT=[
   {id:40,name:"Stands",lat:-23.194647,lng:-45.859300,category:"Outras",floor:"Térreo"},
   {id:41,name:"Mirante da Cruz do Calvário",lat:-23.190711,lng:-45.860419,category:"Outras",floor:"Térreo"},
   {id:42,name:"Sala de Projeção",lat:-23.193872,lng:-45.860444,category:"Outras",floor:"2 andar"},
+  {id:43,name:"Teste",lat:-23.216019901954436,lng:-45.85332795519363,category:"Outras",floor:"Térreo"},
 ];
 
 // ── STATE ──
@@ -440,6 +441,8 @@ function drawAR(ctx,W,H){
   const col=CAT_COLOR[dest.category]||'#a855f7';
   const [r,g,b]=hexRGB(col);
   const pulse=0.5+0.5*Math.sin(animT*2.4);
+  // Linha flutuante da posição até o destino
+  drawPath(ctx,W,H,camH,br,d3);
   if(onscreen) drawPin(ctx,Math.max(50,Math.min(W-50,sx)),py,sc,d3,col,r,g,b,pulse);
   else drawEdge(ctx,relDeg,W,H,col);
   // bússola HUD
@@ -454,6 +457,73 @@ function drawAR(ctx,W,H){
     else lbl='← ESQUERDA';
     document.getElementById('cdir').textContent=lbl;
   }
+}
+
+function drawPath(ctx,W,H,camH,br,d3){
+  if(!uLat||!dest) return;
+  // Origin: bottom-center of screen (user position)
+  const ox=W/2, oy=H*0.88;
+  // Destination projected on screen
+  const FOV=65;
+  const hasSensor=camH!==null;
+  let relDeg=0;
+  if(hasSensor) relDeg=((br-camH)+540)%360-180;
+  const sx=hasSensor?W/2+(relDeg/(FOV/2))*(W/2):W/2;
+  const fh=FLOOR_H[dest.floor]||0;
+  const maxD=120, prog=Math.min(d3,maxD)/maxD;
+  const sc=Math.max(0.28,1-prog*0.72);
+  const gy=H*0.70, hz=H*0.38;
+  let py=(gy-(gy-hz)*prog)-(fh/18)*(H*0.22)*sc*(1-prog*0.5);
+  // Destination pin base point
+  const dx=hasSensor?Math.max(50,Math.min(W-50,sx)):W/2;
+  const dy=py;
+  const col=CAT_COLOR[dest.category]||'#a855f7';
+  const [r,g,b]=hexRGB(col);
+  // Control point for bezier curve (arc upward in the middle)
+  const cpx=(ox+dx)/2;
+  const cpy=Math.min(oy,dy)-H*0.18;
+  // Draw glowing path
+  ctx.save();
+  // Outer glow
+  ctx.beginPath();
+  ctx.moveTo(ox,oy);
+  ctx.quadraticCurveTo(cpx,cpy,dx,dy);
+  ctx.strokeStyle=`rgba(${r},${g},${b},0.18)`;
+  ctx.lineWidth=12;
+  ctx.lineCap='round';
+  ctx.filter='blur(8px)';
+  ctx.stroke();
+  // Mid glow
+  ctx.beginPath();
+  ctx.moveTo(ox,oy);
+  ctx.quadraticCurveTo(cpx,cpy,dx,dy);
+  ctx.strokeStyle=`rgba(${r},${g},${b},0.28)`;
+  ctx.lineWidth=5;
+  ctx.filter='blur(3px)';
+  ctx.stroke();
+  // Core line
+  ctx.filter='none';
+  ctx.beginPath();
+  ctx.moveTo(ox,oy);
+  ctx.quadraticCurveTo(cpx,cpy,dx,dy);
+  const linGrad=ctx.createLinearGradient(ox,oy,dx,dy);
+  linGrad.addColorStop(0,`rgba(${r},${g},${b},0.0)`);
+  linGrad.addColorStop(0.2,`rgba(${r},${g},${b},0.55)`);
+  linGrad.addColorStop(0.7,`rgba(${r},${g},${b},0.7)`);
+  linGrad.addColorStop(1,`rgba(${r},${g},${b},0.0)`);
+  ctx.strokeStyle=linGrad;
+  ctx.lineWidth=2;
+  ctx.setLineDash([8,10]);
+  ctx.lineDashOffset=-animT*12;
+  ctx.stroke();
+  ctx.setLineDash([]);
+  // Dot at origin (user position)
+  ctx.beginPath();
+  ctx.arc(ox,oy,5,0,Math.PI*2);
+  ctx.fillStyle=`rgba(${r},${g},${b},0.7)`;
+  ctx.shadowColor=col; ctx.shadowBlur=12;
+  ctx.fill(); ctx.shadowBlur=0;
+  ctx.restore();
 }
 
 function drawPin(ctx,x,y,sc,d,col,r,g,b,pulse){
