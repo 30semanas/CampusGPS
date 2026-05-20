@@ -181,7 +181,18 @@ html,body{width:100%;height:100dvh;overflow:hidden;background:#000;font-family:"
     <div class="hp"><div class="hp-lbl">Precisão GPS</div><div class="hp-val sm" id="hacc">–</div></div>
   </div>
   <div class="hcomp">
-    <div class="cring"><svg id="carr" width="44" height="44" viewBox="0 0 44 44" fill="none" style="transition:transform .4s cubic-bezier(.4,0,.2,1)"><defs><filter id="fg"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><path d="M22 5L29 33L22 27L15 33Z" fill="#00e5ff" filter="url(#fg)"/><circle cx="22" cy="22" r="3" fill="rgba(0,229,255,.3)"/></svg></div>
+    <div class="cring"><svg id="carr" width="56" height="56" viewBox="0 0 56 56" fill="none" style="transition:transform .5s cubic-bezier(.4,0,.2,1)">
+  <defs>
+    <filter id="neon1"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="neon2"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <!-- Chevron 1 (back, faint) -->
+  <polyline points="14,38 28,18 42,38" fill="none" stroke="#00e5ff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.3" filter="url(#neon1)"/>
+  <!-- Chevron 2 (mid) -->
+  <polyline points="14,32 28,12 42,32" fill="none" stroke="#00e5ff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.65" filter="url(#neon1)"/>
+  <!-- Chevron 3 (front, bright) -->
+  <polyline points="14,26 28,6 42,26" fill="none" stroke="#00e5ff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="1" filter="url(#neon2)"/>
+</svg></div>
     <div class="clbl" id="cdir">–</div>
   </div>
   <div id="arrived"><div class="arr-box"><div style="font-size:44px">✅</div><div style="font-family:Orbitron,monospace;font-size:18px;font-weight:900;color:#00e676;margin-top:6px">CHEGOU!</div><div style="font-size:13px;color:rgba(255,255,255,.55);margin-top:4px" id="arrsub">–</div></div></div>
@@ -204,6 +215,16 @@ html,body{width:100%;height:100dvh;overflow:hidden;background:#000;font-family:"
   <div class="ahdr"><div class="ibtn" id="admback"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></div><h2>Gerenciar Locais</h2><button class="abtn" id="btnadd">+ Novo</button></div>
   <div class="asrch"><div class="sbox"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input type="text" id="asrch" placeholder="Filtrar..."></div></div>
   <div class="alist" id="alist"></div>
+  <div style="padding:14px 16px 30px;flex-shrink:0;border-top:1px solid #1a2d46">
+    <div style="font-size:9px;color:rgba(0,229,255,.5);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px">Google Maps API Key</div>
+    <div style="display:flex;gap:8px">
+      <input id="mapsKeyInput" type="text" placeholder="Cole sua API Key aqui para rotas reais" 
+        style="flex:1;background:#111e2f;border:1px solid #1a2d46;border-radius:9px;padding:9px 12px;color:#dceeff;font-family:Rajdhani,sans-serif;font-size:13px;outline:none"
+        value="">
+      <button onclick="saveMapsKey()" style="padding:9px 16px;background:#00e5ff;border:none;border-radius:9px;color:#000;font-family:Rajdhani,sans-serif;font-size:13px;font-weight:700;cursor:pointer">Salvar</button>
+    </div>
+    <div style="font-size:11px;color:#3d5a7a;margin-top:6px">Ative: Maps JS API + Directions API no Google Cloud</div>
+  </div>
 </div>
 
 <div class="mbg" id="mbg">
@@ -480,33 +501,64 @@ function fetchRoutes(oLat,oLng,dLat,dLng){
     points:[{lat:oLat,lng:oLng},{lat:dLat,lng:dLng}]
   }];
   if(!key){
-    routeOptions=fallback;
-    activeRoute=routeOptions[0].points;
+    routeOptions=fallback;activeRoute=routeOptions[0].points;
     return Promise.resolve();
   }
   var colors=['#00e5ff','#00e676','#ffd600'];
   var labels=['Rota mais rápida','Rota alternativa','Rota panorâmica'];
-  var url='https://maps.googleapis.com/maps/api/directions/json?origin='+oLat+','+oLng+'&destination='+dLat+','+dLng+'&mode=walking&alternatives=true&key='+key;
-  return fetch(url).then(function(resp){return resp.json();}).then(function(data){
-    if(data.status==='OK'&&data.routes.length>0){
-      routeOptions=data.routes.map(function(r,i){
-        return{
-          label:labels[i]||'Rota '+(i+1),
-          color:colors[i]||'#a855f7',
-          type:'maps',
-          duration:r.legs[0].duration.text,
-          distance:r.legs[0].distance.text,
-          steps:r.legs[0].steps.slice(0,4).map(function(s){return s.html_instructions.replace(/<[^>]+>/g,'');}),
-          points:decodePolyline(r.overview_polyline.points)
-        };
+
+  // Usa Maps JS API (DirectionsService) se já carregada, senão carrega agora
+  return loadMapsAPI(key).then(function(){
+    return new Promise(function(resolve){
+      var svc=new google.maps.DirectionsService();
+      svc.route({
+        origin:new google.maps.LatLng(oLat,oLng),
+        destination:new google.maps.LatLng(dLat,dLng),
+        travelMode:google.maps.TravelMode.WALKING,
+        provideRouteAlternatives:true
+      },function(result,status){
+        if(status==='OK'&&result.routes.length>0){
+          routeOptions=result.routes.map(function(r,i){
+            // Extrai todos os waypoints do steps para rota detalhada
+            var pts=[];
+            r.legs[0].steps.forEach(function(step){
+              step.path.forEach(function(ll){pts.push({lat:ll.lat(),lng:ll.lng()});});
+            });
+            if(!pts.length){pts=[{lat:oLat,lng:oLng},{lat:dLat,lng:dLng}];}
+            return{
+              label:labels[i]||'Rota '+(i+1),
+              color:colors[i]||'#a855f7',
+              type:'maps',
+              duration:r.legs[0].duration.text,
+              distance:r.legs[0].distance.text,
+              steps:r.legs[0].steps.slice(0,4).map(function(s){return s.instructions?s.instructions.replace(/<[^>]+>/g,''):'';}),
+              points:pts
+            };
+          });
+        } else {
+          routeOptions=fallback;
+        }
+        activeRoute=routeOptions[0].points;
+        resolve();
       });
-    } else {
-      routeOptions=fallback;
-    }
-    activeRoute=routeOptions[0].points;
+    });
   }).catch(function(){
-    routeOptions=fallback;
-    activeRoute=routeOptions[0].points;
+    routeOptions=fallback;activeRoute=routeOptions[0].points;
+    return Promise.resolve();
+  });
+}
+
+// Carrega Google Maps JS API dinamicamente (sem CORS)
+function loadMapsAPI(key){
+  if(window.google&&window.google.maps&&window.google.maps.DirectionsService){
+    return Promise.resolve();
+  }
+  return new Promise(function(resolve,reject){
+    window._mapsReady=function(){resolve();};
+    var s=document.createElement('script');
+    s.src='https://maps.googleapis.com/maps/api/js?key='+key+'&callback=_mapsReady&libraries=geometry';
+    s.onerror=function(){reject(new Error('Maps load failed'));};
+    document.head.appendChild(s);
   });
 }
 
@@ -737,19 +789,50 @@ function drawPin(ctx,x,y,sc,d,col,r,g,b,pulse){
 }
 
 function drawEdge(ctx,relDeg,W,H,col){
-  const pulse=0.6+0.4*Math.sin(animT*3.5);
-  const goR=relDeg>0,ex=goR?W-20:20,ey=H*0.5;
-  ctx.save();ctx.translate(ex,ey);
-  ctx.beginPath();ctx.arc(0,0,34,0,Math.PI*2);ctx.fillStyle='rgba(0,0,0,0.6)';ctx.fill();
-  ctx.strokeStyle=col;ctx.lineWidth=2;ctx.globalAlpha=pulse;ctx.stroke();
-  for(let i=0;i<3;i++){
-    const off=(goR?1:-1)*(i*9-9);
+  var pulse=0.55+0.45*Math.sin(animT*3.5);
+  var goR=relDeg>0;
+  // Neon chevrons pointing left or right
+  var cx=goR?W-52:52, cy=H*0.5;
+  var dir=goR?1:-1;
+  ctx.save();
+  ctx.translate(cx,cy);
+  // Background circle
+  ctx.beginPath();ctx.arc(0,0,42,0,Math.PI*2);
+  ctx.fillStyle='rgba(0,0,0,0.55)';ctx.fill();
+  ctx.strokeStyle=col;ctx.lineWidth=1.5;ctx.globalAlpha=0.4*pulse;ctx.stroke();
+  ctx.globalAlpha=1;
+  // Draw 3 neon chevrons pointing in direction
+  var chevW=18,chevH=14;
+  for(var i=0;i<3;i++){
+    var ox=dir*(i*12-12);
+    var alpha=pulse*(0.3+i*0.35);
+    var lw=2+i*0.8;
+    // Glow pass
+    ctx.save();
+    ctx.shadowColor=col;ctx.shadowBlur=12+i*4;
+    ctx.strokeStyle=col;ctx.lineWidth=lw+2;ctx.globalAlpha=alpha*0.4;
+    ctx.lineCap='round';ctx.lineJoin='round';
     ctx.beginPath();
-    if(goR){ctx.moveTo(off-8,-12);ctx.lineTo(off+5,0);ctx.lineTo(off-8,12);}
-    else{ctx.moveTo(off+8,-12);ctx.lineTo(off-5,0);ctx.lineTo(off+8,12);}
-    ctx.strokeStyle=col;ctx.lineWidth=Math.max(1.5,3-i*.7);ctx.lineJoin='round';
-    ctx.globalAlpha=pulse*(1-i*0.28);ctx.stroke();
+    ctx.moveTo(ox-dir*chevW*0.5,-chevH*0.5);
+    ctx.lineTo(ox+dir*chevW*0.5,0);
+    ctx.lineTo(ox-dir*chevW*0.5,chevH*0.5);
+    ctx.stroke();ctx.restore();
+    // Bright pass
+    ctx.save();
+    ctx.shadowColor=col;ctx.shadowBlur=6;
+    ctx.strokeStyle=col;ctx.lineWidth=lw;ctx.globalAlpha=alpha;
+    ctx.lineCap='round';ctx.lineJoin='round';
+    ctx.beginPath();
+    ctx.moveTo(ox-dir*chevW*0.5,-chevH*0.5);
+    ctx.lineTo(ox+dir*chevW*0.5,0);
+    ctx.lineTo(ox-dir*chevW*0.5,chevH*0.5);
+    ctx.stroke();ctx.restore();
   }
+  // Label
+  ctx.globalAlpha=pulse;
+  ctx.fillStyle=col;ctx.font='bold 10px Orbitron,monospace';
+  ctx.textAlign='center';ctx.textBaseline='top';
+  ctx.fillText(goR?'DIR':'ESQ',0,28);
   ctx.restore();
 }
 function rr(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();}
@@ -820,7 +903,17 @@ function stopCamera(){
 }
 
 // ── MAPS API KEY ──
-function saveMapsKey(key){localStorage.setItem('mapsApiKey',key);}
+function saveMapsKey(){
+  var inp=document.getElementById('mapsKeyInput');
+  if(!inp)return;
+  var key=inp.value.trim();
+  localStorage.setItem('mapsApiKey',key);
+  toast(key?'Chave salva ✓':'Chave removida');
+}
+function loadMapsKeyInput(){
+  var inp=document.getElementById('mapsKeyInput');
+  if(inp)inp.value=localStorage.getItem('mapsApiKey')||'';
+}
 
 // ── NAV ──
 function startNav(loc){
@@ -910,8 +1003,7 @@ function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t
 // ── EVENTS ──
 document.getElementById('sinput').addEventListener('input',renderList);
 document.getElementById('fab').addEventListener('click',()=>{
-  // Mostra input da API key no admin
-  renderAdmin();showScreen('admin');
+  renderAdmin();loadMapsKeyInput();showScreen('admin');
 });
 document.getElementById('admback').addEventListener('click',()=>showScreen('home'));
 document.getElementById('arback').addEventListener('click',goHome);
