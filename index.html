@@ -8,16 +8,12 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{width:100%;height:100dvh;overflow:hidden;background:#000;font-family:'Rajdhani',sans-serif;color:#dceeff;position:fixed;inset:0}
-
-/* SCREENS */
+html,body{width:100%;height:100dvh;overflow:hidden;background:#000;font-family:"Rajdhani",sans-serif;color:#dceeff;position:fixed;inset:0}
 .screen{display:none;width:100%;height:100%;flex-direction:column;overflow:hidden;position:absolute;inset:0}
 .screen.active{display:flex}
-
-/* HOME */
 #home{background:linear-gradient(160deg,#040810,#091220)}
 .htop{padding:48px 20px 8px;flex-shrink:0}
-.htitle{font-family:'Orbitron',monospace;font-size:22px;font-weight:900;letter-spacing:1px}
+.htitle{font-family:"Orbitron",monospace;font-size:22px;font-weight:900;letter-spacing:1px}
 .htitle span{color:#00e5ff;text-shadow:0 0 16px rgba(0,229,255,.5)}
 .hsub{font-size:12px;color:#3d5a7a;margin-top:3px}
 .gbar{display:flex;align-items:center;gap:8px;padding:6px 20px;flex-shrink:0}
@@ -27,7 +23,7 @@ html,body{width:100%;height:100dvh;overflow:hidden;background:#000;font-family:'
 .gtxt{font-size:11px;color:#3d5a7a}
 .swrap{padding:8px 20px;flex-shrink:0}
 .sbox{background:#111e2f;border:1px solid #1a2d46;border-radius:13px;display:flex;align-items:center;gap:9px;padding:10px 14px}
-.sbox input{background:none;border:none;outline:none;color:#dceeff;font-family:'Rajdhani',sans-serif;font-size:15px;flex:1}
+.sbox input{background:none;border:none;outline:none;color:#dceeff;font-family:"Rajdhani",sans-serif;font-size:15px;flex:1}
 .sbox input::placeholder{color:#3d5a7a}
 .sbox svg{color:#3d5a7a;flex-shrink:0}
 .cscroll{display:flex;gap:7px;overflow-x:auto;padding:0 20px 8px;flex-shrink:0;scrollbar-width:none}
@@ -36,68 +32,81 @@ html,body{width:100%;height:100dvh;overflow:hidden;background:#000;font-family:'
 .cpill.on{background:#00e5ff;border-color:#00e5ff;color:#000}
 .llist{flex:1;overflow-y:auto;padding:0 20px 80px;display:flex;flex-direction:column;gap:8px;-webkit-overflow-scrolling:touch}
 .lcard{background:#111e2f;border:1px solid #1a2d46;border-radius:13px;padding:13px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;position:relative;overflow:hidden}
-.lcard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--cc,#00e5ff);border-radius:3px 0 0 3px}
+.lcard::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--cc,#00e5ff);border-radius:3px 0 0 3px}
 .lcard:active{opacity:.75}
 .lic{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
 .lname{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lmeta{font-size:11px;color:#3d5a7a;margin-top:2px}
-.ldist{font-size:11px;font-weight:700;color:#00e5ff;white-space:nowrap;font-family:'Orbitron',monospace;margin-left:auto;flex-shrink:0}
+.ldist{font-size:11px;font-weight:700;color:#00e5ff;white-space:nowrap;font-family:"Orbitron",monospace;margin-left:auto;flex-shrink:0}
 .fab{position:fixed;bottom:22px;right:22px;width:54px;height:54px;border-radius:50%;background:#111e2f;border:1.5px solid #00e5ff;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;box-shadow:0 0 18px rgba(0,229,255,.2);z-index:99}
-
 /* AR */
 #ar{background:#000}
 #vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
 #cvs{position:absolute;inset:0;width:100%;height:100%;z-index:5;pointer-events:none}
-
-/* HUD TOP */
 .htop-ar{position:absolute;top:0;left:0;right:0;z-index:20;padding:44px 14px 0;display:flex;align-items:flex-start;gap:10px;pointer-events:all}
 .hback{width:44px;height:44px;border-radius:50%;background:rgba(0,0,0,.65);border:1.5px solid rgba(0,229,255,.4);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#00e5ff;flex-shrink:0}
 .hdest{flex:1;background:rgba(0,0,0,.65);backdrop-filter:blur(10px);border:1.5px solid rgba(0,229,255,.25);border-radius:12px;padding:8px 13px}
 .hdest-lbl{font-size:9px;color:rgba(0,229,255,.6);letter-spacing:1.5px;text-transform:uppercase}
-.hdest-name{font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hdest-name{font-family:"Orbitron",monospace;font-size:13px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hdest-floor{font-size:10px;color:rgba(255,255,255,.45);margin-top:1px}
 .hclock{flex-shrink:0;background:rgba(0,0,0,.72);backdrop-filter:blur(10px);border:1.5px solid rgba(0,229,255,.25);border-radius:12px;padding:7px 12px;text-align:right}
-.hclock-t{font-family:'Orbitron',monospace;font-size:20px;font-weight:700;line-height:1}
+.hclock-t{font-family:"Orbitron",monospace;font-size:20px;font-weight:700;line-height:1}
 .hclock-d{font-size:9px;color:#3d5a7a;margin-top:2px}
-
-/* HUD SENSOR */
-.hsensor{position:absolute;top:108px;right:14px;z-index:20;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);border:1px solid #1a2d46;border-radius:8px;padding:4px 10px;font-size:10px;color:#3d5a7a;font-family:'Orbitron',monospace;display:flex;align-items:center;gap:5px}
+.hsensor{position:absolute;top:108px;right:14px;z-index:20;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);border:1px solid #1a2d46;border-radius:8px;padding:4px 10px;font-size:10px;color:#3d5a7a;font-family:"Orbitron",monospace;display:flex;align-items:center;gap:5px}
 .sdot{width:6px;height:6px;border-radius:50%;background:#3d5a7a;flex-shrink:0}
 .sdot.on{background:#00e676;box-shadow:0 0 5px #00e676}
-
-/* HUD PANELS LEFT */
+/* BARÔMETRO HUD */
+.hbaro{position:absolute;top:145px;right:14px;z-index:20;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);border:1px solid rgba(0,229,255,.2);border-radius:8px;padding:5px 10px;text-align:right}
+.hbaro-lbl{font-size:8px;color:rgba(0,229,255,.5);letter-spacing:1px;text-transform:uppercase}
+.hbaro-val{font-family:"Orbitron",monospace;font-size:13px;font-weight:700;color:#00e5ff;line-height:1.2}
+.hbaro-diff{font-size:10px;margin-top:2px;font-weight:600}
+/* FLOOR INDICATOR */
+.hfloor{position:absolute;top:210px;right:14px;z-index:20;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);border-radius:10px;padding:8px 12px;text-align:center;min-width:64px}
+.hfloor-icon{font-size:20px;line-height:1}
+.hfloor-txt{font-size:10px;color:#00e5ff;font-family:"Orbitron",monospace;margin-top:3px;letter-spacing:.5px}
+.hfloor-arrow{font-size:18px;animation:bob .8s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+/* HUD PANELS */
 .hpanels{position:absolute;bottom:0;left:0;z-index:20;padding:0 0 30px 14px;display:flex;flex-direction:column;gap:7px;pointer-events:none}
 .hp{background:rgba(0,0,0,.75);backdrop-filter:blur(12px);border:1px solid rgba(0,229,255,.2);border-left:2.5px solid #00e5ff;border-radius:10px;padding:7px 13px;min-width:160px}
 .hp-lbl{font-size:9px;color:rgba(0,229,255,.5);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:2px}
-.hp-val{font-family:'Orbitron',monospace;font-weight:700;color:#00e5ff;line-height:1}
+.hp-val{font-family:"Orbitron",monospace;font-weight:700;color:#00e5ff;line-height:1}
 .hp-val.big{font-size:26px}
 .hp-val.med{font-size:12px;color:#dceeff}
 .hp-val.sm{font-size:13px}
-
-/* HUD COMPASS RIGHT */
 .hcomp{position:absolute;bottom:30px;right:14px;z-index:20;display:flex;flex-direction:column;align-items:center;gap:5px;pointer-events:none}
 .cring{width:74px;height:74px;border-radius:50%;background:rgba(0,0,0,.72);backdrop-filter:blur(12px);border:2px solid rgba(0,229,255,.3);display:flex;align-items:center;justify-content:center}
-.clbl{font-family:'Orbitron',monospace;font-size:10px;font-weight:700;color:#00e5ff;background:rgba(0,0,0,.6);padding:3px 8px;border-radius:6px;border:1px solid rgba(0,229,255,.2);white-space:nowrap}
-
-/* PERM OVERLAY */
+.clbl{font-family:"Orbitron",monospace;font-size:10px;font-weight:700;color:#00e5ff;background:rgba(0,0,0,.6);padding:3px 8px;border-radius:6px;border:1px solid rgba(0,229,255,.2);white-space:nowrap}
+/* PERMISSION */
 #perm{position:absolute;bottom:170px;left:50%;transform:translateX(-50%);z-index:30;display:none;flex-direction:column;align-items:center;gap:10px;background:rgba(0,0,0,.8);backdrop-filter:blur(12px);border:1.5px solid #00e5ff;border-radius:16px;padding:18px 24px;text-align:center;min-width:260px}
 #perm.show{display:flex}
-.perm-btn{padding:11px 0;background:#00e5ff;border:none;border-radius:10px;color:#000;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;cursor:pointer;width:100%}
-
+.perm-btn{padding:11px 0;background:#00e5ff;border:none;border-radius:10px;color:#000;font-family:"Rajdhani",sans-serif;font-size:15px;font-weight:700;cursor:pointer;width:100%}
+/* ROUTE PICKER MODAL */
+#routepicker{position:absolute;inset:0;z-index:60;display:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
+#routepicker.show{display:flex}
+.rp-box{background:#0d1623;border:1px solid #1a2d46;border-radius:20px 20px 0 0;width:100%;max-width:500px;padding:20px;max-height:70vh;overflow-y:auto}
+.rp-title{font-family:"Orbitron",monospace;font-size:15px;font-weight:700;margin-bottom:16px;color:#dceeff}
+.rp-option{background:#111e2f;border:1px solid #1a2d46;border-radius:12px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:all .2s}
+.rp-option:hover,.rp-option.selected{border-color:#00e5ff;background:#0d1f33}
+.rp-option-header{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.rp-badge{padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;font-family:"Orbitron",monospace}
+.rp-time{font-family:"Orbitron",monospace;font-size:18px;font-weight:900;color:#00e5ff}
+.rp-dist{font-size:12px;color:#3d5a7a;margin-left:auto}
+.rp-steps{font-size:12px;color:#7a9ab5;line-height:1.6;margin-top:4px}
+.rp-actions{display:flex;gap:10px;margin-top:14px}
+.rp-cancel{flex:1;padding:11px;background:#111e2f;border:1px solid #1a2d46;border-radius:10px;color:#dceeff;font-family:"Rajdhani",sans-serif;font-size:14px;font-weight:600;cursor:pointer}
+.rp-go{flex:2;padding:11px;background:#00e5ff;border:none;border-radius:10px;color:#000;font-family:"Rajdhani",sans-serif;font-size:14px;font-weight:700;cursor:pointer}
 /* ARRIVED */
 #arrived{position:absolute;inset:0;z-index:40;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.4);pointer-events:none}
 .arr-box{background:rgba(0,20,10,.9);backdrop-filter:blur(16px);border:2px solid #00e676;border-radius:20px;padding:24px 36px;text-align:center;animation:pop .4s cubic-bezier(.34,1.56,.64,1)}
 @keyframes pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
-
-/* CAM ERROR */
 #cmerr{position:absolute;inset:0;z-index:50;background:#060c14;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:40px;text-align:center}
-
 /* ADMIN */
 #admin{background:#060c14}
 .ahdr{padding:46px 18px 12px;background:#0d1623;border-bottom:1px solid #1a2d46;display:flex;align-items:center;gap:12px;flex-shrink:0}
-.ahdr h2{font-family:'Orbitron',monospace;font-size:15px;font-weight:700;flex:1}
+.ahdr h2{font-family:"Orbitron",monospace;font-size:15px;font-weight:700;flex:1}
 .ibtn{width:38px;height:38px;border-radius:10px;background:#111e2f;border:1px solid #1a2d46;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
-.abtn{padding:8px 15px;background:#00e5ff;border:none;border-radius:9px;color:#000;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;cursor:pointer}
+.abtn{padding:8px 15px;background:#00e5ff;border:none;border-radius:9px;color:#000;font-family:"Rajdhani",sans-serif;font-size:13px;font-weight:700;cursor:pointer}
 .asrch{padding:10px 18px;background:#0d1623;border-bottom:1px solid #1a2d46;flex-shrink:0}
 .alist{flex:1;overflow-y:auto;padding:10px 16px;display:flex;flex-direction:column;gap:7px}
 .aitem{background:#111e2f;border:1px solid #1a2d46;border-radius:11px;padding:11px 13px;display:flex;align-items:center;gap:11px}
@@ -107,77 +116,64 @@ html,body{width:100%;height:100dvh;overflow:hidden;background:#000;font-family:'
 .acat{font-size:11px;color:#3d5a7a;margin-top:1px}
 .abtns{display:flex;gap:6px;flex-shrink:0}
 .ebtn,.dbtn{width:30px;height:30px;border-radius:7px;border:1px solid #1a2d46;background:#0d1623;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px}
-
-/* MODAL */
 .mbg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);z-index:200;align-items:flex-end;justify-content:center}
 .mbg.open{display:flex}
 .modal{background:#0d1623;border:1px solid #1a2d46;border-radius:20px 20px 0 0;width:100%;max-width:500px;padding:22px;animation:sup .25s ease;max-height:90vh;overflow-y:auto}
 @keyframes sup{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.modal h3{font-family:'Orbitron',monospace;font-size:15px;font-weight:700;margin-bottom:18px}
+.modal h3{font-family:"Orbitron",monospace;font-size:15px;font-weight:700;margin-bottom:18px}
 .fg{margin-bottom:11px}
 .fg label{display:block;font-size:10px;color:#3d5a7a;margin-bottom:4px;letter-spacing:.6px;text-transform:uppercase}
-.fg input,.fg select{width:100%;background:#111e2f;border:1px solid #1a2d46;border-radius:9px;padding:10px 12px;color:#dceeff;font-family:'Rajdhani',sans-serif;font-size:14px;outline:none;-webkit-appearance:none}
+.fg input,.fg select{width:100%;background:#111e2f;border:1px solid #1a2d46;border-radius:9px;padding:10px 12px;color:#dceeff;font-family:"Rajdhani",sans-serif;font-size:14px;outline:none;-webkit-appearance:none}
 .fg input:focus,.fg select:focus{border-color:#00e5ff}
 .fg select option{background:#111e2f}
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .macts{display:flex;gap:9px;margin-top:16px}
-.mcnl{flex:1;padding:12px;background:#111e2f;border:1px solid #1a2d46;border-radius:10px;color:#dceeff;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;cursor:pointer}
-.msav{flex:1;padding:12px;background:#00e5ff;border:none;border-radius:10px;color:#000;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;cursor:pointer}
-
-/* TOAST */
+.mcnl{flex:1;padding:12px;background:#111e2f;border:1px solid #1a2d46;border-radius:10px;color:#dceeff;font-family:"Rajdhani",sans-serif;font-size:14px;font-weight:600;cursor:pointer}
+.msav{flex:1;padding:12px;background:#00e5ff;border:none;border-radius:10px;color:#000;font-family:"Rajdhani",sans-serif;font-size:14px;font-weight:700;cursor:pointer}
 .toast{position:fixed;top:60px;left:50%;transform:translateX(-50%);background:rgba(0,229,255,.12);border:1px solid rgba(0,229,255,.35);backdrop-filter:blur(10px);border-radius:999px;padding:9px 20px;font-size:13px;font-weight:600;z-index:500;opacity:0;pointer-events:none;transition:opacity .3s;white-space:nowrap;color:#00e5ff}
 .toast.show{opacity:1}
 </style>
 </head>
 <body>
-
-<!-- HOME -->
 <div class="screen active" id="home">
   <div class="htop">
     <div class="htitle">Campus <span>GPS</span></div>
     <div class="hsub">Igreja da Cidade · São José dos Campos</div>
   </div>
   <div class="gbar"><div class="gdot" id="gdot"></div><span class="gtxt" id="gtxt">Aguardando GPS...</span></div>
-  <div class="swrap">
-    <div class="sbox">
-      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input type="text" id="sinput" placeholder="Buscar local...">
-    </div>
-  </div>
+  <div class="swrap"><div class="sbox"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input type="text" id="sinput" placeholder="Buscar local..."></div></div>
   <div class="cscroll" id="catrow"></div>
   <div class="llist" id="llist"></div>
   <div class="fab" id="fab">⚙️</div>
 </div>
 
-<!-- AR -->
 <div class="screen" id="ar">
   <video id="vid" autoplay muted playsinline webkit-playsinline></video>
   <canvas id="cvs"></canvas>
   <div class="hsensor"><div class="sdot" id="sdot"></div><span id="stxt">bússola: –</span></div>
+  <div class="hbaro" id="hbaro" style="display:none">
+    <div class="hbaro-lbl">Altitude</div>
+    <div class="hbaro-val" id="hbaro-val">– m</div>
+    <div class="hbaro-diff" id="hbaro-diff"></div>
+  </div>
+  <div class="hfloor" id="hfloor" style="display:none">
+    <div class="hfloor-icon" id="hfloor-icon">🏢</div>
+    <div class="hfloor-txt" id="hfloor-txt">–</div>
+    <div class="hfloor-arrow" id="hfloor-arrow" style="display:none">⬆️</div>
+  </div>
   <div id="perm">
     <div style="font-size:30px">🧭</div>
     <div style="font-size:13px;line-height:1.5;color:#dceeff">Toque para ativar a<br><strong style="color:#00e5ff">bússola em tempo real</strong></div>
     <button class="perm-btn" id="btnperm">Ativar Bússola</button>
   </div>
-  <!-- Maps API key panel -->
-  <div id="mapspanel" style="position:absolute;top:108px;left:14px;z-index:20;background:rgba(0,0,0,.72);backdrop-filter:blur(10px);border:1px solid #1a2d46;border-radius:10px;padding:8px 12px;display:flex;align-items:center;gap:8px;max-width:calc(100% - 130px)">
-    <span style="font-size:10px;color:rgba(0,229,255,.55);letter-spacing:1px;white-space:nowrap;font-family:'Orbitron',monospace">MAPS KEY</span>
-    <input id="mapskey" type="text" placeholder="Cole sua Google Maps API Key (opcional)" style="background:none;border:none;outline:none;color:#dceeff;font-family:'Rajdhani',sans-serif;font-size:11px;flex:1;min-width:0" oninput="onMapsKeyChange()">
-    <div id="routestatus" style="font-size:10px;color:#3d5a7a;white-space:nowrap;font-family:'Orbitron',monospace">linha direta</div>
-  </div>
   <div class="htop-ar">
-    <div class="hback" id="arback">
-      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-    </div>
+    <div class="hback" id="arback"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></div>
     <div class="hdest">
       <div class="hdest-lbl">DESTINO</div>
       <div class="hdest-name" id="dname">–</div>
       <div class="hdest-floor" id="dfloor">–</div>
     </div>
-    <div class="hclock">
-      <div class="hclock-t" id="htime">00:00</div>
-      <div class="hclock-d" id="hdate">–</div>
-    </div>
+    <div class="hclock"><div class="hclock-t" id="htime">00:00</div><div class="hclock-d" id="hdate">–</div></div>
   </div>
   <div class="hpanels">
     <div class="hp"><div class="hp-lbl">Distância</div><div class="hp-val big" id="hdist">–</div></div>
@@ -185,84 +181,54 @@ html,body{width:100%;height:100dvh;overflow:hidden;background:#000;font-family:'
     <div class="hp"><div class="hp-lbl">Precisão GPS</div><div class="hp-val sm" id="hacc">–</div></div>
   </div>
   <div class="hcomp">
-    <div class="cring">
-      <svg id="carr" width="44" height="44" viewBox="0 0 44 44" fill="none" style="transition:transform .4s cubic-bezier(.4,0,.2,1)">
-        <defs><filter id="fg"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-        <path d="M22 5L29 33L22 27L15 33Z" fill="#00e5ff" filter="url(#fg)"/>
-        <circle cx="22" cy="22" r="3" fill="rgba(0,229,255,.3)"/>
-      </svg>
-    </div>
+    <div class="cring"><svg id="carr" width="44" height="44" viewBox="0 0 44 44" fill="none" style="transition:transform .4s cubic-bezier(.4,0,.2,1)"><defs><filter id="fg"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><path d="M22 5L29 33L22 27L15 33Z" fill="#00e5ff" filter="url(#fg)"/><circle cx="22" cy="22" r="3" fill="rgba(0,229,255,.3)"/></svg></div>
     <div class="clbl" id="cdir">–</div>
   </div>
-  <div id="arrived">
-    <div class="arr-box">
-      <div style="font-size:44px">✅</div>
-      <div style="font-family:'Orbitron',monospace;font-size:18px;font-weight:900;color:#00e676;margin-top:6px">CHEGOU!</div>
-      <div style="font-size:13px;color:rgba(255,255,255,.55);margin-top:4px" id="arrsub">–</div>
+  <div id="arrived"><div class="arr-box"><div style="font-size:44px">✅</div><div style="font-family:Orbitron,monospace;font-size:18px;font-weight:900;color:#00e676;margin-top:6px">CHEGOU!</div><div style="font-size:13px;color:rgba(255,255,255,.55);margin-top:4px" id="arrsub">–</div></div></div>
+  <div id="cmerr"><div style="font-size:54px">📷</div><div style="font-family:Orbitron,monospace;font-size:17px">Câmera Bloqueada</div><div style="font-size:13px;color:#3d5a7a;max-width:270px;line-height:1.6">Permita câmera nas configurações e recarregue.</div><button class="msav" style="width:160px;margin-top:8px" onclick="goHome()">Voltar</button></div>
+</div>
+
+<!-- ROUTE PICKER -->
+<div id="routepicker">
+  <div class="rp-box">
+    <div class="rp-title">🗺️ Escolha sua rota</div>
+    <div id="rp-options"></div>
+    <div class="rp-actions">
+      <button class="rp-cancel" id="rp-cancel">Cancelar</button>
+      <button class="rp-go" id="rp-go">Usar esta rota →</button>
     </div>
-  </div>
-  <div id="cmerr">
-    <div style="font-size:54px">📷</div>
-    <div style="font-family:'Orbitron',monospace;font-size:17px">Câmera Bloqueada</div>
-    <div style="font-size:13px;color:#3d5a7a;max-width:270px;line-height:1.6">Permita o acesso à câmera nas configurações e recarregue.</div>
-    <button class="msav" style="width:160px" onclick="goHome()">Voltar</button>
   </div>
 </div>
 
-<!-- ADMIN -->
 <div class="screen" id="admin">
-  <div class="ahdr">
-    <div class="ibtn" id="admback"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></div>
-    <h2>Gerenciar Locais</h2>
-    <button class="abtn" id="btnadd">+ Novo</button>
-  </div>
-  <div class="asrch">
-    <div class="sbox">
-      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input type="text" id="asrch" placeholder="Filtrar...">
-    </div>
-  </div>
+  <div class="ahdr"><div class="ibtn" id="admback"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></div><h2>Gerenciar Locais</h2><button class="abtn" id="btnadd">+ Novo</button></div>
+  <div class="asrch"><div class="sbox"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input type="text" id="asrch" placeholder="Filtrar..."></div></div>
   <div class="alist" id="alist"></div>
 </div>
 
-<!-- MODAL -->
 <div class="mbg" id="mbg">
   <div class="modal">
     <h3 id="mtitle">Adicionar Local</h3>
     <div class="fg"><label>Nome</label><input id="fn" type="text" placeholder="Ex: Aud. Principal"></div>
-    <div class="fg"><label>Categoria</label>
-      <select id="fcat"><option>Auditório</option><option>Sanitário</option><option>SAC</option><option>Praça de Alimentação</option><option>Outras</option></select>
-    </div>
-    <div class="fg"><label>Andar</label>
-      <select id="ffloor">
-        <option value="Térreo">Térreo (nível do chão)</option>
-        <option value="1 andar">1º Andar (+5m)</option>
-        <option value="2 andar">2º Andar (+10m)</option>
-        <option value="3 andar">3º Andar (+15m)</option>
-      </select>
-    </div>
-    <div class="frow">
-      <div class="fg"><label>Latitude</label><input id="flat" type="number" step="0.000001" inputmode="decimal" placeholder="-23.194"></div>
-      <div class="fg"><label>Longitude</label><input id="flng" type="number" step="0.000001" inputmode="decimal" placeholder="-45.860"></div>
-    </div>
-    <div class="macts">
-      <button class="mcnl" id="mcnl">Cancelar</button>
-      <button class="msav" id="msav">Salvar</button>
-    </div>
+    <div class="fg"><label>Categoria</label><select id="fcat"><option>Auditório</option><option>Sanitário</option><option>SAC</option><option>Praça de Alimentação</option><option>Outras</option></select></div>
+    <div class="fg"><label>Andar</label><select id="ffloor"><option value="Térreo">Térreo</option><option value="1 andar">1º Andar (+5m)</option><option value="2 andar">2º Andar (+10m)</option><option value="3 andar">3º Andar (+15m)</option></select></div>
+    <div class="frow"><div class="fg"><label>Latitude</label><input id="flat" type="number" step="0.000001" inputmode="decimal" placeholder="-23.194"></div><div class="fg"><label>Longitude</label><input id="flng" type="number" step="0.000001" inputmode="decimal" placeholder="-45.860"></div></div>
+    <div class="macts"><button class="mcnl" id="mcnl">Cancelar</button><button class="msav" id="msav">Salvar</button></div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
 
 <script>
-// ── LIMPA localStorage de versões antigas ──
+// ── LIMPA localStorage antigo ──
 ['col_locs','col2_locs','col3_locs','col4_locs'].forEach(k=>localStorage.removeItem(k));
+const LSTORE='gpslocs_v2';
 
-// ── DADOS ──
+// ── CATEGORIAS ──
 const CAT_COLOR={"Auditório":"#5b6ef8","Sanitário":"#06b6d4","SAC":"#f59e0b","Praça de Alimentação":"#10b981","Outras":"#a855f7"};
 const CAT_ICON={"Auditório":"🎤","Sanitário":"🚻","SAC":"🩺","Praça de Alimentação":"🍽️","Outras":"📍"};
 const FLOOR_H={"Térreo":0,"1 andar":5,"2 andar":10,"3 andar":15};
-const LSTORE='gpslocs_v1';
 
+// ── LOCAIS ──
 const DEFAULT=[
   {id:1,name:"Aud. Principal",lat:-23.194017,lng:-45.860111,category:"Auditório",floor:"Térreo"},
   {id:2,name:"Aud. Estações",lat:-23.194114,lng:-45.859431,category:"Auditório",floor:"3 andar"},
@@ -311,16 +277,15 @@ const DEFAULT=[
 ];
 
 // ── STATE ──
-let locs = JSON.parse(localStorage.getItem(LSTORE)||'null') || DEFAULT;
-let uLat=null, uLng=null, uAcc=null;
-let headRaw=null, headSmooth=null, sensorOK=false;
-let dest=null, stream=null, raf=null;
-let routePoints=[]; // array de {lat,lng} da rota do Maps
-let routeStep=0;    // ponto mais próximo da rota
-let mapsKey='';     // Google Maps API key (opcional)
-let activeCat='Todos', editId=null, arrivedShown=false, animT=0;
+let locs=JSON.parse(localStorage.getItem(LSTORE)||'null')||DEFAULT;
+let uLat=null,uLng=null,uAcc=null;
+let headRaw=null,headSmooth=null,sensorOK=false;
+let baroAlt=null,baroRef=null; // altitude pelo barômetro
+let dest=null,stream=null,raf=null;
+let activeCat='Todos',editId=null,arrivedShown=false,animT=0;
+let routeOptions=[],selectedRoute=0,activeRoute=[];
 
-function saveLocs(){localStorage.setItem(LSTORE,JSON.stringify(locs))}
+function saveLocs(){localStorage.setItem(LSTORE,JSON.stringify(locs));}
 
 // ── GEO ──
 function dist(a,b,c,d){
@@ -334,53 +299,117 @@ function bearing(a,b,c,d){
   const x=Math.cos(a*Math.PI/180)*Math.sin(c*Math.PI/180)-Math.sin(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.cos(dO);
   return(Math.atan2(y,x)*180/Math.PI+360)%360;
 }
-function fmtD(m){return m>=1000?(m/1000).toFixed(2)+'km':Math.round(m)+'m'}
-function fmtC(v){return v!=null?v.toFixed(5):'–'}
+function fmtD(m){return m>=1000?(m/1000).toFixed(2)+'km':Math.round(m)+'m';}
+function fmtC(v){return v!=null?v.toFixed(5):'–';}
 function lerpA(cur,tgt,a){
   if(cur===null)return tgt;
-  let d=tgt-cur; if(d>180)d-=360; if(d<-180)d+=360;
+  let d=tgt-cur;if(d>180)d-=360;if(d<-180)d+=360;
   return(cur+d*a+360)%360;
 }
 
-// ── GPS ──
-// Kalman-like position smoother
-let kLat=null,kLng=null,kQ=0.0001,kR=0.01,kP=1;
-function kalmanUpdate(measured,prev,P){
-  const K=(P+kQ)/(P+kQ+kR);
-  const newVal=prev===null?measured:prev+K*(measured-prev);
-  const newP=(1-K)*(P+kQ);
-  return{val:newVal,P:newP};
+// ── KALMAN GPS ──
+let kLat=null,kLng=null,kP=1;
+function kalman(raw,prev,P){
+  const Q=0.00005,R=0.008,K=(P+Q)/(P+Q+R);
+  return{val:prev===null?raw:prev+K*(raw-prev),P:(1-K)*(P+Q)};
 }
 
+// ── GPS ──
 function startGPS(){
   if(!navigator.geolocation)return;
   navigator.geolocation.watchPosition(p=>{
-    const raw_lat=p.coords.latitude, raw_lng=p.coords.longitude;
     uAcc=Math.round(p.coords.accuracy);
-    // Smooth position with Kalman filter
-    const resLat=kalmanUpdate(raw_lat,kLat,kP);
-    const resLng=kalmanUpdate(raw_lng,kLng,kP);
-    kLat=resLat.val; kLng=resLng.val; kP=resLat.P;
-    uLat=kLat; uLng=kLng;
+    const rL=kalman(p.coords.latitude,kLat,kP);
+    const rO=kalman(p.coords.longitude,kLng,kP);
+    kLat=rL.val;kLng=rO.val;kP=rL.P;
+    uLat=kLat;uLng=kLng;
     document.getElementById('gdot').className='gdot on';
     document.getElementById('gtxt').textContent='GPS · ±'+uAcc+'m';
-    refreshHUD(); renderList();
-    // Update route if we have one
-    if(routePoints.length>0) updateRouteProgress();
+    refreshHUD();renderList();
+    updateRouteProgress();
   },()=>{
     document.getElementById('gdot').className='gdot warn';
     document.getElementById('gtxt').textContent='GPS indisponível';
   },{enableHighAccuracy:true,maximumAge:0,timeout:5000});
 }
 
-// ── COMPASS ──
+// ── BARÔMETRO ──
+function startBaro(){
+  // API: Sensor.AmbientPressure (Chrome Android) ou DeviceMotionEvent pressure
+  if(typeof AbsoluteOrientationSensor!=='undefined'||window.AmbientLightSensor){/* skip */}
+  // Tenta via Sensor API genérica
+  if('PressureSensor' in window){
+    try{
+      const ps=new PressureSensor({frequency:1});
+      ps.addEventListener('reading',()=>{
+        const p=ps.pressure; // hPa
+        // Fórmula barométrica: altitude = 44330*(1-(p/1013.25)^0.1903)
+        const alt=44330*(1-Math.pow(p/1013.25,0.1903));
+        updateBaro(alt);
+      });
+      ps.start();
+      return;
+    }catch(e){}
+  }
+  // Fallback: DeviceOrientationEvent não tem pressão; usa GPS altitude se disponível
+  navigator.geolocation.watchPosition(p=>{
+    if(p.coords.altitude!==null&&p.coords.altitudeAccuracy!==null&&p.coords.altitudeAccuracy<30){
+      updateBaro(p.coords.altitude);
+    }
+  },{enableHighAccuracy:true,maximumAge:0});
+}
+
+function updateBaro(alt){
+  baroAlt=alt;
+  if(baroRef===null) baroRef=alt;
+  const el=document.getElementById('hbaro');
+  if(el) el.style.display='block';
+  const valEl=document.getElementById('hbaro-val');
+  if(valEl) valEl.textContent=alt.toFixed(1)+' m';
+  updateFloorIndicator();
+}
+
+function updateFloorIndicator(){
+  if(!dest||baroAlt===null) return;
+  const targetFloorH=FLOOR_H[dest.floor]||0;
+  // Altitude relativa ao ponto de referência
+  const relAlt=baroRef!==null?baroAlt-baroRef:0;
+  const diffH=targetFloorH-relAlt;
+  const floorEl=document.getElementById('hfloor');
+  const iconEl=document.getElementById('hfloor-icon');
+  const txtEl=document.getElementById('hfloor-txt');
+  const arrEl=document.getElementById('hfloor-arrow');
+  const diffEl=document.getElementById('hbaro-diff');
+  if(floorEl) floorEl.style.display='block';
+  if(Math.abs(diffH)<2){
+    // Mesmo nível
+    if(iconEl) iconEl.textContent='✅';
+    if(txtEl) txtEl.textContent='NÍVEL OK';
+    if(arrEl) arrEl.style.display='none';
+    if(diffEl){diffEl.textContent='nível certo';diffEl.style.color='#00e676';}
+  } else if(diffH>0){
+    // Precisa subir
+    if(iconEl) iconEl.textContent='🏢';
+    if(txtEl) txtEl.textContent='SUBIR '+Math.round(diffH)+'m';
+    if(arrEl){arrEl.style.display='block';arrEl.textContent='⬆️';}
+    if(diffEl){diffEl.textContent='⬆ +'+Math.round(diffH)+'m';diffEl.style.color='#ffd600';}
+  } else {
+    // Precisa descer
+    if(iconEl) iconEl.textContent='🏢';
+    if(txtEl) txtEl.textContent='DESCER '+Math.round(Math.abs(diffH))+'m';
+    if(arrEl){arrEl.style.display='block';arrEl.textContent='⬇️';}
+    if(diffEl){diffEl.textContent='⬇ '+Math.round(diffH)+'m';diffEl.style.color='#f59e0b';}
+  }
+}
+
+// ── BÚSSOLA ──
 function onOri(e){
   let r=null;
   if(e.webkitCompassHeading!=null&&e.webkitCompassHeading>=0) r=e.webkitCompassHeading;
   else if(e.absolute&&e.alpha!=null) r=(360-e.alpha)%360;
   else if(e.alpha!=null) r=(360-e.alpha)%360;
   if(r===null)return;
-  headRaw=r; sensorOK=true;
+  headRaw=r;sensorOK=true;
   document.getElementById('sdot').className='sdot on';
   document.getElementById('stxt').textContent='bússola: '+Math.round(r)+'°';
 }
@@ -391,16 +420,12 @@ function regCompass(){
 function startCompass(){
   if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){
     document.getElementById('perm').classList.add('show');
-  } else {
-    regCompass();
-  }
-  setTimeout(()=>{
-    if(!sensorOK){document.getElementById('sdot').className='sdot';document.getElementById('stxt').textContent='bússola: sem sinal';}
-  },3000);
+  } else {regCompass();}
+  setTimeout(()=>{if(!sensorOK){document.getElementById('sdot').className='sdot';document.getElementById('stxt').textContent='bússola: sem sinal';}},3000);
 }
 document.getElementById('btnperm').addEventListener('click',()=>{
   DeviceOrientationEvent.requestPermission().then(s=>{
-    if(s==='granted') regCompass();
+    if(s==='granted')regCompass();
     document.getElementById('perm').classList.remove('show');
   }).catch(()=>document.getElementById('perm').classList.remove('show'));
 });
@@ -408,268 +433,296 @@ document.getElementById('btnperm').addEventListener('click',()=>{
 // ── CLOCK ──
 function tick(){
   const n=new Date(),p=v=>String(v).padStart(2,'0');
-  const el=document.getElementById('htime'); if(el) el.textContent=p(n.getHours())+':'+p(n.getMinutes())+':'+p(n.getSeconds());
+  const el=document.getElementById('htime');if(el)el.textContent=p(n.getHours())+':'+p(n.getMinutes())+':'+p(n.getSeconds());
   const days=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
   const mo=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-  const el2=document.getElementById('hdate'); if(el2) el2.textContent=days[n.getDay()]+' '+n.getDate()+' '+mo[n.getMonth()];
+  const el2=document.getElementById('hdate');if(el2)el2.textContent=days[n.getDay()]+' '+n.getDate()+' '+mo[n.getMonth()];
 }
-setInterval(tick,1000); tick();
+setInterval(tick,1000);tick();
 
 // ── HUD ──
 function refreshHUD(){
   if(!dest)return;
   const d=uLat!=null?dist(uLat,uLng,dest.lat,dest.lng):null;
-  const el=document.getElementById('hdist'); if(el) el.textContent=d!=null?fmtD(d):'–';
-  const el2=document.getElementById('hmpos'); if(el2) el2.textContent=uLat!=null?fmtC(uLat)+', '+fmtC(uLng):'Sem GPS';
-  const el3=document.getElementById('hacc');
-  if(el3){el3.textContent=uAcc!=null?'±'+uAcc+'m':'–'; el3.style.color=uAcc!=null&&uAcc<20?'#00e676':'#ffd600';}
+  const el=document.getElementById('hdist');if(el)el.textContent=d!=null?fmtD(d):'–';
+  const el2=document.getElementById('hmpos');if(el2)el2.textContent=uLat!=null?fmtC(uLat)+', '+fmtC(uLng):'Sem GPS';
+  const el3=document.getElementById('hacc');if(el3){el3.textContent=uAcc!=null?'±'+uAcc+'m':'–';el3.style.color=uAcc!=null&&uAcc<20?'#00e676':'#ffd600';}
+  updateFloorIndicator();
   if(d!=null&&d<8&&!arrivedShown){
     arrivedShown=true;
     document.getElementById('arrsub').textContent=dest.name+' · '+dest.floor;
-    const av=document.getElementById('arrived'); av.style.display='flex';
+    const av=document.getElementById('arrived');av.style.display='flex';
     setTimeout(()=>av.style.display='none',7000);
   }
-  if(d!=null&&d>15) arrivedShown=false;
+  if(d!=null&&d>15)arrivedShown=false;
 }
-setInterval(()=>{refreshHUD(); renderList();},3000);
+setInterval(()=>{refreshHUD();renderList();},3000);
 
-// ── CANVAS AR ──
-function startCanvas(){
-  const cv=document.getElementById('cvs');
-  const ctx=cv.getContext('2d');
-  const resize=()=>{cv.width=window.innerWidth; cv.height=window.innerHeight;};
-  resize(); window.addEventListener('resize',resize);
-  function frame(){
-    raf=requestAnimationFrame(frame);
-    if(headRaw!==null) headSmooth=lerpA(headSmooth,headRaw,0.12);
-    ctx.clearRect(0,0,cv.width,cv.height);
-    if(!dest) return;
-    animT+=0.04;
-    drawAR(ctx,cv.width,cv.height);
-  }
-  frame();
-}
-
-function drawAR(ctx,W,H){
-  if(uLat===null) return;
-  const d3=dist(uLat,uLng,dest.lat,dest.lng);
-  const br=bearing(uLat,uLng,dest.lat,dest.lng);
-  const camH=headSmooth;
-  const FOV=65;
-  let relDeg=0, hasSensor=camH!==null;
-  if(hasSensor) relDeg=((br-camH)+540)%360-180;
-  const onscreen=!hasSensor||Math.abs(relDeg)<(FOV/2+8);
-  const sx=hasSensor?W/2+(relDeg/(FOV/2))*(W/2):W/2;
-  const fh=FLOOR_H[dest.floor]||0;
-  const maxD=120, prog=Math.min(d3,maxD)/maxD;
-  const sc=Math.max(0.28,1-prog*0.72);
-  const gy=H*0.70, hz=H*0.38;
-  let py=(gy-(gy-hz)*prog)-(fh/18)*(H*0.22)*sc*(1-prog*0.5);
-  const col=CAT_COLOR[dest.category]||'#a855f7';
-  const [r,g,b]=hexRGB(col);
-  const pulse=0.5+0.5*Math.sin(animT*2.4);
-  // Linha flutuante da posição até o destino
-  drawPath(ctx,W,H,camH,br,d3);
-  if(onscreen) drawPin(ctx,Math.max(50,Math.min(W-50,sx)),py,sc,d3,col,r,g,b,pulse);
-  else drawEdge(ctx,relDeg,W,H,col);
-  // bússola HUD
-  if(hasSensor){
-    const rot=((br-camH)+360)%360;
-    document.getElementById('carr').style.transform='rotate('+rot+'deg)';
-    let lbl='';
-    if(Math.abs(relDeg)<12)lbl='▲ FRENTE';
-    else if(relDeg>0&&relDeg<75)lbl='↗ DIREITA';
-    else if(relDeg>=75)lbl='→ DIREITA';
-    else if(relDeg<0&&relDeg>-75)lbl='↖ ESQUERDA';
-    else lbl='← ESQUERDA';
-    document.getElementById('cdir').textContent=lbl;
-  }
-}
-
-// ── GOOGLE MAPS DIRECTIONS (se API key disponível) ──
-async function fetchRoute(oLat,oLng,dLat,dLng){
-  const key=document.getElementById('mapskey')?document.getElementById('mapskey').value.trim():'';
-  if(!key){
-    // Sem API key: rota direta (linha reta)
-    routePoints=[{lat:oLat,lng:oLng},{lat:dLat,lng:dLng}];
-    return;
-  }
-  try{
-    const url=`https://maps.googleapis.com/maps/api/directions/json?origin=${oLat},${oLng}&destination=${dLat},${dLng}&mode=walking&key=${key}`;
-    const r=await fetch(url);
-    const data=await r.json();
-    if(data.status==='OK'){
-      const pts=data.routes[0].overview_polyline.points;
-      routePoints=decodePolyline(pts);
-    } else {
-      routePoints=[{lat:oLat,lng:oLng},{lat:dLat,lng:dLng}];
-    }
-  } catch(e){
-    routePoints=[{lat:oLat,lng:oLng},{lat:dLat,lng:dLng}];
-  }
-}
-
-function decodePolyline(encoded){
-  const pts=[]; let idx=0,lat=0,lng=0;
-  while(idx<encoded.length){
+// ── GOOGLE MAPS DIRECTIONS – múltiplas rotas ──
+function decodePolyline(enc){
+  const pts=[];let idx=0,lat=0,lng=0;
+  while(idx<enc.length){
     let b,shift=0,result=0;
-    do{b=encoded.charCodeAt(idx++)-63;result|=(b&0x1f)<<shift;shift+=5;}while(b>=0x20);
-    lat+=(result&1)?~(result>>1):(result>>1);
-    shift=0;result=0;
-    do{b=encoded.charCodeAt(idx++)-63;result|=(b&0x1f)<<shift;shift+=5;}while(b>=0x20);
+    do{b=enc.charCodeAt(idx++)-63;result|=(b&0x1f)<<shift;shift+=5;}while(b>=0x20);
+    lat+=(result&1)?~(result>>1):(result>>1);shift=0;result=0;
+    do{b=enc.charCodeAt(idx++)-63;result|=(b&0x1f)<<shift;shift+=5;}while(b>=0x20);
     lng+=(result&1)?~(result>>1):(result>>1);
     pts.push({lat:lat/1e5,lng:lng/1e5});
   }
   return pts;
 }
 
+async function fetchRoutes(oLat,oLng,dLat,dLng){
+  const key=(localStorage.getItem('mapsApiKey')||'').trim();
+  if(!key){
+    // Sem chave: gera 1 rota direta
+    routeOptions=[{
+      label:'Linha direta',color:'#00e5ff',type:'direct',
+      duration:'–',distance:fmtD(dist(oLat,oLng,dLat,dLng)),
+      steps:['Siga em direção ao alfinete'],
+      points:[{lat:oLat,lng:oLng},{lat:dLat,lng:dLng}]
+    }];
+    return;
+  }
+  try{
+    // Pede até 3 rotas alternativas
+    const url=`https://maps.googleapis.com/maps/api/directions/json?origin=${oLat},${oLng}&destination=${dLat},${dLng}&mode=walking&alternatives=true&key=${key}`;
+    const resp=await fetch(url);
+    const data=await resp.json();
+    if(data.status==='OK'&&data.routes.length>0){
+      const colors=['#00e5ff','#00e676','#ffd600'];
+      const labels=['Rota mais rápida','Rota alternativa','Rota panorâmica'];
+      routeOptions=data.routes.map((r,i)=>({
+        label:labels[i]||'Rota '+(i+1),
+        color:colors[i]||'#a855f7',
+        type:'maps',
+        duration:r.legs[0].duration.text,
+        distance:r.legs[0].distance.text,
+        steps:r.legs[0].steps.slice(0,4).map(s=>s.html_instructions.replace(/<[^>]+>/g,'')),
+        points:decodePolyline(r.overview_polyline.points)
+      }));
+    } else {
+      routeOptions=[{label:'Linha direta',color:'#00e5ff',type:'direct',duration:'–',distance:fmtD(dist(oLat,oLng,dLat,dLng)),steps:['Siga em direção ao alfinete'],points:[{lat:oLat,lng:oLng},{lat:dLat,lng:dLng}]}];
+    }
+  }catch(e){
+    routeOptions=[{label:'Linha direta',color:'#00e5ff',type:'direct',duration:'–',distance:fmtD(dist(oLat,oLng,dLat,dLng)),steps:['Siga em direção ao alfinete'],points:[{lat:oLat,lng:oLng},{lat:dLat,lng:dLng}]}];
+  }
+}
+
+function showRoutePicker(){
+  if(routeOptions.length<=1){
+    // Só uma rota: usa direto sem mostrar picker
+    selectRoute(0);
+    return;
+  }
+  selectedRoute=0;
+  const container=document.getElementById('rp-options');
+  container.innerHTML=routeOptions.map((r,i)=>`
+    <div class="rp-option ${i===0?'selected':''}" data-i="${i}" onclick="pickRoute(${i})">
+      <div class="rp-option-header">
+        <span class="rp-badge" style="background:${r.color}22;color:${r.color};border:1px solid ${r.color}44">${r.label}</span>
+        <span class="rp-time">${r.duration}</span>
+        <span class="rp-dist">${r.distance}</span>
+      </div>
+      <div class="rp-steps">${r.steps.slice(0,3).map(s=>'• '+s).join('<br>')}</div>
+    </div>
+  `).join('');
+  document.getElementById('routepicker').classList.add('show');
+}
+
+function pickRoute(i){
+  selectedRoute=i;
+  document.querySelectorAll('.rp-option').forEach((el,j)=>el.classList.toggle('selected',j===i));
+}
+
+function selectRoute(i){
+  activeRoute=routeOptions[i]?routeOptions[i].points:[];
+  routeStep=0;
+  document.getElementById('routepicker').classList.remove('show');
+  showScreen('ar');
+  startCamera();refreshHUD();
+}
+
+let routeStep=0;
 function updateRouteProgress(){
-  if(!uLat||routePoints.length<2)return;
-  // Encontra o ponto da rota mais próximo da posição atual
+  if(!uLat||activeRoute.length<2)return;
   let minD=Infinity;
-  routePoints.forEach((pt,i)=>{
+  activeRoute.forEach((pt,i)=>{
     const d=dist(uLat,uLng,pt.lat,pt.lng);
     if(d<minD){minD=d;routeStep=i;}
   });
 }
 
-// Projeta lat/lng para posição X,Y na tela AR
-function projectToScreen(lat,lng,W,H,camH){
-  if(!uLat) return null;
+// ── CANVAS AR ──
+function startCanvas(){
+  const cv=document.getElementById('cvs');
+  const ctx=cv.getContext('2d');
+  const resize=()=>{cv.width=window.innerWidth;cv.height=window.innerHeight;};
+  resize();window.addEventListener('resize',resize);
+  function frame(){
+    raf=requestAnimationFrame(frame);
+    if(headRaw!==null)headSmooth=lerpA(headSmooth,headRaw,0.12);
+    ctx.clearRect(0,0,cv.width,cv.height);
+    if(!dest)return;
+    animT+=0.04;
+    drawAR(ctx,cv.width,cv.height);
+  }
+  frame();
+}
+
+// Projeta lat/lng para XY na tela
+function project(lat,lng,W,H,camH){
+  if(!uLat)return null;
   const br=bearing(uLat,uLng,lat,lng);
   const d3=dist(uLat,uLng,lat,lng);
   const FOV=65;
   const relDeg=camH!==null?((br-camH)+540)%360-180:0;
-  if(Math.abs(relDeg)>FOV*0.8) return null; // fora da tela
+  if(Math.abs(relDeg)>FOV)return null;
   const sx=W/2+(relDeg/(FOV/2))*(W/2);
   const maxD=120,prog=Math.min(d3,maxD)/maxD;
-  const gy=H*0.70,hz=H*0.38;
-  const sy=gy-(gy-hz)*prog;
-  return{x:Math.max(10,Math.min(W-10,sx)),y:sy,dist:d3,rel:relDeg};
+  const sy=H*0.70-(H*0.70-H*0.38)*prog;
+  return{x:Math.max(10,Math.min(W-10,sx)),y:sy,dist:d3};
 }
 
-function drawPath(ctx,W,H,camH,br,d3){
-  if(!uLat||!dest) return;
+function drawAR(ctx,W,H){
+  if(uLat===null)return;
+  const d3=dist(uLat,uLng,dest.lat,dest.lng);
+  const br=bearing(uLat,uLng,dest.lat,dest.lng);
+  const camH=headSmooth;
+  const FOV=65;
+  let relDeg=0;const hasSensor=camH!==null;
+  if(hasSensor)relDeg=((br-camH)+540)%360-180;
+  const onscreen=!hasSensor||Math.abs(relDeg)<(FOV/2+8);
+  const sx=hasSensor?W/2+(relDeg/(FOV/2))*(W/2):W/2;
+  const fh=FLOOR_H[dest.floor]||0;
+  const maxD=120,prog=Math.min(d3,maxD)/maxD;
+  const sc=Math.max(0.28,1-prog*0.72);
+  const gy=H*0.70,hz=H*0.38;
+  let py=(gy-(gy-hz)*prog)-(fh/18)*(H*0.22)*sc*(1-prog*0.5);
   const col=CAT_COLOR[dest.category]||'#a855f7';
   const [r,g,b]=hexRGB(col);
-  const ox=W/2, oy=H*0.88; // posição do usuário na tela
+  const pulse=0.5+0.5*Math.sin(animT*2.4);
+  // Rota
+  drawRoute(ctx,W,H,camH,col,r,g,b);
+  // Alfinete ou seta
+  if(onscreen)drawPin(ctx,Math.max(50,Math.min(W-50,sx)),py,sc,d3,col,r,g,b,pulse);
+  else drawEdge(ctx,relDeg,W,H,col);
+  // Bússola
+  if(hasSensor){
+    const rot=((br-camH)+360)%360;
+    document.getElementById('carr').style.transform='rotate('+rot+'deg)';
+    const abs=Math.abs(relDeg);
+    let lbl=abs<12?'▲ FRENTE':relDeg>0?(relDeg<75?'↗ DIREITA':'→ DIREITA'):(relDeg>-75?'↖ ESQUERDA':'← ESQUERDA');
+    document.getElementById('cdir').textContent=lbl;
+  }
+}
 
-  ctx.save();
+function drawRoute(ctx,W,H,camH,col,r,g,b){
+  const ox=W/2,oy=H*0.88;
+  const routeColor=routeOptions[selectedRoute]?routeOptions[selectedRoute].color:col;
+  const [rr2,gg2,bb2]=hexRGB(routeColor);
 
-  if(routePoints.length>=2){
-    // ── ROTA DO MAPS: desenha segmentos projetados na AR ──
-    const visible=[]; // pontos visíveis na tela
-    // Adiciona ponto de origem
-    visible.push({x:ox,y:oy});
-    // Projeta pontos da rota a partir do passo atual
-    const remaining=routePoints.slice(routeStep);
+  if(activeRoute.length>=2){
+    // Projeta pontos da rota
+    const pts=[{x:ox,y:oy}];
+    const remaining=activeRoute.slice(routeStep);
     for(const pt of remaining){
-      const proj=projectToScreen(pt.lat,pt.lng,W,H,camH);
-      if(proj) visible.push({x:proj.x,y:proj.y});
+      const p=project(pt.lat,pt.lng,W,H,camH);
+      if(p)pts.push({x:p.x,y:p.y});
     }
-    if(visible.length>=2){
+    if(pts.length>=2){
       // Glow externo
-      ctx.beginPath();
-      ctx.moveTo(visible[0].x,visible[0].y);
-      for(let i=1;i<visible.length;i++) ctx.lineTo(visible[i].x,visible[i].y);
-      ctx.strokeStyle=`rgba(${r},${g},${b},0.15)`;
-      ctx.lineWidth=14; ctx.lineCap='round'; ctx.lineJoin='round';
-      ctx.filter='blur(7px)'; ctx.stroke();
-      // Linha principal animada
+      ctx.save();
+      ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);
+      for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i].x,pts[i].y);
+      ctx.strokeStyle=`rgba(${rr2},${gg2},${bb2},0.12)`;
+      ctx.lineWidth=16;ctx.lineCap='round';ctx.lineJoin='round';
+      ctx.filter='blur(8px)';ctx.stroke();
+      // Linha principal
       ctx.filter='none';
-      ctx.beginPath();
-      ctx.moveTo(visible[0].x,visible[0].y);
-      for(let i=1;i<visible.length;i++) ctx.lineTo(visible[i].x,visible[i].y);
-      ctx.strokeStyle=`rgba(${r},${g},${b},0.75)`;
-      ctx.lineWidth=2.5; ctx.setLineDash([10,12]);
-      ctx.lineDashOffset=-animT*14; ctx.stroke();
-      ctx.setLineDash([]);
-      // Bolinhas nos waypoints
-      for(let i=1;i<visible.length-1;i++){
-        ctx.beginPath(); ctx.arc(visible[i].x,visible[i].y,3,0,Math.PI*2);
-        ctx.fillStyle=`rgba(${r},${g},${b},0.5)`; ctx.fill();
+      ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);
+      for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i].x,pts[i].y);
+      const lg=ctx.createLinearGradient(pts[0].x,pts[0].y,pts[pts.length-1].x,pts[pts.length-1].y);
+      lg.addColorStop(0,`rgba(${rr2},${gg2},${bb2},0)`);
+      lg.addColorStop(0.1,`rgba(${rr2},${gg2},${bb2},0.7)`);
+      lg.addColorStop(0.9,`rgba(${rr2},${gg2},${bb2},0.8)`);
+      lg.addColorStop(1,`rgba(${rr2},${gg2},${bb2},0)`);
+      ctx.strokeStyle=lg;ctx.lineWidth=3;
+      ctx.setLineDash([10,12]);ctx.lineDashOffset=-animT*14;ctx.stroke();ctx.setLineDash([]);
+      // Waypoints
+      for(let i=1;i<pts.length-1;i++){
+        ctx.beginPath();ctx.arc(pts[i].x,pts[i].y,3,0,Math.PI*2);
+        ctx.fillStyle=`rgba(${rr2},${gg2},${bb2},0.5)`;ctx.fill();
       }
+      ctx.restore();
     }
   } else {
-    // ── LINHA DIRETA (sem rota Maps) ──
-    const hasSensor=camH!==null;
-    let relDeg=hasSensor?((br-camH)+540)%360-180:0;
-    const sx=hasSensor?W/2+(relDeg/(65/2))*(W/2):W/2;
-    const maxD=120,prog=Math.min(d3,maxD)/maxD;
-    const fh=FLOOR_H[dest.floor]||0,sc=Math.max(0.28,1-prog*0.72);
-    const gy=H*0.70,hz=H*0.38;
-    const dx=hasSensor?Math.max(50,Math.min(W-50,sx)):W/2;
-    const dy=(gy-(gy-hz)*prog)-(fh/18)*(H*0.22)*sc*(1-prog*0.5);
-    const cpx=(ox+dx)/2, cpy=Math.min(oy,dy)-H*0.18;
-    // Glow
-    ctx.beginPath(); ctx.moveTo(ox,oy); ctx.quadraticCurveTo(cpx,cpy,dx,dy);
-    ctx.strokeStyle=`rgba(${r},${g},${b},0.18)`; ctx.lineWidth=12;
-    ctx.filter='blur(8px)'; ctx.stroke();
-    // Linha
+    // Linha curva direta
+    const proj=project(dest.lat,dest.lng,W,H,camH);
+    const dx=proj?proj.x:W/2,dy=proj?proj.y:H*0.5;
+    const cpx=(ox+dx)/2,cpy=Math.min(oy,dy)-H*0.15;
+    ctx.save();
+    ctx.beginPath();ctx.moveTo(ox,oy);ctx.quadraticCurveTo(cpx,cpy,dx,dy);
+    ctx.strokeStyle=`rgba(${rr2},${gg2},${bb2},0.12)`;ctx.lineWidth=14;
+    ctx.filter='blur(7px)';ctx.stroke();
     ctx.filter='none';
-    ctx.beginPath(); ctx.moveTo(ox,oy); ctx.quadraticCurveTo(cpx,cpy,dx,dy);
-    const lg=ctx.createLinearGradient(ox,oy,dx,dy);
-    lg.addColorStop(0,`rgba(${r},${g},${b},0.0)`);
-    lg.addColorStop(0.25,`rgba(${r},${g},${b},0.6)`);
-    lg.addColorStop(0.8,`rgba(${r},${g},${b},0.75)`);
-    lg.addColorStop(1,`rgba(${r},${g},${b},0.0)`);
-    ctx.strokeStyle=lg; ctx.lineWidth=2.5;
-    ctx.setLineDash([8,10]); ctx.lineDashOffset=-animT*12; ctx.stroke(); ctx.setLineDash([]);
+    ctx.beginPath();ctx.moveTo(ox,oy);ctx.quadraticCurveTo(cpx,cpy,dx,dy);
+    const lg2=ctx.createLinearGradient(ox,oy,dx,dy);
+    lg2.addColorStop(0,`rgba(${rr2},${gg2},${bb2},0)`);
+    lg2.addColorStop(0.2,`rgba(${rr2},${gg2},${bb2},0.65)`);
+    lg2.addColorStop(1,`rgba(${rr2},${gg2},${bb2},0)`);
+    ctx.strokeStyle=lg2;ctx.lineWidth=2.5;
+    ctx.setLineDash([8,10]);ctx.lineDashOffset=-animT*12;ctx.stroke();ctx.setLineDash([]);
+    ctx.restore();
   }
-
-  // Dot usuário
-  ctx.filter='none';
-  ctx.beginPath(); ctx.arc(ox,oy,6,0,Math.PI*2);
-  ctx.fillStyle=`rgba(${r},${g},${b},0.8)`; ctx.shadowColor=col; ctx.shadowBlur=14;
-  ctx.fill(); ctx.shadowBlur=0;
-  // Anel pulsante no usuário
-  ctx.beginPath(); ctx.arc(ox,oy,10+4*Math.sin(animT*3),0,Math.PI*2);
-  ctx.strokeStyle=`rgba(${r},${g},${b},${0.3+0.2*Math.sin(animT*3)})`;
-  ctx.lineWidth=2; ctx.stroke();
+  // Dot usuário + anel pulsante
+  ctx.save();
+  ctx.beginPath();ctx.arc(ox,oy,6,0,Math.PI*2);
+  ctx.fillStyle=`rgba(${rr2},${gg2},${bb2},0.85)`;ctx.shadowColor=routeColor;ctx.shadowBlur=14;ctx.fill();ctx.shadowBlur=0;
+  ctx.beginPath();ctx.arc(ox,oy,10+4*Math.sin(animT*3),0,Math.PI*2);
+  ctx.strokeStyle=`rgba(${rr2},${gg2},${bb2},${0.3+0.2*Math.sin(animT*3)})`;ctx.lineWidth=2;ctx.stroke();
   ctx.restore();
 }
 
 function drawPin(ctx,x,y,sc,d,col,r,g,b,pulse){
   const sz=Math.max(18,52*sc);
-  ctx.save(); ctx.translate(x,y);
+  ctx.save();ctx.translate(x,y);
   // sombra chão
-  ctx.save(); ctx.scale(1,0.28);
+  ctx.save();ctx.scale(1,0.28);
   const sg=ctx.createRadialGradient(0,sz*1.65/0.28,0,0,sz*1.65/0.28,sz*0.8);
-  sg.addColorStop(0,`rgba(${r},${g},${b},${0.55*sc})`); sg.addColorStop(1,'transparent');
-  ctx.fillStyle=sg; ctx.beginPath(); ctx.ellipse(0,sz*1.65/0.28,sz*0.75,sz*0.5,0,0,Math.PI*2); ctx.fill(); ctx.restore();
+  sg.addColorStop(0,`rgba(${r},${g},${b},${0.55*sc})`);sg.addColorStop(1,'transparent');
+  ctx.fillStyle=sg;ctx.beginPath();ctx.ellipse(0,sz*1.65/0.28,sz*0.75,sz*0.5,0,0,Math.PI*2);ctx.fill();ctx.restore();
   // anel chão
-  ctx.save(); ctx.scale(1,0.32);
-  ctx.beginPath(); ctx.arc(0,sz*1.65/0.32,sz*(0.5+pulse*0.35),0,Math.PI*2);
-  ctx.strokeStyle=`rgba(${r},${g},${b},${(1-pulse)*0.5})`; ctx.lineWidth=2*sc; ctx.stroke(); ctx.restore();
+  ctx.save();ctx.scale(1,0.32);
+  ctx.beginPath();ctx.arc(0,sz*1.65/0.32,sz*(0.5+pulse*0.35),0,Math.PI*2);
+  ctx.strokeStyle=`rgba(${r},${g},${b},${(1-pulse)*0.5})`;ctx.lineWidth=2*sc;ctx.stroke();ctx.restore();
   // gota
-  const pinH=sz*1.6, cr=sz*0.52, topY=-pinH, circY=topY+cr;
+  const pinH=sz*1.6,cr=sz*0.52,topY=-pinH,circY=topY+cr;
   const grad=ctx.createLinearGradient(0,topY,0,0);
-  grad.addColorStop(0,'rgba(255,255,255,0.95)'); grad.addColorStop(0.22,col);
-  grad.addColorStop(0.72,col); grad.addColorStop(1,`rgba(${r},${g},${b},0.45)`);
-  ctx.save(); ctx.shadowColor=col; ctx.shadowBlur=20*sc*(0.65+0.35*pulse);
-  ctx.beginPath();
-  ctx.arc(0,circY,cr,Math.PI*1.18,Math.PI*1.82,false);
-  ctx.lineTo(0,0); ctx.closePath();
-  ctx.fillStyle=grad; ctx.fill();
-  ctx.strokeStyle='rgba(255,255,255,0.2)'; ctx.lineWidth=1.5*sc; ctx.stroke(); ctx.restore();
+  grad.addColorStop(0,'rgba(255,255,255,0.95)');grad.addColorStop(0.22,col);
+  grad.addColorStop(0.72,col);grad.addColorStop(1,`rgba(${r},${g},${b},0.45)`);
+  ctx.save();ctx.shadowColor=col;ctx.shadowBlur=20*sc*(0.65+0.35*pulse);
+  ctx.beginPath();ctx.arc(0,circY,cr,Math.PI*1.18,Math.PI*1.82,false);
+  ctx.lineTo(0,0);ctx.closePath();
+  ctx.fillStyle=grad;ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,0.2)';ctx.lineWidth=1.5*sc;ctx.stroke();ctx.restore();
   // ponto branco
-  ctx.beginPath(); ctx.arc(0,circY,cr*0.36,0,Math.PI*2);
-  ctx.fillStyle='rgba(255,255,255,0.93)'; ctx.shadowColor='rgba(255,255,255,0.6)'; ctx.shadowBlur=7*sc;
-  ctx.fill(); ctx.shadowBlur=0;
+  ctx.beginPath();ctx.arc(0,circY,cr*0.36,0,Math.PI*2);
+  ctx.fillStyle='rgba(255,255,255,0.93)';ctx.shadowColor='rgba(255,255,255,0.6)';ctx.shadowBlur=7*sc;
+  ctx.fill();ctx.shadowBlur=0;
   // label
   if(sc>0.4){
-    const pad=8,lh=44;
-    ctx.save();
+    const pad=8,lh=44;ctx.save();
     ctx.font=`700 ${Math.max(9,12*sc)}px Rajdhani,sans-serif`;
     const tw=Math.min(ctx.measureText(dest.name).width,170*sc);
-    const lw=Math.max(tw+pad*2,70), lx=-lw/2, ly=topY-lh-12;
-    ctx.fillStyle='rgba(4,10,20,0.90)'; ctx.strokeStyle=`rgba(${r},${g},${b},0.55)`; ctx.lineWidth=1;
-    rr(ctx,lx,ly,lw,lh,7); ctx.fill(); rr(ctx,lx,ly,lw,lh,7); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(0,ly+lh); ctx.lineTo(0,topY-3);
-    ctx.strokeStyle=`rgba(${r},${g},${b},0.3)`; ctx.lineWidth=1; ctx.setLineDash([3,4]); ctx.stroke(); ctx.setLineDash([]);
-    ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.textBaseline='top';
-    ctx.save(); ctx.rect(lx+2,ly,lw-4,lh); ctx.clip(); ctx.fillText(dest.name,0,ly+6); ctx.restore();
-    ctx.font=`700 ${Math.max(8,10*sc)}px Orbitron,monospace`; ctx.fillStyle=col; ctx.fillText(fmtD(d),0,ly+lh-16);
+    const lw=Math.max(tw+pad*2,70),lx=-lw/2,ly=topY-lh-12;
+    ctx.fillStyle='rgba(4,10,20,0.90)';ctx.strokeStyle=`rgba(${r},${g},${b},0.55)`;ctx.lineWidth=1;
+    rr(ctx,lx,ly,lw,lh,7);ctx.fill();rr(ctx,lx,ly,lw,lh,7);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(0,ly+lh);ctx.lineTo(0,topY-3);
+    ctx.strokeStyle=`rgba(${r},${g},${b},0.3)`;ctx.lineWidth=1;ctx.setLineDash([3,4]);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='top';
+    ctx.save();ctx.rect(lx+2,ly,lw-4,lh);ctx.clip();ctx.fillText(dest.name,0,ly+6);ctx.restore();
+    ctx.font=`700 ${Math.max(8,10*sc)}px Orbitron,monospace`;ctx.fillStyle=col;ctx.fillText(fmtD(d),0,ly+lh-16);
     ctx.restore();
   }
   ctx.restore();
@@ -677,91 +730,82 @@ function drawPin(ctx,x,y,sc,d,col,r,g,b,pulse){
 
 function drawEdge(ctx,relDeg,W,H,col){
   const pulse=0.6+0.4*Math.sin(animT*3.5);
-  const goR=relDeg>0, ex=goR?W-20:20, ey=H*0.5;
-  ctx.save(); ctx.translate(ex,ey);
-  ctx.beginPath(); ctx.arc(0,0,34,0,Math.PI*2); ctx.fillStyle='rgba(0,0,0,0.6)'; ctx.fill();
-  ctx.strokeStyle=col; ctx.lineWidth=2; ctx.globalAlpha=pulse; ctx.stroke();
+  const goR=relDeg>0,ex=goR?W-20:20,ey=H*0.5;
+  ctx.save();ctx.translate(ex,ey);
+  ctx.beginPath();ctx.arc(0,0,34,0,Math.PI*2);ctx.fillStyle='rgba(0,0,0,0.6)';ctx.fill();
+  ctx.strokeStyle=col;ctx.lineWidth=2;ctx.globalAlpha=pulse;ctx.stroke();
   for(let i=0;i<3;i++){
     const off=(goR?1:-1)*(i*9-9);
     ctx.beginPath();
     if(goR){ctx.moveTo(off-8,-12);ctx.lineTo(off+5,0);ctx.lineTo(off-8,12);}
     else{ctx.moveTo(off+8,-12);ctx.lineTo(off-5,0);ctx.lineTo(off+8,12);}
-    ctx.strokeStyle=col; ctx.lineWidth=Math.max(1.5,3-i*.7); ctx.lineJoin='round';
-    ctx.globalAlpha=pulse*(1-i*0.28); ctx.stroke();
+    ctx.strokeStyle=col;ctx.lineWidth=Math.max(1.5,3-i*.7);ctx.lineJoin='round';
+    ctx.globalAlpha=pulse*(1-i*0.28);ctx.stroke();
   }
   ctx.restore();
 }
-
-function rr(ctx,x,y,w,h,r){
-  ctx.beginPath(); ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.arcTo(x+w,y,x+w,y+r,r);
-  ctx.lineTo(x+w,y+h-r); ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
-  ctx.lineTo(x+r,y+h); ctx.arcTo(x,y+h,x,y+h-r,r);
-  ctx.lineTo(x,y+r); ctx.arcTo(x,y,x+r,y,r); ctx.closePath();
-}
+function rr(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();}
 function hexRGB(h){const c=h.replace('#','');return[parseInt(c.slice(0,2),16),parseInt(c.slice(2,4),16),parseInt(c.slice(4,6),16)];}
 
 // ── CÂMERA ──
 async function startCamera(){
-  if(stream) return;
+  if(stream)return;
   const vid=document.getElementById('vid');
   const opts=[{video:{facingMode:{exact:'environment'}},audio:false},{video:{facingMode:'environment'},audio:false},{video:true,audio:false}];
-  for(const o of opts){try{stream=await navigator.mediaDevices.getUserMedia(o);break}catch(e){}}
+  for(const o of opts){try{stream=await navigator.mediaDevices.getUserMedia(o);break;}catch(e){}}
   if(!stream){document.getElementById('cmerr').style.display='flex';return;}
-  vid.setAttribute('playsinline',''); vid.setAttribute('webkit-playsinline','');
-  vid.srcObject=stream; try{await vid.play();}catch(e){}
+  vid.setAttribute('playsinline','');vid.setAttribute('webkit-playsinline','');
+  vid.srcObject=stream;try{await vid.play();}catch(e){}
   document.getElementById('cmerr').style.display='none';
-  startCompass(); startCanvas();
+  startCompass();startBaro();startCanvas();
 }
 function stopCamera(){
   if(raf){cancelAnimationFrame(raf);raf=null;}
   if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;}
   document.getElementById('vid').srcObject=null;
-  headRaw=null; headSmooth=null; sensorOK=false;
+  headRaw=null;headSmooth=null;sensorOK=false;
   document.getElementById('perm').classList.remove('show');
 }
 
+// ── MAPS API KEY ──
+function saveMapsKey(key){localStorage.setItem('mapsApiKey',key);}
+
 // ── NAV ──
-function startNav(loc){
-  dest=loc; arrivedShown=false;
+async function startNav(loc){
+  dest=loc;arrivedShown=false;selectedRoute=0;activeRoute=[];routeStep=0;
   document.getElementById('dname').textContent=loc.name;
   document.getElementById('dfloor').textContent=loc.floor+' · '+loc.category;
-  showScreen('ar');
   const d=uLat!=null?dist(uLat,uLng,loc.lat,loc.lng):null;
   document.getElementById('hdist').textContent=d!=null?fmtD(d):'–';
   document.getElementById('hmpos').textContent=uLat!=null?fmtC(uLat)+', '+fmtC(uLng):'Sem GPS';
   document.getElementById('hacc').textContent=uAcc!=null?'±'+uAcc+'m':'–';
-  // Busca rota (usa Maps API se key disponível, senão linha direta)
-  routePoints=[];routeStep=0;
-  if(uLat!=null) fetchRoute(uLat,uLng,loc.lat,loc.lng);
-  startCamera(); refreshHUD();
+  // Busca rotas e mostra picker
+  if(uLat!=null){
+    showScreen('ar');
+    startCamera();
+    toast('Buscando rotas...');
+    await fetchRoutes(uLat,uLng,loc.lat,loc.lng);
+    showRoutePicker();
+  } else {
+    showScreen('ar');
+    startCamera();
+  }
+  refreshHUD();
 }
-function goHome(){stopCamera(); dest=null; routePoints=[]; routeStep=0; showScreen('home');}
-function showScreen(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
+function goHome(){stopCamera();dest=null;activeRoute=[];routeStep=0;showScreen('home');}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
 
 // ── HOME ──
 function allCats(){return['Todos',...new Set(locs.map(l=>l.category))];}
-
 function renderCats(){
   const el=document.getElementById('catrow');
-  el.innerHTML=allCats().map(cat=>
-    `<div class="cpill ${cat===activeCat?'on':''}" data-cat="${cat}">${cat}</div>`
-  ).join('');
-  el.querySelectorAll('.cpill').forEach(p=>p.addEventListener('click',()=>{
-    activeCat=p.dataset.cat; renderCats(); renderList();
-  }));
+  el.innerHTML=allCats().map(cat=>`<div class="cpill ${cat===activeCat?'on':''}" data-cat="${cat}">${cat}</div>`).join('');
+  el.querySelectorAll('.cpill').forEach(p=>p.addEventListener('click',()=>{activeCat=p.dataset.cat;renderCats();renderList();}));
 }
-
 function renderList(){
   const q=document.getElementById('sinput').value.toLowerCase();
-  let fl=locs.filter(loc=>{
-    const okCat=activeCat==='Todos'||loc.category===activeCat;
-    const okQ=!q||loc.name.toLowerCase().includes(q)||loc.category.toLowerCase().includes(q);
-    return okCat&&okQ;
-  });
-  if(uLat!=null) fl.sort((a,b)=>dist(uLat,uLng,a.lat,a.lng)-dist(uLat,uLng,b.lat,b.lng));
+  let fl=locs.filter(loc=>(activeCat==='Todos'||loc.category===activeCat)&&(!q||loc.name.toLowerCase().includes(q)||loc.category.toLowerCase().includes(q)));
+  if(uLat!=null)fl.sort((a,b)=>dist(uLat,uLng,a.lat,a.lng)-dist(uLat,uLng,b.lat,b.lng));
   const el=document.getElementById('llist');
   el.innerHTML=fl.map(loc=>{
     const col=CAT_COLOR[loc.category]||'#a855f7';
@@ -769,16 +813,11 @@ function renderList(){
     const d=uLat!=null?fmtD(dist(uLat,uLng,loc.lat,loc.lng)):'';
     return `<div class="lcard" data-id="${loc.id}" style="--cc:${col}">
       <div class="lic" style="background:${col}22;color:${col}">${ico}</div>
-      <div style="flex:1;min-width:0">
-        <div class="lname">${loc.name}</div>
-        <div class="lmeta">${loc.category} · ${loc.floor}</div>
-      </div>
-      <div class="ldist">${d}</div>
-    </div>`;
+      <div style="flex:1;min-width:0"><div class="lname">${loc.name}</div><div class="lmeta">${loc.category} · ${loc.floor}</div></div>
+      <div class="ldist">${d}</div></div>`;
   }).join('');
   el.querySelectorAll('.lcard').forEach(card=>card.addEventListener('click',()=>{
-    const loc=locs.find(l=>String(l.id)===card.dataset.id);
-    if(loc) startNav(loc);
+    const loc=locs.find(l=>String(l.id)===card.dataset.id);if(loc)startNav(loc);
   }));
 }
 
@@ -789,97 +828,34 @@ function renderAdmin(q=''){
   el.innerHTML=fl.map(loc=>{
     const col=CAT_COLOR[loc.category]||'#a855f7';
     const ico=CAT_ICON[loc.category]||'📍';
-    return `<div class="aitem">
-      <div class="aic" style="background:${col}22;color:${col}">${ico}</div>
+    return `<div class="aitem"><div class="aic" style="background:${col}22;color:${col}">${ico}</div>
       <div class="ainf"><div class="aname">${loc.name}</div><div class="acat">${loc.category} · ${loc.floor}</div></div>
-      <div class="abtns">
-        <button class="ebtn" data-id="${loc.id}">✏️</button>
-        <button class="dbtn" data-id="${loc.id}">🗑️</button>
-      </div>
-    </div>`;
+      <div class="abtns"><button class="ebtn" data-id="${loc.id}">✏️</button><button class="dbtn" data-id="${loc.id}">🗑️</button></div></div>`;
   }).join('');
   el.querySelectorAll('.ebtn').forEach(b=>b.addEventListener('click',()=>openEdit(b.dataset.id)));
   el.querySelectorAll('.dbtn').forEach(b=>b.addEventListener('click',()=>delLoc(b.dataset.id)));
 }
-
-function delLoc(id){
-  if(!confirm('Remover este local?'))return;
-  locs=locs.filter(l=>String(l.id)!==String(id));
-  saveLocs(); renderAdmin(); renderList(); toast('Removido');
-}
-function openAdd(){
-  editId=null;
-  document.getElementById('mtitle').textContent='Adicionar Local';
-  document.getElementById('fn').value='';
-  document.getElementById('fcat').value='Outras';
-  document.getElementById('ffloor').value='Térreo';
-  document.getElementById('flat').value='';
-  document.getElementById('flng').value='';
-  document.getElementById('mbg').classList.add('open');
-}
-function openEdit(id){
-  const loc=locs.find(l=>String(l.id)===String(id)); if(!loc)return;
-  editId=loc.id;
-  document.getElementById('mtitle').textContent='Editar Local';
-  document.getElementById('fn').value=loc.name;
-  document.getElementById('fcat').value=loc.category;
-  document.getElementById('ffloor').value=loc.floor;
-  document.getElementById('flat').value=loc.lat;
-  document.getElementById('flng').value=loc.lng;
-  document.getElementById('mbg').classList.add('open');
-}
+function delLoc(id){if(!confirm('Remover?'))return;locs=locs.filter(l=>String(l.id)!==String(id));saveLocs();renderAdmin();renderList();toast('Removido');}
+function openAdd(){editId=null;document.getElementById('mtitle').textContent='Adicionar Local';['fn','flat','flng'].forEach(i=>document.getElementById(i).value='');document.getElementById('fcat').value='Outras';document.getElementById('ffloor').value='Térreo';document.getElementById('mbg').classList.add('open');}
+function openEdit(id){const loc=locs.find(l=>String(l.id)===String(id));if(!loc)return;editId=loc.id;document.getElementById('mtitle').textContent='Editar Local';document.getElementById('fn').value=loc.name;document.getElementById('fcat').value=loc.category;document.getElementById('ffloor').value=loc.floor;document.getElementById('flat').value=loc.lat;document.getElementById('flng').value=loc.lng;document.getElementById('mbg').classList.add('open');}
 function closeModal(){document.getElementById('mbg').classList.remove('open');}
 function saveModal(){
   const name=document.getElementById('fn').value.trim();
-  const cat=document.getElementById('fcat').value;
-  const floor=document.getElementById('ffloor').value;
-  const lat=parseFloat(document.getElementById('flat').value);
-  const lng=parseFloat(document.getElementById('flng').value);
-  if(!name){toast('Informe o nome');return;}
-  if(isNaN(lat)||isNaN(lng)){toast('Coordenadas inválidas');return;}
-  if(editId!=null){
-    const i=locs.findIndex(l=>l.id===editId);
-    if(i>-1) locs[i]={...locs[i],name,category:cat,floor,lat,lng};
-    toast('Atualizado ✓');
-  } else {
-    locs.push({id:Date.now(),name,category:cat,floor,lat,lng});
-    toast('Adicionado ✓');
-  }
-  saveLocs(); closeModal(); renderAdmin(); renderList(); renderCats();
+  const cat=document.getElementById('fcat').value,floor=document.getElementById('ffloor').value;
+  const lat=parseFloat(document.getElementById('flat').value),lng=parseFloat(document.getElementById('flng').value);
+  if(!name){toast('Informe o nome');return;}if(isNaN(lat)||isNaN(lng)){toast('Coordenadas inválidas');return;}
+  if(editId!=null){const i=locs.findIndex(l=>l.id===editId);if(i>-1)locs[i]={...locs[i],name,category:cat,floor,lat,lng};toast('Atualizado ✓');}
+  else{locs.push({id:Date.now(),name,category:cat,floor,lat,lng});toast('Adicionado ✓');}
+  saveLocs();closeModal();renderAdmin();renderList();renderCats();
 }
-function toast(msg){
-  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2600);
-}
-
-// ── MAPS KEY HANDLER ──
-function onMapsKeyChange(){
-  const key=document.getElementById('mapskey').value.trim();
-  if(key&&uLat!=null&&dest!=null){
-    document.getElementById('routestatus').textContent='buscando rota...';
-    document.getElementById('routestatus').style.color='#ffd600';
-    fetchRoute(uLat,uLng,dest.lat,dest.lng).then(()=>{
-      const status=routePoints.length>2?'rota Maps ✓':'linha direta';
-      document.getElementById('routestatus').textContent=status;
-      document.getElementById('routestatus').style.color=routePoints.length>2?'#00e676':'#3d5a7a';
-    });
-  }
-}
-
-// Update route status after fetch
-const _origFetch=fetchRoute;
-fetchRoute=async function(...args){
-  await _origFetch(...args);
-  const el=document.getElementById('routestatus');
-  if(el){
-    el.textContent=routePoints.length>2?'rota Maps ✓':'linha direta';
-    el.style.color=routePoints.length>2?'#00e676':'#3d5a7a';
-  }
-};
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600);}
 
 // ── EVENTS ──
 document.getElementById('sinput').addEventListener('input',renderList);
-document.getElementById('fab').addEventListener('click',()=>{renderAdmin();showScreen('admin');});
+document.getElementById('fab').addEventListener('click',()=>{
+  // Mostra input da API key no admin
+  renderAdmin();showScreen('admin');
+});
 document.getElementById('admback').addEventListener('click',()=>showScreen('home'));
 document.getElementById('arback').addEventListener('click',goHome);
 document.getElementById('btnadd').addEventListener('click',openAdd);
@@ -887,11 +863,11 @@ document.getElementById('mcnl').addEventListener('click',closeModal);
 document.getElementById('msav').addEventListener('click',saveModal);
 document.getElementById('mbg').addEventListener('click',e=>{if(e.target===document.getElementById('mbg'))closeModal();});
 document.getElementById('asrch').addEventListener('input',e=>renderAdmin(e.target.value));
+document.getElementById('rp-cancel').addEventListener('click',()=>{document.getElementById('routepicker').classList.remove('show');goHome();});
+document.getElementById('rp-go').addEventListener('click',()=>selectRoute(selectedRoute));
 
 // ── INIT ──
-startGPS();
-renderCats();
-renderList();
+startGPS();renderCats();renderList();
 </script>
 </body>
 </html>
