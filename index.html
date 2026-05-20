@@ -472,16 +472,16 @@ function decodePolyline(enc){
   return pts;
 }
 
-async function fetchRoutes(oLat,oLng,dLat,dLng){
+async async function fetchRoutes(oLat,oLng,dLat,dLng){
   const key=(localStorage.getItem('mapsApiKey')||'').trim();
   if(!key){
-    // Sem chave: gera 1 rota direta
     routeOptions=[{
       label:'Linha direta',color:'#00e5ff',type:'direct',
       duration:'–',distance:fmtD(dist(oLat,oLng,dLat,dLng)),
       steps:['Siga em direção ao alfinete'],
       points:[{lat:oLat,lng:oLng},{lat:dLat,lng:dLng}]
     }];
+    activeRoute=routeOptions[0].points;
     return;
   }
   try{
@@ -511,7 +511,6 @@ async function fetchRoutes(oLat,oLng,dLat,dLng){
 
 function showRoutePicker(){
   if(routeOptions.length<=1){
-    // Só uma rota: usa direto sem mostrar picker
     selectRoute(0);
     return;
   }
@@ -536,11 +535,12 @@ function pickRoute(i){
 }
 
 function selectRoute(i){
-  activeRoute=routeOptions[i]?routeOptions[i].points:[];
+  const opt=routeOptions[i];
+  activeRoute=opt?opt.points:[];
   routeStep=0;
   document.getElementById('routepicker').classList.remove('show');
-  showScreen('ar');
-  startCamera();refreshHUD();
+  // já estamos na tela ar, só fecha o picker
+  refreshHUD();
 }
 
 let routeStep=0;
@@ -585,7 +585,14 @@ function project(lat,lng,W,H,camH){
 }
 
 function drawAR(ctx,W,H){
-  if(uLat===null)return;
+  // Sem GPS: mostra alfinete no centro como fallback
+  if(uLat===null){
+    const col=CAT_COLOR[dest.category]||'#a855f7';
+    const [r,g,b]=hexRGB(col);
+    const pulse=0.5+0.5*Math.sin(animT*2.4);
+    drawPin(ctx,W/2,H*0.5,0.7,0,col,r,g,b,pulse);
+    return;
+  }
   const d3=dist(uLat,uLng,dest.lat,dest.lng);
   const br=bearing(uLat,uLng,dest.lat,dest.lng);
   const camH=headSmooth;
@@ -771,7 +778,7 @@ function stopCamera(){
 function saveMapsKey(key){localStorage.setItem('mapsApiKey',key);}
 
 // ── NAV ──
-async function startNav(loc){
+async async function startNav(loc){
   dest=loc;arrivedShown=false;selectedRoute=0;activeRoute=[];routeStep=0;
   document.getElementById('dname').textContent=loc.name;
   document.getElementById('dfloor').textContent=loc.floor+' · '+loc.category;
@@ -779,16 +786,21 @@ async function startNav(loc){
   document.getElementById('hdist').textContent=d!=null?fmtD(d):'–';
   document.getElementById('hmpos').textContent=uLat!=null?fmtC(uLat)+', '+fmtC(uLng):'Sem GPS';
   document.getElementById('hacc').textContent=uAcc!=null?'±'+uAcc+'m':'–';
-  // Busca rotas e mostra picker
+  showScreen('ar');
+  startCamera();
+  // Cria rota direta imediatamente para alfinete aparecer
+  routeOptions=[{
+    label:'Linha direta',color:'#00e5ff',type:'direct',
+    duration:'–',distance:uLat!=null?fmtD(dist(uLat,uLng,loc.lat,loc.lng)):'–',
+    steps:['Siga em direção ao alfinete'],
+    points:uLat!=null?[{lat:uLat,lng:uLng},{lat:loc.lat,lng:loc.lng}]:[{lat:loc.lat,lng:loc.lng}]
+  }];
+  activeRoute=routeOptions[0].points;
+  selectedRoute=0;
+  // Busca rotas reais em paralelo se tiver GPS
   if(uLat!=null){
-    showScreen('ar');
-    startCamera();
-    toast('Buscando rotas...');
-    await fetchRoutes(uLat,uLng,loc.lat,loc.lng);
-    showRoutePicker();
-  } else {
-    showScreen('ar');
-    startCamera();
+    toast('Buscando rotas a pé...');
+    fetchRoutes(uLat,uLng,loc.lat,loc.lng).then(()=>showRoutePicker());
   }
   refreshHUD();
 }
