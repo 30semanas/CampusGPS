@@ -227,13 +227,13 @@ html,body{width:100%;height:100dvh;overflow:hidden;background:#000;font-family:"
 
 <script>
 // ── LIMPA localStorage antigo ──
-['col_locs','col2_locs','col3_locs','col4_locs'].forEach(k=>localStorage.removeItem(k));
-const LSTORE='gpslocs_v2';
+['col_locs','col2_locs','col3_locs','col4_locs'].forEach(function(k){localStorage.removeItem(k);});
+var LSTORE='gpslocs_v2';
 
 // ── CATEGORIAS ──
-const CAT_COLOR={"Auditório":"#5b6ef8","Sanitário":"#06b6d4","SAC":"#f59e0b","Praça de Alimentação":"#10b981","Outras":"#a855f7"};
-const CAT_ICON={"Auditório":"🎤","Sanitário":"🚻","SAC":"🩺","Praça de Alimentação":"🍽️","Outras":"📍"};
-const FLOOR_H={"Térreo":0,"1 andar":5,"2 andar":10,"3 andar":15};
+var CAT_COLOR={"Auditório":"#5b6ef8","Sanitário":"#06b6d4","SAC":"#f59e0b","Praça de Alimentação":"#10b981","Outras":"#a855f7"};
+var CAT_ICON={"Auditório":"🎤","Sanitário":"🚻","SAC":"🩺","Praça de Alimentação":"🍽️","Outras":"📍"};
+var FLOOR_H={"Térreo":0,"1 andar":5,"2 andar":10,"3 andar":15};
 
 // ── GRAFO DO CAMPUS (waypoints para navegação interna) ──
 var CAMPUS_NODES=[[1, -23.1933182, -45.8593261], [2, -23.1933478, -45.8593637], [3, -23.1933552, -45.8593905], [4, -23.1932911, -45.8594549], [5, -23.1932911, -45.859538], [6, -23.1933132, -45.8595917], [7, -23.1933502, -45.8596346], [8, -23.1933995, -45.8596426], [9, -23.1934735, -45.8596346], [10, -23.1935105, -45.8595917], [11, -23.1935623, -45.8596051], [12, -23.193577, -45.8596721], [13, -23.1936387, -45.859648], [14, -23.1937077, -45.8596158], [15, -23.1937915, -45.8595622], [16, -23.1938532, -45.8595353], [17, -23.193937, -45.8595166], [18, -23.1939715, -45.8595622], [19, -23.1940282, -45.8596721], [20, -23.1939838, -45.8597419], [21, -23.1938778, -45.8597955], [22, -23.1937718, -45.8598652], [23, -23.1936485, -45.8599216], [24, -23.1935623, -45.8599779], [25, -23.1935203, -45.8598813], [26, -23.1934612, -45.8597606], [27, -23.1934858, -45.859715], [28, -23.1933157, -45.8597043], [29, -23.1934045, -45.8598679], [30, -23.1934636, -45.8599967], [31, -23.1934957, -45.8601522], [32, -23.193577, -45.8601522], [33, -23.1936288, -45.8602327], [34, -23.1937102, -45.8603507], [35, -23.1937669, -45.8604741], [36, -23.1938236, -45.8605251], [37, -23.1939789, -45.8604956], [38, -23.1940479, -45.860458], [39, -23.1941737, -45.8604071], [40, -23.1942969, -45.8603936], [41, -23.1944745, -45.8603078], [42, -23.1945435, -45.8602837], [43, -23.1945731, -45.860171], [44, -23.1945953, -45.8600664], [45, -23.1945065, -45.8601174], [46, -23.1944128, -45.8601469], [47, -23.1943635, -45.8600637], [48, -23.194329, -45.8599484], [49, -23.1944301, -45.8598787], [50, -23.1945016, -45.8598545], [51, -23.1944794, -45.8597445], [52, -23.1943956, -45.8595541], [53, -23.1943364, -45.8594871], [54, -23.1942501, -45.8595327], [55, -23.1942057, -45.8596185], [56, -23.1941367, -45.8595353], [57, -23.1940923, -45.8594736], [58, -23.1940258, -45.859538], [59, -23.1940825, -45.8596641], [60, -23.1941022, -45.8597472], [61, -23.194154, -45.8598626], [62, -23.1941811, -45.8599457], [63, -23.1942205, -45.8600262], [64, -23.1942871, -45.8601469], [65, -23.1942033, -45.8602139], [66, -23.1940899, -45.860289], [67, -23.194006, -45.8603454], [68, -23.1939247, -45.8603749], [69, -23.1938211, -45.8604205], [70, -23.1943586, -45.8593985], [71, -23.1942822, -45.8592859], [72, -23.1941909, -45.8590874], [73, -23.1940997, -45.8589587], [74, -23.1940455, -45.8588246], [75, -23.1940701, -45.8586824], [76, -23.194154, -45.8585751], [77, -23.1943019, -45.8585188], [78, -23.1944276, -45.8584866], [79, -23.1945312, -45.8584437], [80, -23.1946076, -45.8585134], [81, -23.1946495, -45.8586341], [82, -23.1946988, -45.8587065], [83, -23.1947531, -45.8588514], [84, -23.1948196, -45.8589855], [85, -23.1948615, -45.8591357], [86, -23.1947851, -45.8592349], [87, -23.1946224, -45.8593208], [88, -23.1944942, -45.8593851], [89, -23.194403, -45.859428], [90, -23.1944449, -45.8595541], [91, -23.1944991, -45.8596641], [92, -23.1945509, -45.859758], [93, -23.194578, -45.859817], [94, -23.1946101, -45.8598894], [95, -23.1946594, -45.8600289], [96, -23.194758, -45.8600718], [97, -23.1948813, -45.8601522], [98, -23.1950736, -45.8601093], [99, -23.1953004, -45.8601093], [100, -23.1954631, -45.860045], [101, -23.1955666, -45.860045], [102, -23.1957096, -45.8600128], [103, -23.1962569, -45.8599323], [104, -23.1963703, -45.8596265], [105, -23.196395, -45.8592564], [106, -23.1964788, -45.8590096], [107, -23.1966267, -45.8588004], [108, -23.1968388, -45.8586502], [109, -23.1969423, -45.8584839], [110, -23.1969226, -45.8581835], [111, -23.1967254, -45.8582908], [112, -23.1964246, -45.8583927], [113, -23.1961041, -45.8584839], [114, -23.1958082, -45.8586019], [115, -23.1955469, -45.8586717], [116, -23.1953349, -45.8587736], [117, -23.1950982, -45.8588433], [118, -23.1949059, -45.8589131], [119, -23.1949799, -45.8592725], [120, -23.1950637, -45.8595139], [121, -23.1949503, -45.8596534], [122, -23.1947728, -45.8597499], [123, -23.1946298, -45.8598089], [124, -23.1951327, -45.8596104], [125, -23.1952264, -45.8598089], [126, -23.1950538, -45.8598357], [127, -23.1950095, -45.8599645], [128, -23.1962027, -45.859251], [129, -23.1958723, -45.8593583], [130, -23.1956406, -45.8594602], [131, -23.1954976, -45.8593208], [132, -23.1954384, -45.859133], [133, -23.1953743, -45.8588809], [134, -23.1951327, -45.8589238], [135, -23.1949355, -45.8590257], [136, -23.1950242, -45.8592296], [137, -23.1950834, -45.8593583], [138, -23.1952412, -45.8593261], [139, -23.1952461, -45.8597177], [140, -23.1954729, -45.8596265], [141, -23.195754, -45.8595514], [142, -23.1958082, -45.8596855], [143, -23.1958033, -45.8598733], [144, -23.1955568, -45.8599645], [145, -23.1952856, -45.8599699], [146, -23.1943093, -45.8591491], [147, -23.1942255, -45.8590177], [148, -23.1942008, -45.8589238], [149, -23.1943463, -45.8592832], [150, -23.1947629, -45.8590686], [151, -23.1946051, -45.859251], [152, -23.1947111, -45.8595246], [153, -23.1968412, -45.8579233], [154, -23.197142, -45.8577973], [155, -23.1966267, -45.8577141], [156, -23.1963605, -45.8578026], [157, -23.1959562, -45.8579528], [158, -23.1956998, -45.8580226], [159, -23.1952757, -45.8581996], [160, -23.1948665, -45.8583391], [161, -23.1946446, -45.858382], [162, -23.1938902, -45.8586878], [163, -23.1936831, -45.858779], [164, -23.1936313, -45.8588487], [165, -23.1936707, -45.8589184], [166, -23.1937496, -45.8590204], [167, -23.1938507, -45.859023], [168, -23.1940011, -45.8589077], [169, -23.1939912, -45.8590981], [170, -23.1938507, -45.8591759], [171, -23.1937817, -45.8593315], [172, -23.1936436, -45.85942], [173, -23.1934883, -45.8594066], [174, -23.1935721, -45.8591947], [175, -23.193116, -45.8592993], [176, -23.1930938, -45.8593798], [177, -23.1932935, -45.8598223], [178, -23.1931875, -45.8599055], [179, -23.1930815, -45.8599484], [180, -23.1929607, -45.8598599], [181, -23.1928941, -45.8597311], [182, -23.1928374, -45.8596131], [183, -23.1927906, -45.8595192], [184, -23.1927314, -45.8594173], [185, -23.1926698, -45.8592886], [186, -23.1926279, -45.8591652], [187, -23.1927215, -45.8590794], [188, -23.1928349, -45.8589989], [189, -23.1929262, -45.8589962], [190, -23.1929829, -45.8590794], [191, -23.1930322, -45.8592108], [192, -23.1929632, -45.858956], [193, -23.1930174, -45.8589479], [194, -23.1931185, -45.8589023], [195, -23.1932048, -45.8588782], [196, -23.1932861, -45.8588514], [197, -23.1932812, -45.8589721], [198, -23.1931333, -45.8590016], [199, -23.1931111, -45.8591437], [200, -23.1931752, -45.8592671], [201, -23.1932491, -45.8592644], [202, -23.1930248, -45.8600637], [203, -23.1930322, -45.8601925], [204, -23.193079, -45.8603239], [205, -23.1931407, -45.8604071], [206, -23.1932122, -45.8603615], [207, -23.1932837, -45.8603749], [208, -23.1934464, -45.8604044], [209, -23.1935228, -45.8603722], [210, -23.1935795, -45.8604312], [211, -23.193651, -45.8605036], [212, -23.1937373, -45.8605626], [213, -23.1938162, -45.8606189], [214, -23.1939222, -45.8606297], [215, -23.1940578, -45.8606189], [216, -23.194117, -45.8605921], [217, -23.19426, -45.8605546], [218, -23.1944375, -45.8604902], [219, -23.1961485, -45.8597553], [220, -23.1928769, -45.8600396], [221, -23.1926944, -45.8600208], [222, -23.192507, -45.8599725], [223, -23.192438, -45.8598545], [224, -23.1923221, -45.8596775], [225, -23.1921865, -45.859597], [226, -23.1921002, -45.8596319], [227, -23.1924134, -45.8600181], [228, -23.1922901, -45.8600637], [229, -23.1921397, -45.8600369], [230, -23.1919646, -45.8600289], [231, -23.1919646, -45.8598813], [232, -23.19194, -45.859758], [233, -23.1918537, -45.8595568], [234, -23.1918192, -45.860002], [235, -23.1917501, -45.859935], [236, -23.1916885, -45.8598223], [237, -23.191654, -45.8597258], [238, -23.1915948, -45.8596534], [239, -23.1914987, -45.8596641], [240, -23.1914001, -45.8597043], [241, -23.1914173, -45.8598036], [242, -23.1914148, -45.8598894], [243, -23.191654, -45.8600074], [244, -23.1914863, -45.8600155], [245, -23.1912842, -45.8600584], [246, -23.1910795, -45.8601576], [247, -23.1908429, -45.8602434], [248, -23.1907344, -45.8604366], [249, -23.1905174, -45.8604687], [250, -23.1904533, -45.8606029], [251, -23.1907146, -45.8606029], [252, -23.1911288, -45.8605117], [253, -23.1914148, -45.8603883], [254, -23.1918044, -45.8603561], [255, -23.1932343, -45.8600637], [256, -23.1932763, -45.8600155], [257, -23.1933009, -45.8601362], [258, -23.1932171, -45.8601925], [259, -23.1931505, -45.860061]];
@@ -314,7 +314,7 @@ function calcCampusRoute(oLat,oLng,dLat,dLng){
 }
 
 // ── LOCAIS ──
-const DEFAULT=[
+var DEFAULT=[
   {id:1,name:"Aud. Principal",lat:-23.194017,lng:-45.860111,category:"Auditório",floor:"Térreo"},
   {id:2,name:"Aud. Estações",lat:-23.194114,lng:-45.859431,category:"Auditório",floor:"3 andar"},
   {id:3,name:"Aud. Oliveiras",lat:-23.194114,lng:-45.859431,category:"Auditório",floor:"2 andar"},
@@ -362,40 +362,40 @@ const DEFAULT=[
 ];
 
 // ── STATE ──
-let locs=JSON.parse(localStorage.getItem(LSTORE)||'null')||DEFAULT;
-let uLat=null,uLng=null,uAcc=null;
-let headRaw=null,headSmooth=null,sensorOK=false;
-let baroAlt=null,baroRef=null; // altitude pelo barômetro
-let dest=null,stream=null,raf=null;
-let activeCat='Todos',editId=null,arrivedShown=false,animT=0;
-let routeOptions=[],selectedRoute=0,activeRoute=[];
+var locs=JSON.parse(localStorage.getItem(LSTORE)||'null')||DEFAULT;
+var uLat=null,uLng=null,uAcc=null;
+var headRaw=null,headSmooth=null,sensorOK=false;
+var baroAlt=null,baroRef=null; // altitude pelo barômetro
+var dest=null,stream=null,raf=null;
+var activeCat='Todos',editId=null,arrivedShown=false,animT=0;
+var routeOptions=[],selectedRoute=0,activeRoute=[];
 
 function saveLocs(){localStorage.setItem(LSTORE,JSON.stringify(locs));}
 
 // ── GEO ──
 function dist(a,b,c,d){
-  const R=6371000,dL=(c-a)*Math.PI/180,dO=(d-b)*Math.PI/180;
-  const x=Math.sin(dL/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dO/2)**2;
+  var R=6371000,dL=(c-a)*Math.PI/180,dO=(d-b)*Math.PI/180;
+  var x=Math.sin(dL/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dO/2)**2;
   return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
 }
 function bearing(a,b,c,d){
-  const dO=(d-b)*Math.PI/180;
-  const y=Math.sin(dO)*Math.cos(c*Math.PI/180);
-  const x=Math.cos(a*Math.PI/180)*Math.sin(c*Math.PI/180)-Math.sin(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.cos(dO);
+  var dO=(d-b)*Math.PI/180;
+  var y=Math.sin(dO)*Math.cos(c*Math.PI/180);
+  var x=Math.cos(a*Math.PI/180)*Math.sin(c*Math.PI/180)-Math.sin(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.cos(dO);
   return(Math.atan2(y,x)*180/Math.PI+360)%360;
 }
 function fmtD(m){return m>=1000?(m/1000).toFixed(2)+'km':Math.round(m)+'m';}
 function fmtC(v){return v!=null?v.toFixed(5):'–';}
 function lerpA(cur,tgt,a){
   if(cur===null)return tgt;
-  let d=tgt-cur;if(d>180)d-=360;if(d<-180)d+=360;
+  var d=tgt-cur;if(d>180)d-=360;if(d<-180)d+=360;
   return(cur+d*a+360)%360;
 }
 
 // ── KALMAN GPS ──
-let kLat=null,kLng=null,kP=1;
+var kLat=null,kLng=null,kP=1;
 function kalman(raw,prev,P){
-  const Q=0.00005,R=0.008,K=(P+Q)/(P+Q+R);
+  var Q=0.00005,R=0.008,K=(P+Q)/(P+Q+R);
   return{val:prev===null?raw:prev+K*(raw-prev),P:(1-K)*(P+Q)};
 }
 
@@ -425,7 +425,7 @@ function startBaro(){
   // Tenta via Sensor API genérica
   if('PressureSensor' in window){
     try{
-      const ps=new PressureSensor({frequency:1});
+      var ps=new PressureSensor({frequency:1});
       ps.addEventListener('reading',function(){
         var p=ps.pressure;
         var alt=44330*(1-Math.pow(p/1013.25,0.1903));
@@ -446,24 +446,24 @@ function startBaro(){
 function updateBaro(alt){
   baroAlt=alt;
   if(baroRef===null) baroRef=alt;
-  const el=document.getElementById('hbaro');
+  var el=document.getElementById('hbaro');
   if(el) el.style.display='block';
-  const valEl=document.getElementById('hbaro-val');
+  var valEl=document.getElementById('hbaro-val');
   if(valEl) valEl.textContent=alt.toFixed(1)+' m';
   updateFloorIndicator();
 }
 
 function updateFloorIndicator(){
   if(!dest||baroAlt===null) return;
-  const targetFloorH=FLOOR_H[dest.floor]||0;
+  var targetFloorH=FLOOR_H[dest.floor]||0;
   // Altitude relativa ao ponto de referência
-  const relAlt=baroRef!==null?baroAlt-baroRef:0;
-  const diffH=targetFloorH-relAlt;
-  const floorEl=document.getElementById('hfloor');
-  const iconEl=document.getElementById('hfloor-icon');
-  const txtEl=document.getElementById('hfloor-txt');
-  const arrEl=document.getElementById('hfloor-arrow');
-  const diffEl=document.getElementById('hbaro-diff');
+  var relAlt=baroRef!==null?baroAlt-baroRef:0;
+  var diffH=targetFloorH-relAlt;
+  var floorEl=document.getElementById('hfloor');
+  var iconEl=document.getElementById('hfloor-icon');
+  var txtEl=document.getElementById('hfloor-txt');
+  var arrEl=document.getElementById('hfloor-arrow');
+  var diffEl=document.getElementById('hbaro-diff');
   if(floorEl) floorEl.style.display='block';
   if(Math.abs(diffH)<2){
     // Mesmo nível
@@ -488,7 +488,7 @@ function updateFloorIndicator(){
 
 // ── BÚSSOLA ──
 function onOri(e){
-  let r=null;
+  var r=null;
   if(e.webkitCompassHeading!=null&&e.webkitCompassHeading>=0) r=e.webkitCompassHeading;
   else if(e.absolute&&e.alpha!=null) r=(360-e.alpha)%360;
   else if(e.alpha!=null) r=(360-e.alpha)%360;
@@ -505,48 +505,48 @@ function startCompass(){
   if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){
     document.getElementById('perm').classList.add('show');
   } else {regCompass();}
-  setTimeout(()=>{if(!sensorOK){document.getElementById('sdot').className='sdot';document.getElementById('stxt').textContent='bússola: sem sinal';}},3000);
+  setTimeout(function(){if(!sensorOK){document.getElementById('sdot').className='sdot';document.getElementById('stxt').textContent='bússola: sem sinal';}},3000);
 }
-document.getElementById('btnperm').addEventListener('click',()=>{
-  DeviceOrientationEvent.requestPermission().then(s=>{
+document.getElementById('btnperm').addEventListener('click',function(){
+  DeviceOrientationEvent.requestPermission().then(function(s){
     if(s==='granted')regCompass();
     document.getElementById('perm').classList.remove('show');
-  }).catch(()=>document.getElementById('perm').classList.remove('show'));
+  }).catch(function(){document.getElementById('perm').classList.remove('show');});
 });
 
 // ── CLOCK ──
 function tick(){
-  const n=new Date(),p=v=>String(v).padStart(2,'0');
-  const el=document.getElementById('htime');if(el)el.textContent=p(n.getHours())+':'+p(n.getMinutes())+':'+p(n.getSeconds());
-  const days=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-  const mo=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-  const el2=document.getElementById('hdate');if(el2)el2.textContent=days[n.getDay()]+' '+n.getDate()+' '+mo[n.getMonth()];
+  var n=new Date(); function p(v){return String(v).padStart(2,'0');}
+  var el=document.getElementById('htime');if(el)el.textContent=p(n.getHours())+':'+p(n.getMinutes())+':'+p(n.getSeconds());
+  var days=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  var mo=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  var el2=document.getElementById('hdate');if(el2)el2.textContent=days[n.getDay()]+' '+n.getDate()+' '+mo[n.getMonth()];
 }
 setInterval(tick,1000);tick();
 
 // ── HUD ──
 function refreshHUD(){
   if(!dest)return;
-  const d=uLat!=null?dist(uLat,uLng,dest.lat,dest.lng):null;
-  const el=document.getElementById('hdist');if(el)el.textContent=d!=null?fmtD(d):'–';
-  const el2=document.getElementById('hmpos');if(el2)el2.textContent=uLat!=null?fmtC(uLat)+', '+fmtC(uLng):'Sem GPS';
-  const el3=document.getElementById('hacc');if(el3){el3.textContent=uAcc!=null?'±'+uAcc+'m':'–';el3.style.color=uAcc!=null&&uAcc<20?'#00e676':'#ffd600';}
+  var d=uLat!=null?dist(uLat,uLng,dest.lat,dest.lng):null;
+  var el=document.getElementById('hdist');if(el)el.textContent=d!=null?fmtD(d):'–';
+  var el2=document.getElementById('hmpos');if(el2)el2.textContent=uLat!=null?fmtC(uLat)+', '+fmtC(uLng):'Sem GPS';
+  var el3=document.getElementById('hacc');if(el3){el3.textContent=uAcc!=null?'±'+uAcc+'m':'–';el3.style.color=uAcc!=null&&uAcc<20?'#00e676':'#ffd600';}
   updateFloorIndicator();
   if(d!=null&&d<8&&!arrivedShown){
     arrivedShown=true;
     document.getElementById('arrsub').textContent=dest.name+' · '+dest.floor;
-    const av=document.getElementById('arrived');av.style.display='flex';
-    setTimeout(()=>av.style.display='none',7000);
+    var av=document.getElementById('arrived');av.style.display='flex';
+    setTimeout(function(){av.style.display='none';},7000);
   }
   if(d!=null&&d>15)arrivedShown=false;
 }
-setInterval(()=>{refreshHUD();renderList();},3000);
+setInterval(function(){refreshHUD();renderList();},3000);
 
 // ── GOOGLE MAPS DIRECTIONS – múltiplas rotas ──
 function decodePolyline(enc){
-  const pts=[];let idx=0,lat=0,lng=0;
+  var pts=[];var idx=0,lat=0,lng=0;
   while(idx<enc.length){
-    let b,shift=0,result=0;
+    var b,shift=0,result=0;
     do{b=enc.charCodeAt(idx++)-63;result|=(b&0x1f)<<shift;shift+=5;}while(b>=0x20);
     lat+=(result&1)?~(result>>1):(result>>1);shift=0;result=0;
     do{b=enc.charCodeAt(idx++)-63;result|=(b&0x1f)<<shift;shift+=5;}while(b>=0x20);
@@ -633,27 +633,30 @@ function showRoutePicker(){
   // Always show picker so user sees options (even if only direct line)
   if(routeOptions.length===0){selectRoute(0);return;}
   selectedRoute=0;
-  const container=document.getElementById('rp-options');
-  container.innerHTML=routeOptions.map((r,i)=>`
-    <div class="rp-option ${i===0?'selected':''}" data-i="${i}" onclick="pickRoute(${i})">
-      <div class="rp-option-header">
-        <span class="rp-badge" style="background:${r.color}22;color:${r.color};border:1px solid ${r.color}44">${r.label}</span>
-        <span class="rp-time">${r.duration}</span>
-        <span class="rp-dist">${r.distance}</span>
-      </div>
-      <div class="rp-steps">${r.steps.slice(0,3).map(s=>'• '+s).join('<br>')}</div>
-    </div>
-  `).join('');
+  var container=document.getElementById('rp-options');
+  var rpHtml='';
+  for(var ri=0;ri<routeOptions.length;ri++){
+    var ro=routeOptions[ri];
+    rpHtml+='<div class="rp-option '+(ri===0?'selected':'')+'" data-i="'+ri+'" onclick="pickRoute('+ri+')">';
+    rpHtml+='<div class="rp-option-header">';
+    rpHtml+='<span class="rp-badge" style="background:'+ro.color+'22;color:'+ro.color+';border:1px solid '+ro.color+'44">'+ro.label+'</span>';
+    rpHtml+='<span class="rp-time">'+ro.duration+'</span>';
+    rpHtml+='<span class="rp-dist">'+ro.distance+'</span>';
+    rpHtml+='</div>';
+    rpHtml+='<div class="rp-steps">'+ro.steps.slice(0,3).map(function(s){return '• '+s;}).join('<br>')+'</div>';
+    rpHtml+='</div>';
+  }
+  container.innerHTML=rpHtml;
   document.getElementById('routepicker').classList.add('show');
 }
 
 function pickRoute(i){
   selectedRoute=i;
-  document.querySelectorAll('.rp-option').forEach((el,j)=>el.classList.toggle('selected',j===i));
+  document.querySelectorAll('.rp-option').forEach(function(el,j){el.classList.toggle('selected',j===i);});
 }
 
 function selectRoute(i){
-  const opt=routeOptions[i];
+  var opt=routeOptions[i];
   activeRoute=opt?opt.points:[];
   routeStep=0;
   document.getElementById('routepicker').classList.remove('show');
@@ -661,7 +664,7 @@ function selectRoute(i){
   refreshHUD();
 }
 
-let routeStep=0;
+var routeStep=0;
 function updateRouteProgress(){
   if(!uLat||activeRoute.length<2)return;
   // Advance routeStep when we get close enough to the current waypoint
@@ -679,8 +682,8 @@ function updateRouteProgress(){
 
 // ── CANVAS AR ──
 function startCanvas(){
-  const cv=document.getElementById('cvs');
-  const ctx=cv.getContext('2d');
+  var cv=document.getElementById('cvs');
+  var ctx=cv.getContext('2d');
   function resize(){cv.width=window.innerWidth;cv.height=window.innerHeight;}
   resize();window.addEventListener('resize',resize);
   function frame(){
@@ -697,14 +700,14 @@ function startCanvas(){
 // Projeta lat/lng para XY na tela
 function project(lat,lng,W,H,camH){
   if(!uLat)return null;
-  const br=bearing(uLat,uLng,lat,lng);
-  const d3=dist(uLat,uLng,lat,lng);
-  const FOV=65;
-  const relDeg=camH!==null?((br-camH)+540)%360-180:0;
+  var br=bearing(uLat,uLng,lat,lng);
+  var d3=dist(uLat,uLng,lat,lng);
+  var FOV=65;
+  var relDeg=camH!==null?((br-camH)+540)%360-180:0;
   if(Math.abs(relDeg)>FOV)return null;
-  const sx=W/2+(relDeg/(FOV/2))*(W/2);
-  const maxD=120,prog=Math.min(d3,maxD)/maxD;
-  const sy=H*0.70-(H*0.70-H*0.38)*prog;
+  var sx=W/2+(relDeg/(FOV/2))*(W/2);
+  var maxD=120,prog=Math.min(d3,maxD)/maxD;
+  var sy=H*0.70-(H*0.70-H*0.38)*prog;
   return{x:Math.max(10,Math.min(W-10,sx)),y:sy,dist:d3};
 }
 
@@ -727,20 +730,20 @@ function drawAR(ctx,W,H){
   }
   var d3=dist(uLat,uLng,dest.lat,dest.lng);
   var br=bearing(uLat,uLng,navTarget.lat,navTarget.lng);
-  const camH=headSmooth;
-  const FOV=65;
-  let relDeg=0;const hasSensor=camH!==null;
+  var camH=headSmooth;
+  var FOV=65;
+  var relDeg=0;var hasSensor=camH!==null;
   if(hasSensor)relDeg=((br-camH)+540)%360-180;
-  const onscreen=!hasSensor||Math.abs(relDeg)<(FOV/2+8);
-  const sx=hasSensor?W/2+(relDeg/(FOV/2))*(W/2):W/2;
-  const fh=FLOOR_H[dest.floor]||0;
-  const maxD=120,prog=Math.min(d3,maxD)/maxD;
-  const sc=Math.max(0.28,1-prog*0.72);
-  const gy=H*0.70,hz=H*0.38;
-  let py=(gy-(gy-hz)*prog)-(fh/18)*(H*0.22)*sc*(1-prog*0.5);
-  const col=CAT_COLOR[dest.category]||'#a855f7';
-  const [r,g,b]=hexRGB(col);
-  const pulse=0.5+0.5*Math.sin(animT*2.4);
+  var onscreen=!hasSensor||Math.abs(relDeg)<(FOV/2+8);
+  var sx=hasSensor?W/2+(relDeg/(FOV/2))*(W/2):W/2;
+  var fh=FLOOR_H[dest.floor]||0;
+  var maxD=120,prog=Math.min(d3,maxD)/maxD;
+  var sc=Math.max(0.28,1-prog*0.72);
+  var gy=H*0.70,hz=H*0.38;
+  var py=(gy-(gy-hz)*prog)-(fh/18)*(H*0.22)*sc*(1-prog*0.5);
+  var col=CAT_COLOR[dest.category]||'#a855f7';
+  var [r,g,b]=hexRGB(col);
+  var pulse=0.5+0.5*Math.sin(animT*2.4);
   // Rota
   drawRoute(ctx,W,H,camH,col,r,g,b);
   // Alfinete ou seta
@@ -805,24 +808,24 @@ function drawArrowsAlongPath(ctx,pts,r,g,b,col){
 }
 
 function drawRoute(ctx,W,H,camH,col,r,g,b){
-  const ox=W/2,oy=H*0.88;
-  const routeColor=routeOptions[selectedRoute]?routeOptions[selectedRoute].color:col;
-  const [rr2,gg2,bb2]=hexRGB(routeColor);
+  var ox=W/2,oy=H*0.88;
+  var routeColor=routeOptions[selectedRoute]?routeOptions[selectedRoute].color:col;
+  var [rr2,gg2,bb2]=hexRGB(routeColor);
 
   if(activeRoute.length>=2){
     // Projeta pontos da rota
-    const pts=[{x:ox,y:oy}];
-    const remaining=activeRoute.slice(routeStep);
-    for(const pt of remaining){
-      const p=project(pt.lat,pt.lng,W,H,camH);
+    var pts=[{x:ox,y:oy}];
+    var remaining=activeRoute.slice(routeStep);
+    for(var pt of remaining){
+      var p=project(pt.lat,pt.lng,W,H,camH);
       if(p)pts.push({x:p.x,y:p.y});
     }
     if(pts.length>=2){
       // Glow externo
       ctx.save();
       ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);
-      for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i].x,pts[i].y);
-      ctx.strokeStyle=`rgba(${rr2},${gg2},${bb2},0.12)`;
+      for(var i=1;i<pts.length;i++)ctx.lineTo(pts[i].x,pts[i].y);
+      ctx.strokeStyle='rgba('+rr2+',' +gg2+',' +bb2+',' +0.12+')';
       ctx.lineWidth=16;ctx.lineCap='round';ctx.lineJoin='round';
       ctx.filter='blur(8px)';ctx.stroke();
       // Linha guia suave (fina, semi-transparente)
@@ -842,19 +845,19 @@ function drawRoute(ctx,W,H,camH,col,r,g,b){
     }
   } else {
     // Linha curva direta
-    const proj=project(dest.lat,dest.lng,W,H,camH);
-    const dx=proj?proj.x:W/2,dy=proj?proj.y:H*0.5;
-    const cpx=(ox+dx)/2,cpy=Math.min(oy,dy)-H*0.15;
+    var proj=project(dest.lat,dest.lng,W,H,camH);
+    var dx=proj?proj.x:W/2,dy=proj?proj.y:H*0.5;
+    var cpx=(ox+dx)/2,cpy=Math.min(oy,dy)-H*0.15;
     ctx.save();
     ctx.beginPath();ctx.moveTo(ox,oy);ctx.quadraticCurveTo(cpx,cpy,dx,dy);
-    ctx.strokeStyle=`rgba(${rr2},${gg2},${bb2},0.12)`;ctx.lineWidth=14;
+    ctx.strokeStyle='rgba('+rr2+',' +gg2+',' +bb2+',' +0.12+')';ctx.lineWidth=14;
     ctx.filter='blur(7px)';ctx.stroke();
     ctx.filter='none';
     ctx.beginPath();ctx.moveTo(ox,oy);ctx.quadraticCurveTo(cpx,cpy,dx,dy);
-    const lg2=ctx.createLinearGradient(ox,oy,dx,dy);
-    lg2.addColorStop(0,`rgba(${rr2},${gg2},${bb2},0)`);
-    lg2.addColorStop(0.2,`rgba(${rr2},${gg2},${bb2},0.65)`);
-    lg2.addColorStop(1,`rgba(${rr2},${gg2},${bb2},0)`);
+    var lg2=ctx.createLinearGradient(ox,oy,dx,dy);
+    lg2.addColorStop(0,'rgba('+rr2+',' +gg2+',' +bb2+',' +0+')');
+    lg2.addColorStop(0.2,'rgba('+rr2+',' +gg2+',' +bb2+',' +0.65+')');
+    lg2.addColorStop(1,'rgba('+rr2+',' +gg2+',' +bb2+',' +0+')');
     ctx.strokeStyle=lg2;ctx.lineWidth=2;ctx.stroke();
     // Setinhas na linha direta curva
     var curvePts=[];
@@ -871,29 +874,29 @@ function drawRoute(ctx,W,H,camH,col,r,g,b){
   // Dot usuário + anel pulsante
   ctx.save();
   ctx.beginPath();ctx.arc(ox,oy,6,0,Math.PI*2);
-  ctx.fillStyle=`rgba(${rr2},${gg2},${bb2},0.85)`;ctx.shadowColor=routeColor;ctx.shadowBlur=14;ctx.fill();ctx.shadowBlur=0;
+  ctx.fillStyle='rgba('+rr2+',' +gg2+',' +bb2+',' +0.85+')';ctx.shadowColor=routeColor;ctx.shadowBlur=14;ctx.fill();ctx.shadowBlur=0;
   ctx.beginPath();ctx.arc(ox,oy,10+4*Math.sin(animT*3),0,Math.PI*2);
-  ctx.strokeStyle=`rgba(${rr2},${gg2},${bb2},${0.3+0.2*Math.sin(animT*3)})`;ctx.lineWidth=2;ctx.stroke();
+  ctx.strokeStyle='rgba('+rr2+',' +gg2+',' +bb2+',' +${0.3+0.2*Math.sin(animT*3)}+')';ctx.lineWidth=2;ctx.stroke();
   ctx.restore();
 }
 
 function drawPin(ctx,x,y,sc,d,col,r,g,b,pulse){
-  const sz=Math.max(18,52*sc);
+  var sz=Math.max(18,52*sc);
   ctx.save();ctx.translate(x,y);
   // sombra chão
   ctx.save();ctx.scale(1,0.28);
-  const sg=ctx.createRadialGradient(0,sz*1.65/0.28,0,0,sz*1.65/0.28,sz*0.8);
-  sg.addColorStop(0,`rgba(${r},${g},${b},${0.55*sc})`);sg.addColorStop(1,'transparent');
+  var sg=ctx.createRadialGradient(0,sz*1.65/0.28,0,0,sz*1.65/0.28,sz*0.8);
+  sg.addColorStop(0,'rgba('+r+',' +g+',' +b+',' +${0.55*sc}+')');sg.addColorStop(1,'transparent');
   ctx.fillStyle=sg;ctx.beginPath();ctx.ellipse(0,sz*1.65/0.28,sz*0.75,sz*0.5,0,0,Math.PI*2);ctx.fill();ctx.restore();
   // anel chão
   ctx.save();ctx.scale(1,0.32);
   ctx.beginPath();ctx.arc(0,sz*1.65/0.32,sz*(0.5+pulse*0.35),0,Math.PI*2);
-  ctx.strokeStyle=`rgba(${r},${g},${b},${(1-pulse)*0.5})`;ctx.lineWidth=2*sc;ctx.stroke();ctx.restore();
+  ctx.strokeStyle='rgba('+r+',' +g+',' +b+',' +${(1-pulse)*0.5}+')';ctx.lineWidth=2*sc;ctx.stroke();ctx.restore();
   // gota
-  const pinH=sz*1.6,cr=sz*0.52,topY=-pinH,circY=topY+cr;
-  const grad=ctx.createLinearGradient(0,topY,0,0);
+  var pinH=sz*1.6,cr=sz*0.52,topY=-pinH,circY=topY+cr;
+  var grad=ctx.createLinearGradient(0,topY,0,0);
   grad.addColorStop(0,'rgba(255,255,255,0.95)');grad.addColorStop(0.22,col);
-  grad.addColorStop(0.72,col);grad.addColorStop(1,`rgba(${r},${g},${b},0.45)`);
+  grad.addColorStop(0.72,col);grad.addColorStop(1,'rgba('+r+',' +g+',' +b+',' +0.45+')');
   ctx.save();ctx.shadowColor=col;ctx.shadowBlur=20*sc*(0.65+0.35*pulse);
   ctx.beginPath();ctx.arc(0,circY,cr,Math.PI*1.18,Math.PI*1.82,false);
   ctx.lineTo(0,0);ctx.closePath();
@@ -905,17 +908,17 @@ function drawPin(ctx,x,y,sc,d,col,r,g,b,pulse){
   ctx.fill();ctx.shadowBlur=0;
   // label
   if(sc>0.4){
-    const pad=8,lh=44;ctx.save();
-    ctx.font=`700 ${Math.max(9,12*sc)}px Rajdhani,sans-serif`;
-    const tw=Math.min(ctx.measureText(dest.name).width,170*sc);
-    const lw=Math.max(tw+pad*2,70),lx=-lw/2,ly=topY-lh-12;
-    ctx.fillStyle='rgba(4,10,20,0.90)';ctx.strokeStyle=`rgba(${r},${g},${b},0.55)`;ctx.lineWidth=1;
+    var pad=8,lh=44;ctx.save();
+    ctx.font='700 '+Math.max(9,12*sc)+'px Rajdhani,sans-serif';
+    var tw=Math.min(ctx.measureText(dest.name).width,170*sc);
+    var lw=Math.max(tw+pad*2,70),lx=-lw/2,ly=topY-lh-12;
+    ctx.fillStyle='rgba(4,10,20,0.90)';ctx.strokeStyle='rgba('+r+','+g+','+b+',0.55)';ctx.lineWidth=1;
     rr(ctx,lx,ly,lw,lh,7);ctx.fill();rr(ctx,lx,ly,lw,lh,7);ctx.stroke();
     ctx.beginPath();ctx.moveTo(0,ly+lh);ctx.lineTo(0,topY-3);
-    ctx.strokeStyle=`rgba(${r},${g},${b},0.3)`;ctx.lineWidth=1;ctx.setLineDash([3,4]);ctx.stroke();ctx.setLineDash([]);
+    ctx.strokeStyle='rgba('+r+','+g+','+b+',0.3)';ctx.lineWidth=1;ctx.setLineDash([3,4]);ctx.stroke();ctx.setLineDash([]);
     ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='top';
     ctx.save();ctx.rect(lx+2,ly,lw-4,lh);ctx.clip();ctx.fillText(dest.name,0,ly+6);ctx.restore();
-    ctx.font=`700 ${Math.max(8,10*sc)}px Orbitron,monospace`;ctx.fillStyle=col;ctx.fillText(fmtD(d),0,ly+lh-16);
+    ctx.font='700 '+Math.max(8,10*sc)+'px Orbitron,monospace';ctx.fillStyle=col;ctx.fillText(fmtD(d),0,ly+lh-16);
     ctx.restore();
   }
   ctx.restore();
@@ -1006,7 +1009,7 @@ function drawDirectionArrow(ctx,x,y,col){
   ctx.restore();
 }
 function rr(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();}
-function hexRGB(h){const c=h.replace('#','');return[parseInt(c.slice(0,2),16),parseInt(c.slice(2,4),16),parseInt(c.slice(4,6),16)];}
+function hexRGB(h){var c=h.replace('#','');return[parseInt(c.slice(0,2),16),parseInt(c.slice(2,4),16),parseInt(c.slice(4,6),16)];}
 
 // ── CÂMERA ──
 function startCamera(){
@@ -1066,7 +1069,7 @@ function startCamera(){
 }
 function stopCamera(){
   if(raf){cancelAnimationFrame(raf);raf=null;}
-  if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;}
+  if(stream){stream.getTracks().forEach(function(t){t.stop();});stream=null;}
   document.getElementById('vid').srcObject=null;
   headRaw=null;headSmooth=null;sensorOK=false;
   document.getElementById('perm').classList.remove('show');
@@ -1090,7 +1093,7 @@ function startNav(loc){
   dest=loc;arrivedShown=false;selectedRoute=0;activeRoute=[];routeStep=0;
   document.getElementById('dname').textContent=loc.name;
   document.getElementById('dfloor').textContent=loc.floor+' · '+loc.category;
-  const d=uLat!=null?dist(uLat,uLng,loc.lat,loc.lng):null;
+  var d=uLat!=null?dist(uLat,uLng,loc.lat,loc.lng):null;
   document.getElementById('hdist').textContent=d!=null?fmtD(d):'–';
   document.getElementById('hmpos').textContent=uLat!=null?fmtC(uLat)+', '+fmtC(uLng):'Sem GPS';
   document.getElementById('hacc').textContent=uAcc!=null?'±'+uAcc+'m':'–';
@@ -1116,77 +1119,97 @@ function startNav(loc){
   },800);
 }
 function goHome(){stopCamera();dest=null;activeRoute=[];routeStep=0;showScreen('home');}
-function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function showScreen(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});document.getElementById(id).classList.add('active');}
 
 // ── HOME ──
-function allCats(){return['Todos',...new Set(locs.map(l=>l.category))];}
+function allCats(){var cats=['Todos'];locs.forEach(function(l){if(cats.indexOf(l.category)<0)cats.push(l.category);});return cats;}
 function renderCats(){
-  const el=document.getElementById('catrow');
-  el.innerHTML=allCats().map(cat=>`<div class="cpill ${cat===activeCat?'on':''}" data-cat="${cat}">${cat}</div>`).join('');
-  el.querySelectorAll('.cpill').forEach(p=>p.addEventListener('click',()=>{activeCat=p.dataset.cat;renderCats();renderList();}));
+  var el=document.getElementById('catrow');
+  var catHtml='';
+  allCats().forEach(function(cat){
+    catHtml+='<div class="cpill '+(cat===activeCat?'on':'')+'" data-cat="'+cat+'">'+cat+'</div>';
+  });
+  el.innerHTML=catHtml;
+  el.querySelectorAll('.cpill').forEach(function(p){p.addEventListener('click',function(){activeCat=p.dataset.cat;renderCats();renderList();});});
 }
 function renderList(){
-  const q=document.getElementById('sinput').value.toLowerCase();
-  let fl=locs.filter(loc=>(activeCat==='Todos'||loc.category===activeCat)&&(!q||loc.name.toLowerCase().includes(q)||loc.category.toLowerCase().includes(q)));
-  if(uLat!=null)fl.sort((a,b)=>dist(uLat,uLng,a.lat,a.lng)-dist(uLat,uLng,b.lat,b.lng));
-  const el=document.getElementById('llist');
-  el.innerHTML=fl.map(loc=>{
-    const col=CAT_COLOR[loc.category]||'#a855f7';
-    const ico=CAT_ICON[loc.category]||'📍';
-    const d=uLat!=null?fmtD(dist(uLat,uLng,loc.lat,loc.lng)):'';
-    return `<div class="lcard" data-id="${loc.id}" style="--cc:${col}">
-      <div class="lic" style="background:${col}22;color:${col}">${ico}</div>
-      <div style="flex:1;min-width:0"><div class="lname">${loc.name}</div><div class="lmeta">${loc.category} · ${loc.floor}</div></div>
-      <div class="ldist">${d}</div></div>`;
-  }).join('');
-  el.querySelectorAll('.lcard').forEach(card=>card.addEventListener('click',()=>{
-    const loc=locs.find(l=>String(l.id)===card.dataset.id);if(loc)startNav(loc);
-  }));
+  var q=document.getElementById('sinput').value.toLowerCase();
+  var fl=[];
+  for(var rli=0;rli<locs.length;rli++){
+    var rloc=locs[rli];
+    var okCat=(activeCat==='Todos'||rloc.category===activeCat);
+    var okQ=(!q||rloc.name.toLowerCase().includes(q)||rloc.category.toLowerCase().includes(q));
+    if(okCat&&okQ)fl.push(rloc);
+  }
+  if(uLat!=null)fl.sort(function(a,b){return dist(uLat,uLng,a.lat,a.lng)-dist(uLat,uLng,b.lat,b.lng);});
+  var el=document.getElementById('llist');
+  var lHtml='';
+  fl.forEach(function(loc){
+    var lcol=CAT_COLOR[loc.category]||'#a855f7';
+    var lico=CAT_ICON[loc.category]||'📍';
+    var ld=uLat!=null?fmtD(dist(uLat,uLng,loc.lat,loc.lng)):'';
+    lHtml+='<div class="lcard" data-id="'+loc.id+'" style="--cc:'+lcol+'">';
+    lHtml+='<div class="lic" style="background:'+lcol+'22;color:'+lcol+'">'+lico+'</div>';
+    lHtml+='<div style="flex:1;min-width:0"><div class="lname">'+loc.name+'</div>';
+    lHtml+='<div class="lmeta">'+loc.category+' · '+loc.floor+'</div></div>';
+    lHtml+='<div class="ldist">'+ld+'</div></div>';
+  });
+  el.innerHTML=lHtml;
+  el.querySelectorAll('.lcard').forEach(function(card){
+    card.addEventListener('click',function(){
+      var loc=null;
+      for(var fi=0;fi<locs.length;fi++){if(String(locs[fi].id)===card.dataset.id){loc=locs[fi];break;}}
+      if(loc)startNav(loc);
+    });
+  });
 }
 
 // ── ADMIN ──
 function renderAdmin(q=''){
-  const fl=q?locs.filter(l=>l.name.toLowerCase().includes(q.toLowerCase())):locs;
-  const el=document.getElementById('alist');
-  el.innerHTML=fl.map(loc=>{
-    const col=CAT_COLOR[loc.category]||'#a855f7';
-    const ico=CAT_ICON[loc.category]||'📍';
-    return `<div class="aitem"><div class="aic" style="background:${col}22;color:${col}">${ico}</div>
-      <div class="ainf"><div class="aname">${loc.name}</div><div class="acat">${loc.category} · ${loc.floor}</div></div>
-      <div class="abtns"><button class="ebtn" data-id="${loc.id}">✏️</button><button class="dbtn" data-id="${loc.id}">🗑️</button></div></div>`;
-  }).join('');
-  el.querySelectorAll('.ebtn').forEach(b=>b.addEventListener('click',()=>openEdit(b.dataset.id)));
-  el.querySelectorAll('.dbtn').forEach(b=>b.addEventListener('click',()=>delLoc(b.dataset.id)));
+  var fl=q?locs.filter(function(l){return l.name.toLowerCase().includes(q.toLowerCase());}):locs;
+  var el=document.getElementById('alist');
+  var aHtml='';
+  fl.forEach(function(loc){
+    var acol=CAT_COLOR[loc.category]||'#a855f7';
+    var aico=CAT_ICON[loc.category]||'📍';
+    aHtml+='<div class="aitem"><div class="aic" style="background:'+acol+'22;color:'+acol+'">'+aico+'</div>';
+    aHtml+='<div class="ainf"><div class="aname">'+loc.name+'</div><div class="acat">'+loc.category+' · '+loc.floor+'</div></div>';
+    aHtml+='<div class="abtns"><button class="ebtn" data-id="'+loc.id+'">✏️</button>';
+    aHtml+='<button class="dbtn" data-id="'+loc.id+'">🗑️</button></div></div>';
+  });
+  el.innerHTML=aHtml;
+  el.querySelectorAll('.ebtn').forEach(function(b){b.addEventListener('click',function(){openEdit(b.dataset.id);});});
+  el.querySelectorAll('.dbtn').forEach(function(b){b.addEventListener('click',function(){delLoc(b.dataset.id);});});
 }
-function delLoc(id){if(!confirm('Remover?'))return;locs=locs.filter(l=>String(l.id)!==String(id));saveLocs();renderAdmin();renderList();toast('Removido');}
-function openAdd(){editId=null;document.getElementById('mtitle').textContent='Adicionar Local';['fn','flat','flng'].forEach(i=>document.getElementById(i).value='');document.getElementById('fcat').value='Outras';document.getElementById('ffloor').value='Térreo';document.getElementById('mbg').classList.add('open');}
-function openEdit(id){const loc=locs.find(l=>String(l.id)===String(id));if(!loc)return;editId=loc.id;document.getElementById('mtitle').textContent='Editar Local';document.getElementById('fn').value=loc.name;document.getElementById('fcat').value=loc.category;document.getElementById('ffloor').value=loc.floor;document.getElementById('flat').value=loc.lat;document.getElementById('flng').value=loc.lng;document.getElementById('mbg').classList.add('open');}
+function delLoc(id){if(!confirm('Remover?'))return;var newLocs=[];for(var fli=0;fli<locs.length;fli++){if(String(locs[fli].id)!==String(id))newLocs.push(locs[fli]);}locs=newLocs;saveLocs();renderAdmin();renderList();toast('Removido');}
+function openAdd(){editId=null;document.getElementById('mtitle').textContent='Adicionar Local';['fn','flat','flng'].forEach(function(i){document.getElementById(i).value='';});document.getElementById('fcat').value='Outras';document.getElementById('ffloor').value='Térreo';document.getElementById('mbg').classList.add('open');}
+function openEdit(id){var loc=null;for(var li2=0;li2<locs.length;li2++){if(String(locs[li2].id)===String(id)){loc=locs[li2];break;}}if(!loc)return;editId=loc.id;document.getElementById('mtitle').textContent='Editar Local';document.getElementById('fn').value=loc.name;document.getElementById('fcat').value=loc.category;document.getElementById('ffloor').value=loc.floor;document.getElementById('flat').value=loc.lat;document.getElementById('flng').value=loc.lng;document.getElementById('mbg').classList.add('open');}
 function closeModal(){document.getElementById('mbg').classList.remove('open');}
 function saveModal(){
-  const name=document.getElementById('fn').value.trim();
-  const cat=document.getElementById('fcat').value,floor=document.getElementById('ffloor').value;
-  const lat=parseFloat(document.getElementById('flat').value),lng=parseFloat(document.getElementById('flng').value);
+  var name=document.getElementById('fn').value.trim();
+  var cat=document.getElementById('fcat').value,floor=document.getElementById('ffloor').value;
+  var lat=parseFloat(document.getElementById('flat').value),lng=parseFloat(document.getElementById('flng').value);
   if(!name){toast('Informe o nome');return;}if(isNaN(lat)||isNaN(lng)){toast('Coordenadas inválidas');return;}
-  if(editId!=null){const i=locs.findIndex(l=>l.id===editId);if(i>-1)locs[i]={...locs[i],name,category:cat,floor,lat,lng};toast('Atualizado ✓');}
-  else{locs.push({id:Date.now(),name,category:cat,floor,lat,lng});toast('Adicionado ✓');}
+  if(editId!=null){var i=-1;for(var fi2=0;fi2<locs.length;fi2++){if(locs[fi2].id===editId){i=fi2;break;}} if(i>-1){var old=locs[i];locs[i]={id:old.id,name:name,category:cat,floor:floor,lat:lat,lng:lng};}toast('Atualizado ✓');}
+  else{locs.push({id:Date.now(),name:name,category:cat,floor:floor,lat:lat,lng:lng});toast('Adicionado ✓');}
   saveLocs();closeModal();renderAdmin();renderList();renderCats();
 }
-function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600);}
+function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2600);}
 
 // ── EVENTS ──
 document.getElementById('sinput').addEventListener('input',renderList);
-document.getElementById('fab').addEventListener('click',()=>{
+document.getElementById('fab').addEventListener('click',function(){
   renderAdmin();loadMapsKeyInput();showScreen('admin');
 });
-document.getElementById('admback').addEventListener('click',()=>showScreen('home'));
+document.getElementById('admback').addEventListener('click',function(){showScreen('home');});
 document.getElementById('arback').addEventListener('click',goHome);
 document.getElementById('btnadd').addEventListener('click',openAdd);
 document.getElementById('mcnl').addEventListener('click',closeModal);
 document.getElementById('msav').addEventListener('click',saveModal);
-document.getElementById('mbg').addEventListener('click',e=>{if(e.target===document.getElementById('mbg'))closeModal();});
-document.getElementById('asrch').addEventListener('input',e=>renderAdmin(e.target.value));
-document.getElementById('rp-cancel').addEventListener('click',()=>{document.getElementById('routepicker').classList.remove('show');goHome();});
-document.getElementById('rp-go').addEventListener('click',()=>selectRoute(selectedRoute));
+document.getElementById('mbg').addEventListener('click',function(e){if(e.target===document.getElementById('mbg'))closeModal();});
+document.getElementById('asrch').addEventListener('input',function(e){renderAdmin(e.target.value);});
+document.getElementById('rp-cancel').addEventListener('click',function(){document.getElementById('routepicker').classList.remove('show');goHome();});
+document.getElementById('rp-go').addEventListener('click',function(){selectRoute(selectedRoute);});
 
 // ── INIT ──
 startGPS();renderCats();renderList();
