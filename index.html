@@ -293,10 +293,13 @@ function calcCampusRoute(oLat,oLng,dLat,dLng){
   var startId=nearestCampusNode(oLat,oLng);
   var endId=nearestCampusNode(dLat,dLng);
   if(!startId||!endId)return null;
+  if(startId===endId)return null;
   var path=campusDijkstra(startId,endId);
   if(!path||path.length<2)return null;
-  // Converte IDs para lat/lng
-  var pts=path.map(function(id){return CNODE_MAP[id];});
+  // Converte IDs para lat/lng - include real origin and dest as first/last point
+  var pts=[{lat:oLat,lng:oLng}]; // real user position
+  for(var pi=0;pi<path.length;pi++){pts.push(CNODE_MAP[path[pi]]);}
+  pts.push({lat:dLat,lng:dLng}); // real destination
   return{
     points:pts,
     nodeIds:path,
@@ -402,20 +405,66 @@ function kalman(raw,prev,P){
 // ── GPS ──
 function startGPS(){
   if(!navigator.geolocation)return;
+  // Kick off with getCurrentPosition first for immediate fix
+  navigator.geolocation.getCurrentPosition(function(p){
+    onGPSUpdate(p);
+  },function(){},
+  {enableHighAccuracy:true,timeout:10000,maximumAge:0});
+  // Then watch continuously
   navigator.geolocation.watchPosition(function(p){
-    uAcc=Math.round(p.coords.accuracy);
-    var rL=kalman(p.coords.latitude,kLat,kP);
-    var rO=kalman(p.coords.longitude,kLng,kP);
-    kLat=rL.val;kLng=rO.val;kP=rL.P;
-    uLat=kLat;uLng=kLng;
-    document.getElementById('gdot').className='gdot on';
-    document.getElementById('gtxt').textContent='GPS · ±'+uAcc+'m';
-    refreshHUD();renderList();
-    updateRouteProgress();
+    onGPSUpdate(p);
   },function(){
     document.getElementById('gdot').className='gdot warn';
     document.getElementById('gtxt').textContent='GPS indisponível';
   },{enableHighAccuracy:true,maximumAge:0,timeout:5000});
+}
+
+function onGPSUpdate(p){
+  var rawLat=p.coords.latitude;
+  var rawLng=p.coords.longitude;
+  uAcc=Math.round(p.coords.accuracy);
+  // Only use reading if accuracy acceptable (<=40m)
+  // Better accuracy = more weight to new reading
+  var alpha=uAcc<=10?0.5:uAcc<=20?0.3:uAcc<=40?0.15:0.05;
+  var rL=kalmanAlpha(rawLat,kLat,kP,alpha);
+  var rO=kalmanAlpha(rawLng,kLng,kP,alpha);
+  kLat=rL.val;kLng=rO.val;kP=rL.P;
+  uLat=kLat;uLng=kLng;
+  document.getElementById('gdot').className='gdot on';
+  document.getElementById('gtxt').textContent='GPS · ±'+uAcc+'m';
+  refreshHUD();renderList();
+  if(dest)checkRouteDeviation();
+}
+
+function kalmanAlpha(raw,prev,P,alpha){
+  var Q=0.00003,R=0.01;
+  var K=(P+Q)/(P+Q+R*(1/alpha));
+  return{val:prev===null?raw:prev+K*(raw-prev),P:(1-K)*(P+Q)};
+}
+
+// Check if user deviated from route - recalculate if needed
+var lastRecalc=0;
+function checkRouteDeviation(){
+  if(!dest||!uLat||activeRoute.length<2)return;
+  var now=Date.now();
+  if(now-lastRecalc<8000)return; // max recalc every 8s
+  // Find distance to nearest point on active route
+  var minD=Infinity;
+  for(var i=0;i<activeRoute.length;i++){
+    var d=geodist(uLat,uLng,activeRoute[i].lat,activeRoute[i].lng);
+    if(d<minD)minD=d;
+  }
+  // If more than 25m off route, recalculate
+  if(minD>25){
+    lastRecalc=now;
+    var campus=calcCampusRoute(uLat,uLng,dest.lat,dest.lng);
+    if(campus&&campus.points.length>1){
+      activeRoute=campus.points;
+      routeStep=0;
+      routeOptions[0]=campus;
+      toast('Rota recalculada');
+    }
+  }
 }
 
 // ── BARÔMETRO ──
@@ -667,8 +716,8 @@ function selectRoute(i){
 var routeStep=0;
 function updateRouteProgress(){
   if(!uLat||activeRoute.length<2)return;
-  // Advance routeStep when we get close enough to the current waypoint
-  var THRESHOLD=12; // meters - advance when within 12m of waypoint
+  var THRESHOLD=15; // meters to advance waypoint
+  // Advance past any waypoints we are close to
   while(routeStep<activeRoute.length-1){
     var wp=activeRoute[routeStep];
     var d=geodist(uLat,uLng,wp.lat,wp.lng);
@@ -676,6 +725,21 @@ function updateRouteProgress(){
       routeStep++;
     } else {
       break;
+    }
+  }
+  // Also skip waypoints that are BEHIND us (dot product check)
+  if(routeStep<activeRoute.length-1){
+    var cur=activeRoute[routeStep];
+    var nxt=activeRoute[routeStep+1];
+    // Vector from cur to nxt
+    var vx=nxt.lng-cur.lng, vy=nxt.lat-cur.lat;
+    // Vector from cur to user
+    var ux=uLng-cur.lng, uy=uLat-cur.lat;
+    // If dot product > 0.8 of segment length, we are past midpoint -> advance
+    var dot=vx*ux+vy*uy;
+    var segLen=vx*vx+vy*vy;
+    if(segLen>0&&dot/segLen>0.85){
+      routeStep++;
     }
   }
 }
