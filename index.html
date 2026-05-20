@@ -245,30 +245,30 @@ CAMPUS_NODES.forEach(function(n){CNODE_MAP[n[0]]={lat:n[1],lng:n[2]};});
 
 // Dijkstra no grafo do campus
 function campusDijkstra(startId, endId){
-  var dist={}, prev={}, visited={};
+  var dmap={}, pmap={}, vis={};
   var queue=[];
-  CAMPUS_NODES.forEach(function(n){dist[n[0]]=Infinity;});
-  dist[startId]=0;
+  CAMPUS_NODES.forEach(function(n){dmap[n[0]]=Infinity;});
+  dmap[startId]=0;
   queue.push([0,startId]);
   while(queue.length){
     queue.sort(function(a,b){return a[0]-b[0];});
     var cur=queue.shift();
-    var d=cur[0], u=cur[1];
-    if(visited[u])continue;
-    visited[u]=true;
+    var dd=cur[0], u=cur[1];
+    if(vis[u])continue;
+    vis[u]=true;
     if(u===endId)break;
     var edges=CAMPUS_ADJ[String(u)]||[];
     for(var i=0;i<edges.length;i++){
       var v=edges[i][0], w=edges[i][1];
-      var nd=d+w;
-      if(nd<dist[v]){dist[v]=nd;prev[v]=u;queue.push([nd,v]);}
+      var nd=dd+w;
+      if(nd<dmap[v]){dmap[v]=nd;pmap[v]=u;queue.push([nd,v]);}
     }
   }
-  if(dist[endId]===Infinity)return null;
+  if(dmap[endId]===Infinity)return null;
   var path=[];
-  var cur=endId;
-  while(cur!==undefined){path.unshift(cur);cur=prev[cur];}
-  return path; // array of node IDs
+  var node=endId;
+  while(node!==undefined){path.unshift(node);node=pmap[node];}
+  return path;
 }
 
 // Encontra o nó do campus mais próximo de lat/lng
@@ -307,7 +307,7 @@ function calcCampusRoute(oLat,oLng,dLat,dLng){
     distance:fmtD(path.reduce(function(acc,id,i){
       if(i===0)return 0;
       var a=CNODE_MAP[path[i-1]],b=CNODE_MAP[id];
-      return acc+dist(a.lat,a.lng,b.lat,b.lng);
+      return acc+geodist(a.lat,a.lng,b.lat,b.lng);
     },0)),
     steps:['Siga os waypoints do campus','Distância calculada pelo mapa interno']
   };
@@ -373,7 +373,7 @@ var routeOptions=[],selectedRoute=0,activeRoute=[];
 function saveLocs(){localStorage.setItem(LSTORE,JSON.stringify(locs));}
 
 // ── GEO ──
-function dist(a,b,c,d){
+function geodist(a,b,c,d){
   var R=6371000,dL=(c-a)*Math.PI/180,dO=(d-b)*Math.PI/180;
   var x=Math.sin(dL/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dO/2)**2;
   return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
@@ -527,7 +527,7 @@ setInterval(tick,1000);tick();
 // ── HUD ──
 function refreshHUD(){
   if(!dest)return;
-  var d=uLat!=null?dist(uLat,uLng,dest.lat,dest.lng):null;
+  var d=uLat!=null?geodist(uLat,uLng,dest.lat,dest.lng):null;
   var el=document.getElementById('hdist');if(el)el.textContent=d!=null?fmtD(d):'–';
   var el2=document.getElementById('hmpos');if(el2)el2.textContent=uLat!=null?fmtC(uLat)+', '+fmtC(uLng):'Sem GPS';
   var el3=document.getElementById('hacc');if(el3){el3.textContent=uAcc!=null?'±'+uAcc+'m':'–';el3.style.color=uAcc!=null&&uAcc<20?'#00e676':'#ffd600';}
@@ -560,7 +560,7 @@ function fetchRoutes(oLat,oLng,dLat,dLng){
   var key=(localStorage.getItem('mapsApiKey')||'').trim();
   var directFallback={
     label:'Linha direta',color:'#a855f7',type:'direct',
-    duration:'–',distance:fmtD(dist(oLat,oLng,dLat,dLng)),
+    duration:'–',distance:fmtD(geodist(oLat,oLng,dLat,dLng)),
     steps:['Siga em direção ao alfinete'],
     points:[{lat:oLat,lng:oLng},{lat:dLat,lng:dLng}]
   };
@@ -671,7 +671,7 @@ function updateRouteProgress(){
   var THRESHOLD=12; // meters - advance when within 12m of waypoint
   while(routeStep<activeRoute.length-1){
     var wp=activeRoute[routeStep];
-    var d=dist(uLat,uLng,wp.lat,wp.lng);
+    var d=geodist(uLat,uLng,wp.lat,wp.lng);
     if(d<=THRESHOLD){
       routeStep++;
     } else {
@@ -701,7 +701,7 @@ function startCanvas(){
 function project(lat,lng,W,H,camH){
   if(!uLat)return null;
   var br=bearing(uLat,uLng,lat,lng);
-  var d3=dist(uLat,uLng,lat,lng);
+  var d3=geodist(uLat,uLng,lat,lng);
   var FOV=65;
   var relDeg=camH!==null?((br-camH)+540)%360-180:0;
   if(Math.abs(relDeg)>FOV)return null;
@@ -722,13 +722,13 @@ function drawAR(ctx,W,H){
   }
   // NEXT WAYPOINT: use current route waypoint as nav target (not final dest)
   var navTarget=dest;
-  var navDist=uLat!=null?dist(uLat,uLng,dest.lat,dest.lng):0;
+  var navDist=uLat!=null?geodist(uLat,uLng,dest.lat,dest.lng):0;
   if(activeRoute.length>1&&routeStep<activeRoute.length-1){
     var wp=activeRoute[routeStep];
     navTarget={lat:wp.lat,lng:wp.lng};
-    navDist=dist(uLat,uLng,wp.lat,wp.lng);
+    navDist=geodist(uLat,uLng,wp.lat,wp.lng);
   }
-  var d3=dist(uLat,uLng,dest.lat,dest.lng);
+  var d3=geodist(uLat,uLng,dest.lat,dest.lng);
   var br=bearing(uLat,uLng,navTarget.lat,navTarget.lng);
   var camH=headSmooth;
   var FOV=65;
@@ -1093,14 +1093,14 @@ function startNav(loc){
   dest=loc;arrivedShown=false;selectedRoute=0;activeRoute=[];routeStep=0;
   document.getElementById('dname').textContent=loc.name;
   document.getElementById('dfloor').textContent=loc.floor+' · '+loc.category;
-  var d=uLat!=null?dist(uLat,uLng,loc.lat,loc.lng):null;
+  var d=uLat!=null?geodist(uLat,uLng,loc.lat,loc.lng):null;
   document.getElementById('hdist').textContent=d!=null?fmtD(d):'–';
   document.getElementById('hmpos').textContent=uLat!=null?fmtC(uLat)+', '+fmtC(uLng):'Sem GPS';
   document.getElementById('hacc').textContent=uAcc!=null?'±'+uAcc+'m':'–';
   // Rota direta imediata — alfinete aparece na hora
   routeOptions=[{
     label:'Linha direta',color:'#00e5ff',type:'direct',
-    duration:'–',distance:uLat!=null?fmtD(dist(uLat,uLng,loc.lat,loc.lng)):'–',
+    duration:'–',distance:uLat!=null?fmtD(geodist(uLat,uLng,loc.lat,loc.lng)):'–',
     steps:['Siga em direção ao alfinete'],
     points:uLat!=null?[{lat:uLat,lng:uLng},{lat:loc.lat,lng:loc.lng}]:[{lat:loc.lat,lng:loc.lng}]
   }];
@@ -1141,13 +1141,13 @@ function renderList(){
     var okQ=(!q||rloc.name.toLowerCase().includes(q)||rloc.category.toLowerCase().includes(q));
     if(okCat&&okQ)fl.push(rloc);
   }
-  if(uLat!=null)fl.sort(function(a,b){return dist(uLat,uLng,a.lat,a.lng)-dist(uLat,uLng,b.lat,b.lng);});
+  if(uLat!=null)fl.sort(function(a,b){return geodist(uLat,uLng,a.lat,a.lng)-geodist(uLat,uLng,b.lat,b.lng);});
   var el=document.getElementById('llist');
   var lHtml='';
   fl.forEach(function(loc){
     var lcol=CAT_COLOR[loc.category]||'#a855f7';
     var lico=CAT_ICON[loc.category]||'📍';
-    var ld=uLat!=null?fmtD(dist(uLat,uLng,loc.lat,loc.lng)):'';
+    var ld=uLat!=null?fmtD(geodist(uLat,uLng,loc.lat,loc.lng)):'';
     lHtml+='<div class="lcard" data-id="'+loc.id+'" style="--cc:'+lcol+'">';
     lHtml+='<div class="lic" style="background:'+lcol+'22;color:'+lcol+'">'+lico+'</div>';
     lHtml+='<div style="flex:1;min-width:0"><div class="lname">'+loc.name+'</div>';
