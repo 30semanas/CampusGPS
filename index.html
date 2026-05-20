@@ -761,63 +761,56 @@ function startCamera(){
   if(stream)return;
   var vid=document.getElementById('vid');
   var cmerr=document.getElementById('cmerr');
-  // Garante que erro fica escondido antes de tentar
   cmerr.style.display='none';
 
+  // Mostra log na tela para debug
+  function dbg(msg){
+    var el=document.getElementById('camdbg');
+    if(!el){el=document.createElement('div');el.id='camdbg';
+      el.style.cssText='position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.85);color:#00e5ff;font-size:12px;padding:16px;border-radius:10px;z-index:99;max-width:90%;word-break:break-all;font-family:monospace;line-height:1.6;border:1px solid #00e5ff';
+      document.getElementById('ar').appendChild(el);}
+    el.innerHTML+='<br>'+msg;
+  }
+  function clearDbg(){var el=document.getElementById('camdbg');if(el)el.remove();}
+
   if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
+    dbg('❌ mediaDevices não disponível<br>Use HTTPS ou localhost');
     cmerr.style.display='flex';
     return;
   }
 
-  // Tenta câmera traseira primeiro, depois qualquer câmera
-  // Usa constraints simples para máxima compatibilidade
-  function tryConstraints(constraints, fallback){
+  dbg('🎥 Tentando câmera...');
+
+  function tryConstraints(label, constraints, fallback){
+    dbg('▶ Tentando: '+label);
     navigator.mediaDevices.getUserMedia(constraints)
       .then(function(s){
+        clearDbg();
         stream=s;
         vid.setAttribute('playsinline','true');
         vid.setAttribute('webkit-playsinline','true');
         vid.muted=true;
         vid.srcObject=stream;
-        // Tenta dar play — no iOS pode precisar de interação
-        var playPromise=vid.play();
-        if(playPromise&&playPromise.catch){
-          playPromise.catch(function(e){
-            // Mesmo com erro no play(), tenta continuar
-            console.log('play error (ignorado):',e);
-          });
-        }
+        var p=vid.play();
+        if(p&&p.catch)p.catch(function(){});
         cmerr.style.display='none';
-        startCompass();
-        startBaro();
-        startCanvas();
+        startCompass();startBaro();startCanvas();
       })
       .catch(function(err){
-        console.log('Camera constraint failed:',err.name,err.message);
-        if(fallback){
-          fallback();
-        } else {
-          // Todas as tentativas falharam
-          console.error('Camera totalmente bloqueada');
+        dbg('✗ '+label+': '+err.name+' – '+err.message);
+        if(fallback)fallback();
+        else{
+          dbg('❌ Todas as tentativas falharam');
           cmerr.style.display='flex';
         }
       });
   }
 
-  // Tentativa 1: câmera traseira com environment
-  tryConstraints(
-    {video:{facingMode:'environment'},audio:false},
-    function(){
-      // Tentativa 2: qualquer câmera de vídeo
-      tryConstraints(
-        {video:true,audio:false},
-        function(){
-          // Tentativa 3: constraints mínimas possíveis
-          tryConstraints({video:{}},null);
-        }
-      );
-    }
-  );
+  tryConstraints('traseira',{video:{facingMode:'environment'},audio:false},function(){
+    tryConstraints('qualquer',{video:true,audio:false},function(){
+      tryConstraints('mínimo',{video:{}},null);
+    });
+  });
 }
 function stopCamera(){
   if(raf){cancelAnimationFrame(raf);raf=null;}
