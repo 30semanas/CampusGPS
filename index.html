@@ -74,9 +74,9 @@ html,body{width:100%;height:100dvh;overflow:hidden;background:#000;font-family:"
 .hp-val.big{font-size:26px}
 .hp-val.med{font-size:12px;color:#dceeff}
 .hp-val.sm{font-size:13px}
-.hcomp{position:absolute;bottom:30px;right:14px;z-index:20;display:flex;flex-direction:column;align-items:center;gap:5px;pointer-events:none}
-.cring{width:74px;height:74px;border-radius:50%;background:rgba(0,0,0,.72);backdrop-filter:blur(12px);border:2px solid rgba(0,229,255,.3);display:flex;align-items:center;justify-content:center}
-.clbl{font-family:"Orbitron",monospace;font-size:10px;font-weight:700;color:#00e5ff;background:rgba(0,0,0,.6);padding:3px 8px;border-radius:6px;border:1px solid rgba(0,229,255,.2);white-space:nowrap}
+
+
+
 /* PERMISSION */
 #perm{position:absolute;bottom:170px;left:50%;transform:translateX(-50%);z-index:30;display:none;flex-direction:column;align-items:center;gap:10px;background:rgba(0,0,0,.8);backdrop-filter:blur(12px);border:1.5px solid #00e5ff;border-radius:16px;padding:18px 24px;text-align:center;min-width:260px}
 #perm.show{display:flex}
@@ -180,21 +180,7 @@ html,body{width:100%;height:100dvh;overflow:hidden;background:#000;font-family:"
     <div class="hp"><div class="hp-lbl">Minha Posição</div><div class="hp-val med" id="hmpos">Sem GPS</div></div>
     <div class="hp"><div class="hp-lbl">Precisão GPS</div><div class="hp-val sm" id="hacc">–</div></div>
   </div>
-  <div class="hcomp">
-    <div class="cring"><svg id="carr" width="56" height="56" viewBox="0 0 56 56" fill="none" style="transition:transform .5s cubic-bezier(.4,0,.2,1)">
-  <defs>
-    <filter id="neon1"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-    <filter id="neon2"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-  </defs>
-  <!-- Chevron 1 (back, faint) -->
-  <polyline points="14,38 28,18 42,38" fill="none" stroke="#00e5ff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.3" filter="url(#neon1)"/>
-  <!-- Chevron 2 (mid) -->
-  <polyline points="14,32 28,12 42,32" fill="none" stroke="#00e5ff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.65" filter="url(#neon1)"/>
-  <!-- Chevron 3 (front, bright) -->
-  <polyline points="14,26 28,6 42,26" fill="none" stroke="#00e5ff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="1" filter="url(#neon2)"/>
-</svg></div>
-    <div class="clbl" id="cdir">–</div>
-  </div>
+  <!-- compass removed -->
   <div id="arrived"><div class="arr-box"><div style="font-size:44px">✅</div><div style="font-family:Orbitron,monospace;font-size:18px;font-weight:900;color:#00e676;margin-top:6px">CHEGOU!</div><div style="font-size:13px;color:rgba(255,255,255,.55);margin-top:4px" id="arrsub">–</div></div></div>
   <div id="cmerr"><div style="font-size:54px">📷</div><div style="font-family:Orbitron,monospace;font-size:17px">Câmera Bloqueada</div><div style="font-size:13px;color:#3d5a7a;max-width:270px;line-height:1.6">Permita câmera nas configurações e recarregue.</div><button class="msav" style="width:160px;margin-top:8px" onclick="goHome()">Voltar</button></div>
 </div>
@@ -563,10 +549,8 @@ function loadMapsAPI(key){
 }
 
 function showRoutePicker(){
-  if(routeOptions.length<=1){
-    selectRoute(0);
-    return;
-  }
+  // Always show picker so user sees options (even if only direct line)
+  if(routeOptions.length===0){selectRoute(0);return;}
   selectedRoute=0;
   const container=document.getElementById('rp-options');
   container.innerHTML=routeOptions.map((r,i)=>`
@@ -667,14 +651,7 @@ function drawAR(ctx,W,H){
   // Alfinete ou seta
   if(onscreen)drawPin(ctx,Math.max(50,Math.min(W-50,sx)),py,sc,d3,col,r,g,b,pulse);
   else drawEdge(ctx,relDeg,W,H,col);
-  // Bússola
-  if(hasSensor){
-    const rot=((br-camH)+360)%360;
-    document.getElementById('carr').style.transform='rotate('+rot+'deg)';
-    const abs=Math.abs(relDeg);
-    let lbl=abs<12?'▲ FRENTE':relDeg>0?(relDeg<75?'↗ DIREITA':'→ DIREITA'):(relDeg>-75?'↖ ESQUERDA':'← ESQUERDA');
-    document.getElementById('cdir').textContent=lbl;
-  }
+
 }
 
 function drawRoute(ctx,W,H,camH,col,r,g,b){
@@ -789,50 +766,76 @@ function drawPin(ctx,x,y,sc,d,col,r,g,b,pulse){
 }
 
 function drawEdge(ctx,relDeg,W,H,col){
+  // Neon chevrons on left or right edge pointing toward destination
   var pulse=0.55+0.45*Math.sin(animT*3.5);
   var goR=relDeg>0;
-  // Neon chevrons pointing left or right
-  var cx=goR?W-52:52, cy=H*0.5;
-  var dir=goR?1:-1;
+  var ex=goR?W-60:60, ey=H*0.42;
+  var [r,g,b]=hexRGB(col);
+
   ctx.save();
-  ctx.translate(cx,cy);
-  // Background circle
-  ctx.beginPath();ctx.arc(0,0,42,0,Math.PI*2);
-  ctx.fillStyle='rgba(0,0,0,0.55)';ctx.fill();
-  ctx.strokeStyle=col;ctx.lineWidth=1.5;ctx.globalAlpha=0.4*pulse;ctx.stroke();
-  ctx.globalAlpha=1;
-  // Draw 3 neon chevrons pointing in direction
-  var chevW=18,chevH=14;
-  for(var i=0;i<3;i++){
-    var ox=dir*(i*12-12);
-    var alpha=pulse*(0.3+i*0.35);
-    var lw=2+i*0.8;
-    // Glow pass
+  ctx.translate(ex,ey);
+
+  // 4 vertical neon chevrons stacked (like the reference image)
+  // Each chevron: V shape pointing UP (toward destination)
+  var chW=36, chH=18, spacing=26;
+  for(var i=3;i>=0;i--){
+    var y=i*spacing - spacing*1.5;
+    var alpha=(0.25+(3-i)*0.22)*pulse;
+    var lw=2.5+(3-i)*0.6;
+
+    // Outer glow
     ctx.save();
-    ctx.shadowColor=col;ctx.shadowBlur=12+i*4;
-    ctx.strokeStyle=col;ctx.lineWidth=lw+2;ctx.globalAlpha=alpha*0.4;
-    ctx.lineCap='round';ctx.lineJoin='round';
+    ctx.shadowColor=col;ctx.shadowBlur=18;
+    ctx.strokeStyle='rgba('+r+','+g+','+b+','+alpha*0.5+')';
+    ctx.lineWidth=lw+4;ctx.lineCap='round';ctx.lineJoin='round';
     ctx.beginPath();
-    ctx.moveTo(ox-dir*chevW*0.5,-chevH*0.5);
-    ctx.lineTo(ox+dir*chevW*0.5,0);
-    ctx.lineTo(ox-dir*chevW*0.5,chevH*0.5);
+    ctx.moveTo(-chW/2,y+chH/2);
+    ctx.lineTo(0,y-chH/2);
+    ctx.lineTo(chW/2,y+chH/2);
     ctx.stroke();ctx.restore();
-    // Bright pass
+
+    // Core neon line
     ctx.save();
-    ctx.shadowColor=col;ctx.shadowBlur=6;
-    ctx.strokeStyle=col;ctx.lineWidth=lw;ctx.globalAlpha=alpha;
-    ctx.lineCap='round';ctx.lineJoin='round';
+    ctx.shadowColor=col;ctx.shadowBlur=8;
+    ctx.strokeStyle='rgba('+r+','+g+','+b+','+alpha+')';
+    ctx.lineWidth=lw;ctx.lineCap='round';ctx.lineJoin='round';
     ctx.beginPath();
-    ctx.moveTo(ox-dir*chevW*0.5,-chevH*0.5);
-    ctx.lineTo(ox+dir*chevW*0.5,0);
-    ctx.lineTo(ox-dir*chevW*0.5,chevH*0.5);
+    ctx.moveTo(-chW/2,y+chH/2);
+    ctx.lineTo(0,y-chH/2);
+    ctx.lineTo(chW/2,y+chH/2);
     ctx.stroke();ctx.restore();
   }
-  // Label
-  ctx.globalAlpha=pulse;
-  ctx.fillStyle=col;ctx.font='bold 10px Orbitron,monospace';
+
+  // Arrow label below
+  ctx.globalAlpha=0.85*pulse;
+  ctx.fillStyle=col;
+  ctx.font='bold 11px Orbitron,monospace';
   ctx.textAlign='center';ctx.textBaseline='top';
-  ctx.fillText(goR?'DIR':'ESQ',0,28);
+  ctx.shadowColor=col;ctx.shadowBlur=8;
+  ctx.fillText(goR?'► DIREITA':'◄ ESQUERDA',0,spacing*2+4);
+  ctx.restore();
+}
+
+// Draw neon direction arrow ON SCREEN when destination is visible
+// Called from drawAR when onscreen=true, to show direction cue above pin
+function drawDirectionArrow(ctx,x,y,col){
+  var pulse=0.6+0.4*Math.sin(animT*2.8);
+  var [r,g,b]=hexRGB(col);
+  // Small neon chevron above the pin pointing toward it
+  ctx.save();
+  ctx.translate(x,y-10);
+  var chW=22,chH=12;
+  for(var i=2;i>=0;i--){
+    var oy=i*14-14;
+    var alpha=(0.3+(2-i)*0.3)*pulse;
+    ctx.save();
+    ctx.shadowColor=col;ctx.shadowBlur=14;
+    ctx.strokeStyle='rgba('+r+','+g+','+b+','+alpha+')';
+    ctx.lineWidth=3-(i*0.4);ctx.lineCap='round';ctx.lineJoin='round';
+    ctx.beginPath();
+    ctx.moveTo(-chW/2,oy+chH/2);ctx.lineTo(0,oy-chH/2);ctx.lineTo(chW/2,oy+chH/2);
+    ctx.stroke();ctx.restore();
+  }
   ctx.restore();
 }
 function rr(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();}
@@ -936,11 +939,14 @@ function startNav(loc){
   showScreen('ar');
   startCamera();
   refreshHUD();
-  // Busca rotas reais (Maps) em background se tiver GPS
-  if(uLat!=null){
-    toast('Buscando rotas a pé...');
-    fetchRoutes(uLat,uLng,loc.lat,loc.lng).then(function(){showRoutePicker();});
-  }
+  // Mostra picker imediatamente com rota direta, depois atualiza com Maps
+  setTimeout(function(){
+    if(uLat!=null){
+      fetchRoutes(uLat,uLng,loc.lat,loc.lng).then(function(){showRoutePicker();});
+    } else {
+      showRoutePicker();
+    }
+  },800);
 }
 function goHome(){stopCamera();dest=null;activeRoute=[];routeStep=0;showScreen('home');}
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
