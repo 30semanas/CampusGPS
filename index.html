@@ -1,30 +1,21 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>AR Route Tracker REAL MVP</title>
-
-<script async src="https://docs.opencv.org/4.x/opencv.js"></script>
+<title>AR Indoor Navigation</title>
 
 <style>
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial, Helvetica, sans-serif;
-}
-
 body{
+    margin:0;
     overflow:hidden;
-    background:#000;
-    color:white;
+    background:black;
+    font-family:Arial;
 }
 
-video,
-canvas{
+video{
     position:fixed;
     inset:0;
     width:100%;
@@ -32,29 +23,28 @@ canvas{
     object-fit:cover;
 }
 
-#overlay{
+.overlay{
+    position:fixed;
+    inset:0;
     z-index:5;
     pointer-events:none;
 }
 
 .top{
-    position:fixed;
+    position:absolute;
     top:20px;
     left:20px;
     right:20px;
-    z-index:10;
-
     display:flex;
-    gap:12px;
+    gap:10px;
 }
 
 .card{
     background:rgba(0,0,0,0.6);
-    backdrop-filter:blur(10px);
+    color:white;
+    padding:15px;
     border-radius:18px;
-    padding:16px;
-    min-width:180px;
-    border:1px solid rgba(255,255,255,0.1);
+    min-width:160px;
 }
 
 .green{
@@ -63,103 +53,64 @@ canvas{
 }
 
 .bottom{
-    position:fixed;
-    bottom:30px;
+    position:absolute;
     left:50%;
     transform:translateX(-50%);
-    z-index:10;
-
-    width:90%;
+    bottom:40px;
+    width:85%;
     max-width:420px;
 
-    background:rgba(0,0,0,0.65);
-    backdrop-filter:blur(10px);
-
+    background:rgba(0,0,0,0.6);
     border-radius:24px;
     padding:24px;
     text-align:center;
+    color:white;
 }
 
 .bottom h1{
     color:#00ff88;
-    margin-bottom:10px;
+}
+
+.arrow{
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%, -50%);
+    font-size:180px;
+    color:#00ff88;
+    text-shadow:0 0 20px #00ff88;
 }
 
 .controls{
     position:fixed;
     right:20px;
-    bottom:30px;
-    z-index:15;
-
+    bottom:20px;
     display:flex;
     flex-direction:column;
     gap:12px;
+    z-index:10;
 }
 
 button{
     border:none;
+    padding:18px;
     border-radius:18px;
-    padding:18px 24px;
     font-size:18px;
     font-weight:bold;
-    cursor:pointer;
-}
-
-.start{
-    background:#00ff88;
-    color:black;
 }
 
 .record{
-    background:#ff3b3b;
+    background:#ff3131;
     color:white;
+}
+
+.navigate{
+    background:#00ff88;
 }
 
 .stop{
     background:#444;
     color:white;
-}
-
-#arrow{
-    position:fixed;
-    left:50%;
-    bottom:140px;
-    transform:translateX(-50%);
-    font-size:140px;
-    z-index:8;
-    color:#00ff88;
-    text-shadow:0 0 20px #00ff88;
-    animation:pulse 1s infinite;
-}
-
-@keyframes pulse{
-
-    0%{
-        transform:translateX(-50%) scale(1);
-    }
-
-    50%{
-        transform:translateX(-50%) scale(1.08);
-    }
-
-    100%{
-        transform:translateX(-50%) scale(1);
-    }
-
-}
-
-.scan-box{
-    position:fixed;
-    left:50%;
-    top:50%;
-    transform:translate(-50%, -50%);
-    width:240px;
-    height:240px;
-    border:4px solid #00ff88;
-    border-radius:30px;
-    z-index:7;
-
-    box-shadow:0 0 25px #00ff88;
 }
 
 </style>
@@ -169,47 +120,51 @@ button{
 
 <video id="video" autoplay playsinline muted></video>
 
-<canvas id="overlay"></canvas>
+<div class="overlay">
 
-<div class="scan-box"></div>
+    <div class="top">
 
-<div id="arrow">↑</div>
-
-<div class="top">
-
-    <div class="card">
-        <div>Sistema</div>
-        <div class="green" id="status">
-            Inicializando...
+        <div class="card">
+            <div>Sistema</div>
+            <div class="green" id="status">
+                Iniciando...
+            </div>
         </div>
+
+        <div class="card">
+            <div>Checkpoint</div>
+            <div class="green" id="checkpoint">
+                0
+            </div>
+        </div>
+
     </div>
 
-    <div class="card">
-        <div>Frames gravados</div>
-        <div class="green" id="frameCount">
-            0
-        </div>
+    <div class="arrow" id="arrow">
+        ↑
     </div>
 
-</div>
+    <div class="bottom">
 
-<div class="bottom">
-    <h1 id="instruction">
-        Aguardando...
-    </h1>
+        <h1 id="instruction">
+            Aguardando
+        </h1>
 
-    <p id="similarity">
-        Similaridade: 0%
-    </p>
+        <p id="details">
+            Grave uma rota primeiro
+        </p>
+
+    </div>
+
 </div>
 
 <div class="controls">
 
-    <button class="record" onclick="startRecording()">
-        Gravar Rota
+    <button class="record" onclick="recordRoute()">
+        Gravar
     </button>
 
-    <button class="start" onclick="startNavigation()">
+    <button class="navigate" onclick="startNavigation()">
         Navegar
     </button>
 
@@ -222,189 +177,192 @@ button{
 <script>
 
 const video = document.getElementById("video");
-const canvas = document.getElementById("overlay");
-const ctx = canvas.getContext("2d");
 
-const statusText = document.getElementById("status");
-const frameCountText = document.getElementById("frameCount");
-const similarityText = document.getElementById("similarity");
-const instructionText = document.getElementById("instruction");
+const statusEl = document.getElementById("status");
+const instructionEl = document.getElementById("instruction");
+const detailsEl = document.getElementById("details");
+const checkpointEl = document.getElementById("checkpoint");
+const arrowEl = document.getElementById("arrow");
+
+let checkpoints = [];
 
 let recording = false;
 let navigating = false;
 
-let savedFrames = [];
-let interval = null;
+let currentCheckpoint = 0;
 
 async function initCamera(){
 
     try{
 
-        const stream = await navigator.mediaDevices.getUserMedia({
+        const stream =
+            await navigator.mediaDevices.getUserMedia({
 
-            video:{
-                facingMode:"environment"
-            },
+                video:{
+                    facingMode:"environment"
+                },
 
-            audio:false
+                audio:false
 
-        });
+            });
 
         video.srcObject = stream;
 
-        statusText.innerText = "Câmera ativa";
+        statusEl.innerText = "Câmera ativa";
 
     }catch(err){
 
-        statusText.innerText = "Erro câmera";
+        alert("Erro câmera");
 
-        console.error(err);
     }
 
 }
 
-function resizeCanvas(){
-
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-}
-
-window.addEventListener("resize", resizeCanvas);
-
-resizeCanvas();
-
 function captureFrame(){
 
-    const temp = document.createElement("canvas");
+    const canvas = document.createElement("canvas");
 
-    temp.width = 160;
-    temp.height = 120;
+    canvas.width = 160;
+    canvas.height = 120;
 
-    const tctx = temp.getContext("2d");
+    const ctx = canvas.getContext("2d");
 
-    tctx.drawImage(video, 0, 0, temp.width, temp.height);
+    ctx.drawImage(video,0,0,160,120);
 
-    return temp.toDataURL("image/jpeg", 0.5);
-
-}
-
-function compareImages(img1, img2){
-
-    return Math.random() * 100;
+    return canvas.toDataURL("image/jpeg",0.4);
 
 }
 
-function startRecording(){
+function recordRoute(){
 
-    savedFrames = [];
+    checkpoints = [];
+
+    currentCheckpoint = 0;
 
     recording = true;
 
-    statusText.innerText = "Gravando rota";
+    statusEl.innerText = "Gravando";
 
-    instructionText.innerText = "Ande pelo percurso";
+    instructionEl.innerText = "Ande lentamente";
 
-    interval = setInterval(()=>{
+    detailsEl.innerText =
+        "Checkpoint salvo a cada 2 segundos";
+
+    const recordLoop = setInterval(()=>{
+
+        if(!recording){
+
+            clearInterval(recordLoop);
+            return;
+
+        }
 
         const frame = captureFrame();
 
-        savedFrames.push(frame);
+        checkpoints.push(frame);
 
-        frameCountText.innerText = savedFrames.length;
+        checkpointEl.innerText =
+            checkpoints.length;
 
-    }, 1000);
+    },2000);
 
 }
 
 function startNavigation(){
 
-    if(savedFrames.length === 0){
+    if(checkpoints.length === 0){
 
-        alert("Grave uma rota primeiro");
+        alert("Grave uma rota antes");
 
         return;
+
     }
 
     navigating = true;
 
     recording = false;
 
-    clearInterval(interval);
+    statusEl.innerText = "Navegando";
 
-    statusText.innerText = "Navegando";
+    instructionEl.innerText =
+        "Siga em frente";
 
-    instructionText.innerText = "Comparando ambiente";
+    detailsEl.innerText =
+        "Procurando checkpoint";
 
-    navigateLoop();
+    navigationLoop();
 
 }
 
-function navigateLoop(){
+function fakeSimilarity(){
+
+    return Math.random() * 100;
+
+}
+
+function navigationLoop(){
 
     if(!navigating) return;
 
-    const currentFrame = captureFrame();
+    const similarity = fakeSimilarity();
 
-    let bestSimilarity = 0;
+    if(similarity > 75){
 
-    for(let i=0; i<savedFrames.length; i++){
+        currentCheckpoint++;
 
-        const similarity = compareImages(
-            currentFrame,
-            savedFrames[i]
-        );
+        checkpointEl.innerText =
+            currentCheckpoint + "/" +
+            checkpoints.length;
 
-        if(similarity > bestSimilarity){
+        instructionEl.innerText =
+            "Checkpoint encontrado";
 
-            bestSimilarity = similarity;
+        detailsEl.innerText =
+            "Continue andando";
 
-        }
-
-    }
-
-    similarityText.innerText =
-        "Similaridade: " +
-        bestSimilarity.toFixed(0) +
-        "%";
-
-    if(bestSimilarity > 70){
-
-        instructionText.innerText =
-            "Você está na rota";
-
-        drawArrow();
-
-    }else{
-
-        instructionText.innerText =
-            "Procurando caminho...";
+        arrowEl.innerHTML = "↑";
 
     }
 
-    requestAnimationFrame(navigateLoop);
+    else if(similarity > 45){
 
-}
+        instructionEl.innerText =
+            "Você está próximo";
 
-function drawArrow(){
+        detailsEl.innerText =
+            "Ajuste a câmera";
 
-    ctx.clearRect(0,0,canvas.width,canvas.height);
+    }
 
-    ctx.beginPath();
+    else{
 
-    ctx.moveTo(canvas.width/2, canvas.height-220);
+        instructionEl.innerText =
+            "Você saiu da rota";
 
-    ctx.lineTo(canvas.width/2, canvas.height-420);
+        detailsEl.innerText =
+            "Volte para o último ponto";
 
-    ctx.lineWidth = 18;
+        arrowEl.innerHTML = "↺";
 
-    ctx.strokeStyle = "#00ff88";
+    }
 
-    ctx.shadowBlur = 20;
+    if(currentCheckpoint >= checkpoints.length){
 
-    ctx.shadowColor = "#00ff88";
+        instructionEl.innerText =
+            "Destino alcançado";
 
-    ctx.stroke();
+        detailsEl.innerText =
+            "Você chegou";
+
+        arrowEl.innerHTML = "✓";
+
+        navigating = false;
+
+        return;
+
+    }
+
+    setTimeout(navigationLoop,1500);
 
 }
 
@@ -413,13 +371,11 @@ function stopAll(){
     recording = false;
     navigating = false;
 
-    clearInterval(interval);
+    statusEl.innerText = "Parado";
 
-    statusText.innerText = "Parado";
+    instructionEl.innerText = "Sistema parado";
 
-    instructionText.innerText = "Sistema parado";
-
-    ctx.clearRect(0,0,canvas.width,canvas.height);
+    detailsEl.innerText = "";
 
 }
 
