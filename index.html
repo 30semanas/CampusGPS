@@ -223,6 +223,7 @@ html,body{width:100%;height:100dvh;overflow:hidden;background:#000;font-family:"
   <div class="cscroll" id="catrow"></div>
   <div class="llist" id="llist"></div>
   <div class="fab" id="fab">⚙️</div>
+<div id="adm-entry-btn" onclick="admOpenLogin()" style="position:fixed;bottom:22px;left:22px;width:44px;height:44px;border-radius:50%;background:#111e2f;border:1.5px solid rgba(0,229,255,.3);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;z-index:99;opacity:0.4">🔐</div>
 </div>
 
 <div class="screen" id="ar">
@@ -231,12 +232,7 @@ html,body{width:100%;height:100dvh;overflow:hidden;background:#000;font-family:"
     <!-- Left panel: Camera AR -->
     <div id="ar-cam-panel" style="width:50%;position:relative;flex-shrink:0;overflow:hidden">
   <video id="vid" autoplay muted playsinline webkit-playsinline></video>
-  <canvas id="cvs"></canvas>
-  <div class="hsensor" style="pointer-events:all">
-    <div class="sdot" id="sdot"></div>
-    <span id="stxt">bússola: –</span>
-
-  </div>
+  <canvas id="cvs"></c
   <div class="hbaro" id="hbaro" style="display:none">
     <div class="hbaro-lbl">Altitude</div>
     <div class="hbaro-val" id="hbaro-val">– m</div>
@@ -263,8 +259,6 @@ html,body{width:100%;height:100dvh;overflow:hidden;background:#000;font-family:"
   </div>
   <div class="hpanels">
     <div class="hp"><div class="hp-lbl">Distância</div><div class="hp-val big" id="hdist">–</div></div>
-    <div class="hp"><div class="hp-lbl">Minha Posição</div><div class="hp-val med" id="hmpos">Sem GPS</div></div>
-    <div class="hp"><div class="hp-lbl">Precisão GPS</div><div class="hp-val sm" id="hacc">–</div></div>
   </div>
   <!-- compass removed -->
   <!-- Floor instruction overlay -->
@@ -1023,24 +1017,8 @@ function loadMapsAPI(key){
 }
 
 function showRoutePicker(){
-  // Always show picker so user sees options (even if only direct line)
-  if(routeOptions.length===0){selectRoute(0);return;}
-  selectedRoute=0;
-  var container=document.getElementById('rp-options');
-  var rpHtml='';
-  for(var ri=0;ri<routeOptions.length;ri++){
-    var ro=routeOptions[ri];
-    rpHtml+='<div class="rp-option '+(ri===0?'selected':'')+'" data-i="'+ri+'" onclick="pickRoute('+ri+')">';
-    rpHtml+='<div class="rp-option-header">';
-    rpHtml+='<span class="rp-badge" style="background:'+ro.color+'22;color:'+ro.color+';border:1px solid '+ro.color+'44">'+ro.label+'</span>';
-    rpHtml+='<span class="rp-time">'+ro.duration+'</span>';
-    rpHtml+='<span class="rp-dist">'+ro.distance+'</span>';
-    rpHtml+='</div>';
-    rpHtml+='<div class="rp-steps">'+ro.steps.slice(0,3).map(function(s){return '• '+s;}).join('<br>')+'</div>';
-    rpHtml+='</div>';
-  }
-  container.innerHTML=rpHtml;
-  document.getElementById('routepicker').classList.add('show');
+  // Skip picker - always use first route
+  selectRoute(0);
 }
 
 function pickRoute(i){
@@ -1586,6 +1564,9 @@ function doStartNav(loc){
   showScreen('ar');
   startCamera();
   refreshHUD();
+  // Hide fab + admin btn on AR screen
+  var f=document.getElementById('fab');if(f)f.style.display='none';
+  var ab=document.getElementById('adm-entry-btn');if(ab)ab.style.display='none';
   // Start recording user trace (only if in quadrant)
   startTrace(loc.id||loc.name);
   // Check if refined route exists and use it
@@ -1594,19 +1575,24 @@ function doStartNav(loc){
     activeRoute=refined;
     toast('Usando rota refinada por usuários anteriores');
   }
-  // Mostra picker imediatamente com rota direta, depois atualiza com Maps
-  setTimeout(function(){
-    if(uLat!=null){
-      fetchRoutes(uLat,uLng,loc.lat,loc.lng).then(function(){showRoutePicker();});
-    } else {
-      showRoutePicker();
-    }
-  },800);
+  // Calcula rota campus direto, sem picker
+  if(uLat!=null){
+    fetchRoutes(uLat,uLng,loc.lat,loc.lng).then(function(){
+      // Usa primeira rota automaticamente
+      if(routeOptions.length>0){
+        activeRoute=routeOptions[0].points;
+        selectedRoute=0;
+      }
+    });
+  }
 }
 function goHome(){
-  if(dest)stopTrace(dest.id, false); // save incomplete trace
+  if(dest)stopTrace(dest.id||dest.name, false);
   stopCamera();dest=null;activeRoute=[];routeStep=0;
   showScreen('home');
+  // Show fab + admin btn on home
+  var f=document.getElementById('fab');if(f)f.style.display='flex';
+  var ab=document.getElementById('adm-entry-btn');if(ab)ab.style.display='flex';
 }
 function showScreen(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});document.getElementById(id).classList.add('active');}
 
@@ -1678,7 +1664,10 @@ function saveModal(){
   var name=document.getElementById('fn').value.trim();
   var cat=document.getElementById('fcat').value,floor=document.getElementById('ffloor').value;
   var lat=parseFloat(document.getElementById('flat').value),lng=parseFloat(document.getElementById('flng').value);
-  if(!name){toast('Informe o nome');return;}if(isNaN(lat)||isNaN(lng)){toast('Coordenadas inválidas');return;}
+  if(!name){toast('Informe o nome');return;}if(isNaN(lat)||isNaN(lng)){
+    if(uLat&&uLng){lat=uLat;lng=uLng;}
+    else{toast('Aguardando GPS ou insira coordenadas');return;}
+  }
   if(editId!=null){var i=-1;for(var fi2=0;fi2<locs.length;fi2++){if(locs[fi2].id===editId){i=fi2;break;}} if(i>-1){var old=locs[i];locs[i]={id:old.id,name:name,category:cat,floor:floor,lat:lat,lng:lng};}toast('Atualizado ✓');}
   else{locs.push({id:Date.now(),name:name,category:cat,floor:floor,lat:lat,lng:lng});toast('Adicionado ✓');}
   saveLocs();closeModal();renderAdmin();renderList();renderCats();
@@ -2697,6 +2686,15 @@ startGPS();initFirebase();loadLocaisFromFirebase();
         <div class="quad-ok" id="af-quad-ok">✅ Dentro do campus · Rota será gravada</div>
         <div class="quad-no" id="af-quad-no">⚠️ Fora do quadrante · Rota NÃO será gravada</div>
         <input type="hidden" id="af-lat"><input type="hidden" id="af-lng">
+        <div style="margin-top:8px;display:flex;gap:8px">
+          <input type="number" id="af-manlat" step="0.000001" placeholder="Lat manual ex: -23.2196" 
+            style="flex:1;background:#0d1623;border:1px solid #1a2d46;border-radius:8px;padding:8px 10px;color:#dceeff;font-family:Rajdhani,sans-serif;font-size:12px;outline:none"
+            oninput="afManualCoord()">
+          <input type="number" id="af-manlng" step="0.000001" placeholder="Lng ex: -45.8857"
+            style="flex:1;background:#0d1623;border:1px solid #1a2d46;border-radius:8px;padding:8px 10px;color:#dceeff;font-family:Rajdhani,sans-serif;font-size:12px;outline:none"
+            oninput="afManualCoord()">
+        </div>
+        <div style="font-size:10px;color:#3d5a7a;margin-top:3px">Ou insira coordenadas manuais se GPS indisponível</div>
       </div>
 
       <div class="afg"><label>Andar do Local</label>
@@ -3978,6 +3976,9 @@ function doStartNav(loc){
   showScreen('ar');
   startCamera();
   refreshHUD();
+  // Hide fab + admin btn on AR screen
+  var f=document.getElementById('fab');if(f)f.style.display='none';
+  var ab=document.getElementById('adm-entry-btn');if(ab)ab.style.display='none';
   // Start recording user trace (only if in quadrant)
   startTrace(loc.id||loc.name);
   // Check if refined route exists and use it
@@ -3986,19 +3987,24 @@ function doStartNav(loc){
     activeRoute=refined;
     toast('Usando rota refinada por usuários anteriores');
   }
-  // Mostra picker imediatamente com rota direta, depois atualiza com Maps
-  setTimeout(function(){
-    if(uLat!=null){
-      fetchRoutes(uLat,uLng,loc.lat,loc.lng).then(function(){showRoutePicker();});
-    } else {
-      showRoutePicker();
-    }
-  },800);
+  // Calcula rota campus direto, sem picker
+  if(uLat!=null){
+    fetchRoutes(uLat,uLng,loc.lat,loc.lng).then(function(){
+      // Usa primeira rota automaticamente
+      if(routeOptions.length>0){
+        activeRoute=routeOptions[0].points;
+        selectedRoute=0;
+      }
+    });
+  }
 }
 function goHome(){
-  if(dest)stopTrace(dest.id, false); // save incomplete trace
+  if(dest)stopTrace(dest.id||dest.name, false);
   stopCamera();dest=null;activeRoute=[];routeStep=0;
   showScreen('home');
+  // Show fab + admin btn on home
+  var f=document.getElementById('fab');if(f)f.style.display='flex';
+  var ab=document.getElementById('adm-entry-btn');if(ab)ab.style.display='flex';
 }
 function showScreen(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});document.getElementById(id).classList.add('active');}
 
@@ -5090,6 +5096,16 @@ function admStartGPS(){
     if(a)a.textContent='Precisão: ±'+afAcc+'m '+(afAcc<=10?'🟢':afAcc<=20?'🟡':'🔴');
   },function(){},{enableHighAccuracy:true,maximumAge:0,timeout:5000});
 }
+function afManualCoord(){
+  var lat=parseFloat((document.getElementById('af-manlat')||{value:''}).value);
+  var lng=parseFloat((document.getElementById('af-manlng')||{value:''}).value);
+  if(!isNaN(lat)&&!isNaN(lng)){
+    document.getElementById('af-lat').value=lat;
+    document.getElementById('af-lng').value=lng;
+    document.getElementById('af-gps-disp').textContent=lat.toFixed(7)+', '+lng.toFixed(7);
+    afCheckQuad(lat,lng);
+  }
+}
 function afCaptureGPS(){
   if(!afLat){toast('GPS não disponível');return;}
   if(afAcc>30&&!confirm('Precisão baixa (±'+afAcc+'m). Capturar?'))return;
@@ -5173,7 +5189,14 @@ function afSave(){
   var lat=parseFloat(document.getElementById('af-lat').value);
   var lng=parseFloat(document.getElementById('af-lng').value);
   if(!name){toast('Informe o nome');return;}
-  if(isNaN(lat)||isNaN(lng)){toast('Capture o GPS primeiro');return;}
+  if(isNaN(lat)||isNaN(lng)){
+    var ml=document.getElementById('af-manlat'),mln=document.getElementById('af-manlng');
+    var mlat=ml?parseFloat(ml.value):NaN, mlng=mln?parseFloat(mln.value):NaN;
+    if(!isNaN(mlat)&&!isNaN(mlng)){
+      lat=mlat;lng=mlng;
+      document.getElementById('af-lat').value=lat;document.getElementById('af-lng').value=lng;
+    } else {toast('Capture GPS ou insira coordenadas manualmente');return;}
+  }
   var data={name:name,lat:lat,lng:lng,
     category:document.getElementById('af-cat').value,
     floor:afFloor,
@@ -5356,24 +5379,18 @@ function admTab(name){
   if(name==='stats')admLoadStats();
 }
 
-// Open admin (triple-tap the ⚙️ button)
-var fabTapCount=0,fabTapTimer=null;
-document.getElementById('fab').addEventListener('click',function(){
-  fabTapCount++;
-  if(fabTapTimer)clearTimeout(fabTapTimer);
-  fabTapTimer=setTimeout(function(){fabTapCount=0;},800);
-  if(fabTapCount>=3){
-    fabTapCount=0;
-    if(sessionStorage.getItem(ADM_SESSION)==='1'){
-      document.getElementById('admin-main').classList.add('show');
-      admInitFirebase();admLoadLocais();admStartGPS();
-    } else {
-      document.getElementById('admin-login-screen').classList.add('show');
-      setTimeout(function(){var p=document.getElementById('adm-pwd');if(p)p.focus();},200);
-    }
-  } else if(fabTapCount===1){
-    renderAdmin();loadMapsKeyInput();showScreen('admin');
+// Admin via lock button
+function admOpenLogin(){
+  if(sessionStorage.getItem(ADM_SESSION)==='1'){
+    document.getElementById('admin-main').classList.add('show');
+    admInitFirebase();admLoadLocais();admStartGPS();admLoadStats();
+  } else {
+    document.getElementById('admin-login-screen').classList.add('show');
+    setTimeout(function(){var p=document.getElementById('adm-pwd');if(p)p.focus();},200);
   }
+}
+document.getElementById('fab').addEventListener('click',function(){
+  renderAdmin();loadMapsKeyInput();showScreen('admin');
 });
 
 // Init
