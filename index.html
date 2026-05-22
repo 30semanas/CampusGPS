@@ -155,7 +155,14 @@ html,body{width:100%;height:100dvh;overflow:hidden;background:#000;font-family:"
     <div id="ar-cam-panel" style="width:50%;position:relative;flex-shrink:0;overflow:hidden">
   <video id="vid" autoplay muted playsinline webkit-playsinline></video>
   <canvas id="cvs"></canvas>
-  <div class="hsensor"><div class="sdot" id="sdot"></div><span id="stxt">bússola: –</span></div>
+  <div class="hsensor" style="pointer-events:all">
+    <div class="sdot" id="sdot"></div>
+    <span id="stxt">bússola: –</span>
+    <span onclick="headingOffset=(headingOffset+180)%360;toast('Heading invertido: +'+headingOffset+'°');" 
+      style="margin-left:8px;cursor:pointer;color:rgba(0,229,255,.5);font-size:10px;border:1px solid rgba(0,229,255,.25);border-radius:4px;padding:1px 5px">
+      ↺
+    </span>
+  </div>
   <div class="hbaro" id="hbaro" style="display:none">
     <div class="hbaro-lbl">Altitude</div>
     <div class="hbaro-val" id="hbaro-val">– m</div>
@@ -652,14 +659,25 @@ function updateFloorIndicator(){
 // ── BÚSSOLA ──
 function onOri(e){
   var r=null;
-  if(e.webkitCompassHeading!=null&&e.webkitCompassHeading>=0) r=e.webkitCompassHeading;
-  else if(e.absolute&&e.alpha!=null) r=(360-e.alpha)%360;
-  else if(e.alpha!=null) r=(360-e.alpha)%360;
+  if(e.webkitCompassHeading!=null&&e.webkitCompassHeading>=0){
+    // iOS: webkitCompassHeading já é heading magnético correto (0=Norte CW)
+    r=e.webkitCompassHeading;
+  } else if(e.absolute===true&&e.alpha!=null){
+    // Android absolute: alpha é rotação Z do device em relação ao Norte
+    r=(360-e.alpha)%360;
+  } else if(e.alpha!=null){
+    // Fallback: sem referência absoluta — menos preciso
+    r=(360-e.alpha)%360;
+  }
   if(r===null)return;
   headRaw=r;sensorOK=true;
   document.getElementById('sdot').className='sdot on';
   document.getElementById('stxt').textContent='bússola: '+Math.round(r)+'°';
 }
+
+// Permite calibrar o heading manualmente se necessário
+var headingOffset=0;
+function applyHeadingOffset(h){return(h+headingOffset+360)%360;}
 function regCompass(){
   window.addEventListener('deviceorientationabsolute',onOri,{passive:true});
   window.addEventListener('deviceorientation',onOri,{passive:true});
@@ -949,9 +967,11 @@ function drawAR(ctx,W,H){
     navTarget={lat:wp.lat,lng:wp.lng};
     navDist=geodist(uLat,uLng,wp.lat,wp.lng);
   }
+  // Use corrected heading (with offset if calibrated)
+  var correctedHead=headSmooth!==null?applyHeadingOffset(headSmooth):null;
   var d3=geodist(uLat,uLng,dest.lat,dest.lng);
   var br=bearing(uLat,uLng,navTarget.lat,navTarget.lng);
-  var camH=headSmooth;
+  var camH=correctedHead;
   var FOV=65;
   var relDeg=0;var hasSensor=camH!==null;
   if(hasSensor)relDeg=((br-camH)+540)%360-180;
@@ -966,10 +986,6 @@ function drawAR(ctx,W,H){
   var _rgb=hexRGB(col);var r=_rgb[0],g=_rgb[1],b=_rgb[2];
   var pulse=0.5+0.5*Math.sin(animT*2.4);
   // Alfinete ou seta
-  // Holograma circular no chão quando perto do trigger
-  if(uLat&&geodist(uLat,uLng,FLOOR_TRIGGER_LAT,FLOOR_TRIGGER_LNG)<30){
-    drawHologram(ctx,W,H,camH);
-  }
   if(onscreen)drawPin(ctx,Math.max(50,Math.min(W-50,sx)),py,sc,d3,col,r,g,b,pulse);
   else drawEdge(ctx,relDeg,W,H,col);
 
@@ -1103,60 +1119,6 @@ function drawRoute(ctx,W,H,camH,col,r,g,b){
   ctx.restore();
 }
 
-function drawHologram(ctx,W,H,camH){
-  // Project trigger point onto screen
-  var br2=bearing(uLat,uLng,FLOOR_TRIGGER_LAT,FLOOR_TRIGGER_LNG);
-  var d2=geodist(uLat,uLng,FLOOR_TRIGGER_LAT,FLOOR_TRIGGER_LNG);
-  var FOV=65;
-  var camH2=headSmooth!==null?headSmooth:br2;
-  var rel2=((br2-camH2)+540)%360-180;
-  if(Math.abs(rel2)>FOV)return;
-  var hx=W/2+(rel2/(FOV/2))*(W/2);
-  // Ground level Y - always low on screen (ground projection)
-  var prog2=Math.min(d2,60)/60;
-  var hy=H*0.82-(H*0.82-H*0.65)*((60-d2)/60);
-  var pulse2=0.5+0.5*Math.sin(animT*3);
-  var sz=Math.max(30,(1-prog2)*80+20);
-  ctx.save();
-  ctx.translate(hx,hy);
-  ctx.scale(1,0.28); // flatten to ground perspective
-  // Outer ring glow
-  for(var ri=3;ri>=0;ri--){
-    var ringR=sz*(1+ri*0.18);
-    var alpha=(0.08+ri*0.04)*pulse2;
-    ctx.beginPath();ctx.arc(0,0,ringR,0,Math.PI*2);
-    ctx.strokeStyle='rgba(0,229,255,'+alpha+')';
-    ctx.lineWidth=ri===0?2.5:1.2;
-    ctx.shadowColor='#00e5ff';ctx.shadowBlur=12;
-    ctx.stroke();
-  }
-  // Inner fill
-  var grad=ctx.createRadialGradient(0,0,0,0,0,sz*0.8);
-  grad.addColorStop(0,'rgba(0,229,255,'+(0.18*pulse2)+')');
-  grad.addColorStop(1,'rgba(0,229,255,0)');
-  ctx.fillStyle=grad;
-  ctx.beginPath();ctx.arc(0,0,sz*0.8,0,Math.PI*2);ctx.fill();
-  // Rotating scan line
-  ctx.save();
-  ctx.rotate(animT*1.5);
-  var scanGrad=ctx.createLinearGradient(0,0,sz,0);
-  scanGrad.addColorStop(0,'rgba(0,229,255,0)');
-  scanGrad.addColorStop(1,'rgba(0,229,255,'+(0.6*pulse2)+')');
-  ctx.strokeStyle=scanGrad;ctx.lineWidth=2;
-  ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(sz,0);ctx.stroke();
-  ctx.restore();
-  ctx.restore();
-  // Label above hologram (not scaled)
-  ctx.save();
-  ctx.translate(hx,hy*0.28+(hy*(1-0.28))-sz*0.28-16);
-  ctx.globalAlpha=0.85*pulse2;
-  ctx.fillStyle='#00e5ff';
-  ctx.font='bold 11px Orbitron,monospace';
-  ctx.textAlign='center';ctx.textBaseline='bottom';
-  ctx.shadowColor='#00e5ff';ctx.shadowBlur=8;
-  ctx.fillText('PASSE AQUI',0,0);
-  ctx.restore();
-}
 
 function drawPin(ctx,x,y,sc,d,col,r,g,b,pulse){
   var sz=Math.max(18,52*sc);
@@ -1644,7 +1606,7 @@ function renderMapOverlay(cLat,cLng,W,H){
     ctx.fillStyle='#fff';ctx.fill();
     // Heading arrow
     if(headSmooth!==null){
-      var hRad2=headSmooth*Math.PI/180;
+      var hRad2=applyHeadingOffset(headSmooth)*Math.PI/180;
       ctx.save();ctx.translate(uxy.x,uxy.y);ctx.rotate(hRad2);
       ctx.beginPath();ctx.moveTo(0,-18);ctx.lineTo(-5,-8);ctx.lineTo(5,-8);ctx.closePath();
       ctx.fillStyle='#00e5ff';ctx.shadowColor='#00e5ff';ctx.shadowBlur=8;ctx.fill();ctx.restore();
@@ -1685,7 +1647,7 @@ function startMapLoop(){
 
 // ESRI World Imagery supports zoom 1-23, tiles exist up to level 23
 var SAT_ZOOM_MIN=2;
-var SAT_ZOOM_MAX=23;
+var SAT_ZOOM_MAX=19; // ESRI tiles reliable up to z19
 
 function satZoomIn(){
   if(satZoom>=SAT_ZOOM_MAX)return;
