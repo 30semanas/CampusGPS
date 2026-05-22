@@ -5,9 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>ORB Indoor Navigation</title>
-
-<script async src="https://docs.opencv.org/4.x/opencv.js"></script>
+<title>Futuristic AR Navigation</title>
 
 <style>
 
@@ -15,7 +13,7 @@
     margin:0;
     padding:0;
     box-sizing:border-box;
-    font-family:Arial;
+    font-family:Arial, Helvetica, sans-serif;
 }
 
 body{
@@ -36,6 +34,7 @@ canvas{
     position:fixed;
     inset:0;
     z-index:2;
+    pointer-events:none;
 }
 
 .ui{
@@ -45,92 +44,464 @@ canvas{
     pointer-events:none;
 }
 
+.panel{
+
+    background:rgba(10,10,10,0.55);
+
+    border:2px solid rgba(255,255,255,0.15);
+
+    backdrop-filter:blur(14px);
+
+    border-radius:28px;
+
+    box-shadow:
+    0 0 25px rgba(0,255,180,0.15),
+    inset 0 0 25px rgba(255,255,255,0.04);
+
+    color:white;
+}
+
 .top{
+
     position:absolute;
-    top:20px;
-    left:20px;
-    right:20px;
+
+    top:22px;
+    left:22px;
+    right:22px;
+
     display:flex;
-    gap:12px;
+    gap:14px;
 }
 
 .card{
-    background:rgba(0,0,0,0.65);
-    color:white;
-    padding:16px;
-    border-radius:20px;
-    backdrop-filter:blur(10px);
-    min-width:180px;
+
+    flex:1;
+
+    min-height:120px;
+
+    padding:20px;
+}
+
+.card-title{
+
+    opacity:0.8;
+
+    font-size:22px;
 }
 
 .green{
-    color:#00ff88;
+
+    color:#00ff99;
+
     font-weight:bold;
+
+    margin-top:10px;
+
+    font-size:42px;
+
+    text-shadow:0 0 18px #00ff99;
 }
 
-.bottom{
-    position:absolute;
-    bottom:35px;
-    left:50%;
-    transform:translateX(-50%);
-    width:90%;
-    max-width:420px;
+.small{
 
-    background:rgba(0,0,0,0.65);
-    color:white;
-    padding:24px;
-    border-radius:24px;
+    font-size:26px;
+}
+
+.side-left{
+
+    position:absolute;
+
+    left:22px;
+    top:210px;
+
+    width:180px;
+
+    padding:25px;
+}
+
+.side-left .section{
+
+    margin-bottom:40px;
+}
+
+.side-left .label{
+
+    font-size:22px;
+
+    opacity:0.8;
+}
+
+.side-left .value{
+
+    margin-top:10px;
+
+    color:#00ff99;
+
+    font-size:52px;
+
+    text-shadow:0 0 18px #00ff99;
+}
+
+.side-right{
+
+    position:absolute;
+
+    right:22px;
+    top:260px;
+
+    width:240px;
+
+    padding:22px;
+}
+
+.next{
+
+    font-size:26px;
+    line-height:1.4;
+}
+
+.center-box{
+
+    position:absolute;
+
+    left:50%;
+    top:50%;
+
+    transform:translate(-50%,-50%);
+
+    width:330px;
+
+    padding:26px;
+
     text-align:center;
 }
 
-.bottom h1{
-    color:#00ff88;
-    margin-bottom:10px;
+.center-box h1{
+
+    font-size:28px;
+
+    margin-top:15px;
+
+    line-height:1.4;
 }
 
-.arrow{
+.center-box .highlight{
+
+    color:#ffd94d;
+}
+
+.bottom-main{
+
     position:absolute;
+
     left:50%;
-    top:50%;
-    transform:translate(-50%, -50%);
-    font-size:180px;
-    color:#00ff88;
-    text-shadow:0 0 30px #00ff88;
+
+    transform:translateX(-50%);
+
+    bottom:200px;
+
+    width:86%;
+
+    max-width:700px;
+
+    padding:28px;
+
+    text-align:center;
+}
+
+.bottom-main h1{
+
+    font-size:54px;
+
+    margin-bottom:12px;
+}
+
+.bottom-main p{
+
+    font-size:28px;
+}
+
+.yellow{
+
+    color:#ffd94d;
+}
+
+.green-text{
+
+    color:#00ff99;
 }
 
 .controls{
-    position:fixed;
-    right:20px;
-    bottom:20px;
-    z-index:20;
+
+    position:absolute;
+
+    bottom:65px;
+
+    left:50%;
+
+    transform:translateX(-50%);
 
     display:flex;
-    flex-direction:column;
-    gap:12px;
-}
 
-button{
-    border:none;
-    border-radius:18px;
-    padding:18px 24px;
-    font-size:18px;
-    font-weight:bold;
-    cursor:pointer;
+    gap:24px;
+
+    z-index:30;
+
     pointer-events:auto;
 }
 
-.record{
-    background:#ff3131;
-    color:white;
-}
+button{
 
-.navigate{
-    background:#00ff88;
+    border:none;
+
+    border-radius:999px;
+
+    padding:26px 38px;
+
+    font-size:28px;
+
+    color:white;
+
+    cursor:pointer;
+
+    font-weight:bold;
+
+    min-width:240px;
 }
 
 .stop{
-    background:#444;
-    color:white;
+
+    background:linear-gradient(135deg,#ff5b5b,#d61b1b);
+
+    box-shadow:0 0 25px rgba(255,0,0,0.4);
+}
+
+.pause{
+
+    background:linear-gradient(135deg,#00ff99,#00b96b);
+
+    box-shadow:0 0 25px rgba(0,255,150,0.4);
+
+    color:black;
+}
+
+.mark{
+
+    background:rgba(0,0,0,0.7);
+
+    border:2px solid rgba(255,255,255,0.15);
+}
+
+.tip{
+
+    position:absolute;
+
+    left:22px;
+    right:22px;
+    bottom:18px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    gap:20px;
+
+    padding:26px;
+}
+
+.tip-section{
+
+    flex:1;
+}
+
+.tip-title{
+
+    color:#00ff99;
+
+    font-size:28px;
+
+    margin-bottom:14px;
+}
+
+.tip-text{
+
+    font-size:24px;
+
+    line-height:1.5;
+}
+
+.arrow-left,
+.arrow-right{
+
+    position:absolute;
+
+    bottom:430px;
+
+    font-size:120px;
+
+    font-weight:bold;
+}
+
+.arrow-left{
+
+    left:80px;
+
+    color:#ffd94d;
+
+    text-shadow:0 0 30px #ffd94d;
+}
+
+.arrow-right{
+
+    right:80px;
+
+    color:#00ff99;
+
+    text-shadow:0 0 30px #00ff99;
+}
+
+.path{
+
+    position:absolute;
+
+    left:50%;
+
+    bottom:350px;
+
+    transform:translateX(-50%);
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    gap:18px;
+}
+
+.chevron{
+
+    width:120px;
+    height:120px;
+
+    border-left:10px solid #72ffe1;
+    border-top:10px solid #72ffe1;
+
+    transform:rotate(45deg);
+
+    filter:
+    drop-shadow(0 0 14px #72ffe1)
+    drop-shadow(0 0 24px #72ffe1);
+
+    animation:flow 1.5s infinite;
+}
+
+.chevron:nth-child(2){
+
+    transform:rotate(45deg) scale(0.8);
+
+    opacity:0.8;
+}
+
+.chevron:nth-child(3){
+
+    transform:rotate(45deg) scale(0.6);
+
+    opacity:0.6;
+}
+
+.chevron:nth-child(4){
+
+    transform:rotate(45deg) scale(0.4);
+
+    opacity:0.4;
+}
+
+@keyframes flow{
+
+    0%{
+
+        opacity:0.3;
+        transform:rotate(45deg) translateY(0);
+
+    }
+
+    50%{
+
+        opacity:1;
+        transform:rotate(45deg) translateY(-10px);
+
+    }
+
+    100%{
+
+        opacity:0.3;
+        transform:rotate(45deg) translateY(0);
+
+    }
+
+}
+
+.radar{
+
+    width:220px;
+    height:220px;
+
+    border-radius:50%;
+
+    border:2px solid rgba(0,255,180,0.5);
+
+    margin:20px auto 0;
+
+    position:relative;
+
+    overflow:hidden;
+
+    box-shadow:0 0 25px rgba(0,255,180,0.3);
+}
+
+.radar::before{
+
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    background:
+    radial-gradient(circle, transparent 60%, rgba(0,255,180,0.1));
+
+}
+
+.scan{
+
+    position:absolute;
+
+    width:50%;
+    height:2px;
+
+    background:#00ff99;
+
+    top:50%;
+    left:50%;
+
+    transform-origin:left center;
+
+    animation:radar 2s linear infinite;
+
+    box-shadow:0 0 20px #00ff99;
+}
+
+@keyframes radar{
+
+    from{
+        transform:rotate(0deg);
+    }
+
+    to{
+        transform:rotate(360deg);
+    }
+
 }
 
 </style>
@@ -147,92 +518,227 @@ button{
 
     <div class="top">
 
-        <div class="card">
-            <div>Status</div>
-            <div class="green" id="status">
-                Inicializando...
+        <div class="panel card">
+
+            <div class="card-title">
+                SISTEMA
             </div>
+
+            <div class="green">
+                AR TRACKING
+            </div>
+
+            <div class="green small">
+                ATIVO
+            </div>
+
         </div>
 
-        <div class="card">
-            <div>Checkpoint</div>
-            <div class="green" id="checkpoint">
-                0
+        <div class="panel card">
+
+            <div class="card-title">
+                CHECKPOINT
             </div>
+
+            <div class="green">
+                3 / 12
+            </div>
+
         </div>
 
-        <div class="card">
-            <div>Matches</div>
-            <div class="green" id="matches">
-                0
+        <div class="panel card">
+
+            <div class="card-title">
+                QUALIDADE
             </div>
+
+            <div class="green">
+                78%
+            </div>
+
+            <div class="green small">
+                ● Ótimo
+            </div>
+
         </div>
 
     </div>
 
-    <div class="arrow" id="arrow">
-        ↑
+    <div class="panel side-left">
+
+        <div class="section">
+
+            <div class="label">
+                DISTÂNCIA
+            </div>
+
+            <div class="value">
+                18m
+            </div>
+
+        </div>
+
+        <div class="section">
+
+            <div class="label">
+                DIREÇÃO
+            </div>
+
+            <div class="value">
+                ↑
+            </div>
+
+        </div>
+
+        <div class="section">
+
+            <div class="label">
+                PROGRESSO
+            </div>
+
+            <div class="value">
+                25%
+            </div>
+
+        </div>
+
     </div>
 
-    <div class="bottom">
+    <div class="panel side-right">
 
-        <h1 id="instruction">
-            Aguardando...
+        <div class="next">
+            📍 PRÓXIMO<br><br>
+
+            Vire à direita<br>
+            em 18m
+        </div>
+
+        <div class="radar">
+
+            <div class="scan"></div>
+
+        </div>
+
+    </div>
+
+    <div class="path">
+
+        <div class="chevron"></div>
+        <div class="chevron"></div>
+        <div class="chevron"></div>
+        <div class="chevron"></div>
+
+    </div>
+
+    <div class="panel center-box">
+
+        <div style="font-size:40px">
+            ⌖
+        </div>
+
+        <h1>
+
+            Ajuste levemente<br>
+
+            para a
+            <span class="highlight">
+                direita
+            </span>
+
         </h1>
 
-        <p id="details">
-            Grave uma rota
+    </div>
+
+    <div class="arrow-left">
+        ←
+    </div>
+
+    <div class="arrow-right">
+        →
+    </div>
+
+    <div class="panel bottom-main">
+
+        <h1>
+
+            Ajuste para a
+            <span class="yellow">
+                direita
+            </span>
+
+        </h1>
+
+        <p>
+
+            Em seguida:
+            siga em
+            <span class="green-text">
+                frente
+            </span>
+
         </p>
 
     </div>
 
-</div>
+    <div class="controls">
 
-<div class="controls">
+        <button class="stop">
+            ■ PARAR
+        </button>
 
-    <button class="record" onclick="startRecording()">
-        Gravar
-    </button>
+        <button class="mark">
+            📍 MARCAR PONTO
+        </button>
 
-    <button class="navigate" onclick="startNavigation()">
-        Navegar
-    </button>
+        <button class="pause">
+            ❚❚ PAUSAR
+        </button>
 
-    <button class="stop" onclick="stopAll()">
-        Parar
-    </button>
+    </div>
+
+    <div class="panel tip">
+
+        <div class="tip-section">
+
+            <div class="tip-title">
+                💡 DICA
+            </div>
+
+            <div class="tip-text">
+
+                Mova o celular lentamente
+                para melhor precisão.
+
+            </div>
+
+        </div>
+
+        <div class="tip-section">
+
+            <div class="tip-title">
+                📶 SENSORES
+            </div>
+
+            <div class="tip-text">
+
+                Câmera • Giroscópio<br>
+                Acelerômetro
+
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
 
 <script>
 
-const video = document.getElementById("video");
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
+async function startCamera(){
 
-const statusEl = document.getElementById("status");
-const checkpointEl = document.getElementById("checkpoint");
-const matchesEl = document.getElementById("matches");
-const instructionEl = document.getElementById("instruction");
-const detailsEl = document.getElementById("details");
-const arrowEl = document.getElementById("arrow");
+    try{
 
-let checkpoints = [];
-
-let recording = false;
-let navigating = false;
-
-let currentCheckpoint = 0;
-
-let orb;
-let bf;
-
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
-async function init(){
-
-    const stream =
+        const stream =
         await navigator.mediaDevices.getUserMedia({
 
             video:{
@@ -243,305 +749,23 @@ async function init(){
 
         });
 
-    video.srcObject = stream;
-
-    statusEl.innerText = "Câmera ativa";
-
-}
-
-function waitOpenCV(){
-
-    if(typeof cv === "undefined"){
-
-        setTimeout(waitOpenCV,500);
-        return;
-    }
-
-    orb = new cv.ORB();
-
-    bf = new cv.BFMatcher(cv.NORM_HAMMING, true);
-
-    statusEl.innerText = "OpenCV pronto";
-
-}
-
-function captureMat(){
-
-    const temp = document.createElement("canvas");
-
-    temp.width = 320;
-    temp.height = 240;
-
-    const tctx = temp.getContext("2d");
-
-    tctx.drawImage(video,0,0,320,240);
-
-    return cv.imread(temp);
-
-}
-
-function extractFeatures(mat){
-
-    const gray = new cv.Mat();
-
-    cv.cvtColor(mat, gray, cv.COLOR_RGBA2GRAY);
-
-    const keypoints = new cv.KeyPointVector();
-
-    const descriptors = new cv.Mat();
-
-    orb.detectAndCompute(
-        gray,
-        new cv.Mat(),
-        keypoints,
-        descriptors
-    );
-
-    gray.delete();
-
-    return {
-        keypoints,
-        descriptors
-    };
-
-}
-
-function startRecording(){
-
-    checkpoints = [];
-
-    currentCheckpoint = 0;
-
-    recording = true;
-
-    statusEl.innerText = "Gravando";
-
-    instructionEl.innerText =
-        "Ande lentamente";
-
-    detailsEl.innerText =
-        "Capturando pontos únicos";
-
-    const loop = setInterval(()=>{
-
-        if(!recording){
-
-            clearInterval(loop);
-            return;
-        }
-
-        const frame = captureMat();
-
-        const features =
-            extractFeatures(frame);
-
-        checkpoints.push(features);
-
-        checkpointEl.innerText =
-            checkpoints.length;
-
-        frame.delete();
-
-    },2000);
-
-}
-
-function compareDescriptors(desc1, desc2){
-
-    if(
-        desc1.empty() ||
-        desc2.empty()
-    ){
-        return 0;
-    }
-
-    const matches = new cv.DMatchVector();
-
-    bf.match(desc1, desc2, matches);
-
-    let good = 0;
-
-    for(let i=0; i<matches.size(); i++){
-
-        const m = matches.get(i);
-
-        if(m.distance < 40){
-
-            good++;
-
-        }
+        document
+        .getElementById("video")
+        .srcObject = stream;
 
     }
 
-    matches.delete();
+    catch(e){
 
-    return good;
+        alert(
+            "Erro ao acessar câmera"
+        );
+
+    }
 
 }
 
-function startNavigation(){
-
-    if(checkpoints.length === 0){
-
-        alert("Grave uma rota primeiro");
-        return;
-    }
-
-    recording = false;
-    navigating = true;
-
-    statusEl.innerText = "Navegando";
-
-    instructionEl.innerText =
-        "Analisando ambiente";
-
-    navigationLoop();
-
-}
-
-function navigationLoop(){
-
-    if(!navigating) return;
-
-    const currentFrame = captureMat();
-
-    const currentFeatures =
-        extractFeatures(currentFrame);
-
-    let bestMatch = 0;
-    let bestIndex = 0;
-
-    for(let i=0; i<checkpoints.length; i++){
-
-        const score =
-            compareDescriptors(
-
-                currentFeatures.descriptors,
-                checkpoints[i].descriptors
-
-            );
-
-        if(score > bestMatch){
-
-            bestMatch = score;
-            bestIndex = i;
-
-        }
-
-    }
-
-    matchesEl.innerText = bestMatch;
-
-    checkpointEl.innerText =
-        bestIndex + "/" +
-        checkpoints.length;
-
-    if(bestMatch > 80){
-
-        instructionEl.innerText =
-            "Você está na rota";
-
-        detailsEl.innerText =
-            "Continue andando";
-
-        arrowEl.innerHTML = "↑";
-
-    }
-
-    else if(bestMatch > 40){
-
-        instructionEl.innerText =
-            "Quase alinhado";
-
-        detailsEl.innerText =
-            "Ajuste a câmera";
-
-        arrowEl.innerHTML = "↻";
-
-    }
-
-    else{
-
-        instructionEl.innerText =
-            "Você saiu da rota";
-
-        detailsEl.innerText =
-            "Retorne ao último ponto";
-
-        arrowEl.innerHTML = "↺";
-
-    }
-
-    if(bestIndex >= checkpoints.length - 1
-       && bestMatch > 80){
-
-        instructionEl.innerText =
-            "Destino alcançado";
-
-        detailsEl.innerText =
-            "Você chegou";
-
-        arrowEl.innerHTML = "✓";
-
-        navigating = false;
-
-    }
-
-    drawDebug(bestMatch);
-
-    currentFrame.delete();
-
-    requestAnimationFrame(navigationLoop);
-
-}
-
-function drawDebug(score){
-
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-
-    ctx.strokeStyle = "#00ff88";
-
-    ctx.lineWidth = 10;
-
-    ctx.shadowBlur = 20;
-
-    ctx.shadowColor = "#00ff88";
-
-    ctx.strokeRect(
-        canvas.width/2 - 120,
-        canvas.height/2 - 120,
-        240,
-        240
-    );
-
-    ctx.font = "30px Arial";
-
-    ctx.fillStyle = "#00ff88";
-
-    ctx.fillText(
-        "Score: " + score,
-        40,
-        canvas.height - 40
-    );
-
-}
-
-function stopAll(){
-
-    recording = false;
-    navigating = false;
-
-    statusEl.innerText = "Parado";
-
-    instructionEl.innerText =
-        "Sistema parado";
-
-    detailsEl.innerText = "";
-
-}
-
-init();
-waitOpenCV();
+startCamera();
 
 </script>
 
