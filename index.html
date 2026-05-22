@@ -3,10 +3,12 @@
 <head>
 
 <meta charset="UTF-8">
+
 <meta name="viewport"
-content="width=device-width,
-initial-scale=1.0,
-maximum-scale=1.0,
+content="
+width=device-width,
+initial-scale=1,
+maximum-scale=1,
 user-scalable=no">
 
 <title>AR Indoor Navigation</title>
@@ -26,18 +28,27 @@ body{
 }
 
 video{
+
     position:fixed;
+
     inset:0;
+
     width:100%;
     height:100%;
+
     object-fit:cover;
+
     z-index:1;
 }
 
 .overlay{
+
     position:fixed;
+
     inset:0;
+
     z-index:5;
+
     pointer-events:none;
 }
 
@@ -45,11 +56,12 @@ video{
 
     position:absolute;
 
-    top:14px;
-    left:14px;
-    right:14px;
+    top:12px;
+    left:12px;
+    right:12px;
 
     display:flex;
+
     gap:10px;
 }
 
@@ -57,13 +69,13 @@ video{
 
     flex:1;
 
-    background:rgba(0,0,0,0.45);
+    background:rgba(0,0,0,0.42);
+
+    border:1px solid rgba(255,255,255,0.08);
 
     backdrop-filter:blur(10px);
 
-    border-radius:20px;
-
-    border:1px solid rgba(255,255,255,0.08);
+    border-radius:18px;
 
     padding:14px;
 
@@ -72,22 +84,90 @@ video{
 
 .label{
 
-    font-size:12px;
+    font-size:11px;
 
-    opacity:0.7;
+    opacity:0.65;
 }
 
 .value{
 
     margin-top:6px;
 
-    font-size:20px;
-
     color:#00ff9d;
+
+    font-size:19px;
 
     font-weight:bold;
 
     text-shadow:0 0 10px #00ff9d;
+}
+
+.status-dot{
+
+    display:inline-block;
+
+    width:10px;
+    height:10px;
+
+    border-radius:50%;
+
+    background:#00ff9d;
+
+    margin-right:6px;
+
+    box-shadow:0 0 10px #00ff9d;
+}
+
+.radar{
+
+    position:absolute;
+
+    top:110px;
+    right:15px;
+
+    width:84px;
+    height:84px;
+
+    border-radius:50%;
+
+    border:2px solid rgba(0,255,180,0.35);
+
+    overflow:hidden;
+
+    background:rgba(0,0,0,0.25);
+
+    box-shadow:0 0 18px rgba(0,255,180,0.25);
+}
+
+.scan{
+
+    position:absolute;
+
+    width:50%;
+    height:2px;
+
+    background:#00ff9d;
+
+    top:50%;
+    left:50%;
+
+    transform-origin:left center;
+
+    animation:radar 2s linear infinite;
+
+    box-shadow:0 0 10px #00ff9d;
+}
+
+@keyframes radar{
+
+    from{
+        transform:rotate(0deg);
+    }
+
+    to{
+        transform:rotate(360deg);
+    }
+
 }
 
 .center-guide{
@@ -112,9 +192,9 @@ video{
 
     flex-direction:column;
 
-    gap:10px;
-
     align-items:center;
+
+    gap:12px;
 }
 
 .chevron{
@@ -131,19 +211,21 @@ video{
     drop-shadow(0 0 8px #5fffd2)
     drop-shadow(0 0 16px #5fffd2);
 
-    animation:flow 1.2s infinite;
+    animation:flow 1.3s infinite;
 }
 
 .chevron:nth-child(2){
 
     transform:rotate(45deg) scale(0.8);
+
     opacity:0.7;
 }
 
 .chevron:nth-child(3){
 
     transform:rotate(45deg) scale(0.6);
-    opacity:0.5;
+
+    opacity:0.45;
 }
 
 @keyframes flow{
@@ -155,7 +237,7 @@ video{
 
     50%{
         opacity:1;
-        transform:rotate(45deg) translateY(-6px);
+        transform:rotate(45deg) translateY(-8px);
     }
 
     100%{
@@ -167,39 +249,39 @@ video{
 
 .align-box{
 
-    margin-top:20px;
-
-    background:rgba(0,0,0,0.5);
-
-    padding:16px 20px;
-
-    border-radius:18px;
-
-    border:1px solid rgba(0,255,180,0.3);
-
-    color:white;
-
-    text-align:center;
+    margin-top:22px;
 
     min-width:240px;
 
-    backdrop-filter:blur(8px);
+    background:rgba(0,0,0,0.5);
+
+    border:1px solid rgba(0,255,180,0.25);
+
+    border-radius:18px;
+
+    backdrop-filter:blur(10px);
+
+    padding:16px 20px;
+
+    text-align:center;
+
+    color:white;
 }
 
-.align-box h2{
-
-    font-size:22px;
-
-    margin-bottom:6px;
+.align-title{
 
     color:#00ff9d;
+
+    font-size:20px;
+
+    margin-bottom:6px;
 }
 
-.align-box p{
+.align-text{
 
-    font-size:15px;
+    font-size:14px;
 
-    opacity:0.85;
+    opacity:0.82;
 }
 
 .bottom{
@@ -210,17 +292,19 @@ video{
 
     transform:translateX(-50%);
 
-    bottom:110px;
+    bottom:100px;
 
-    width:88%;
+    width:90%;
 
-    background:rgba(0,0,0,0.5);
+    max-width:420px;
+
+    background:rgba(0,0,0,0.48);
+
+    border:1px solid rgba(255,255,255,0.08);
 
     border-radius:24px;
 
     backdrop-filter:blur(12px);
-
-    border:1px solid rgba(255,255,255,0.08);
 
     padding:18px;
 
@@ -233,14 +317,16 @@ video{
 
     font-size:28px;
 
+    line-height:1.2;
+
     margin-bottom:8px;
 }
 
 .bottom p{
 
-    font-size:16px;
+    font-size:15px;
 
-    opacity:0.9;
+    opacity:0.85;
 }
 
 .highlight{
@@ -280,13 +366,15 @@ button{
 
     padding:14px 18px;
 
-    font-size:15px;
+    font-size:14px;
 
     font-weight:bold;
 
     color:white;
 
     cursor:pointer;
+
+    min-width:100px;
 }
 
 .stop{
@@ -296,79 +384,14 @@ button{
 
 .record{
 
-    background:#1b1b1b;
+    background:#1f1f1f;
 }
 
 .start{
 
     background:#00ff9d;
+
     color:black;
-}
-
-.radar{
-
-    position:absolute;
-
-    right:16px;
-    top:130px;
-
-    width:90px;
-    height:90px;
-
-    border-radius:50%;
-
-    border:2px solid rgba(0,255,180,0.4);
-
-    overflow:hidden;
-
-    box-shadow:0 0 20px rgba(0,255,180,0.3);
-}
-
-.scan{
-
-    position:absolute;
-
-    width:50%;
-    height:2px;
-
-    background:#00ff9d;
-
-    top:50%;
-    left:50%;
-
-    transform-origin:left center;
-
-    animation:radar 2s linear infinite;
-
-    box-shadow:0 0 10px #00ff9d;
-}
-
-@keyframes radar{
-
-    from{
-        transform:rotate(0deg);
-    }
-
-    to{
-        transform:rotate(360deg);
-    }
-
-}
-
-.status-dot{
-
-    display:inline-block;
-
-    width:10px;
-    height:10px;
-
-    border-radius:50%;
-
-    background:#00ff9d;
-
-    margin-right:6px;
-
-    box-shadow:0 0 10px #00ff9d;
 }
 
 </style>
@@ -395,8 +418,11 @@ muted>
             </div>
 
             <div class="value">
+
                 <span class="status-dot"></span>
+
                 AR ATIVO
+
             </div>
 
         </div>
@@ -437,13 +463,20 @@ muted>
 
         <div class="align-box">
 
-            <h2 id="guideTitle">
-                Siga em frente
-            </h2>
+            <div
+            class="align-title">
 
-            <p id="guideText">
+                TRACKING
+
+            </div>
+
+            <div
+            class="align-text"
+            id="trackingText">
+
                 Ambiente alinhado
-            </p>
+
+            </div>
 
         </div>
 
@@ -451,21 +484,20 @@ muted>
 
     <div class="bottom">
 
-        <h1 id="mainDirection">
+        <h1
+        id="directionText">
 
-            Ajuste para a
-            <span class="highlight">
-                direita
+            Siga em
+            <span class="green">
+                frente
             </span>
 
         </h1>
 
-        <p>
+        <p
+        id="subDirection">
 
-            Depois siga em
-            <span class="green">
-                frente
-            </span>
+            Navegação estabilizada
 
         </p>
 
@@ -506,21 +538,27 @@ muted>
 const video =
 document.getElementById("video");
 
-const guideTitle =
-document.getElementById("guideTitle");
+const trackingText =
+document.getElementById("trackingText");
 
-const guideText =
-document.getElementById("guideText");
+const directionText =
+document.getElementById("directionText");
 
-const mainDirection =
-document.getElementById("mainDirection");
+const subDirection =
+document.getElementById("subDirection");
 
 const checkpoint =
 document.getElementById("checkpoint");
 
 let route = [];
 
-let current = 0;
+let navigationLoop = null;
+
+let navigationIndex = 0;
+
+let recording = false;
+
+let navigating = false;
 
 async function startCamera(){
 
@@ -543,7 +581,7 @@ async function startCamera(){
 
     }
 
-    catch(e){
+    catch(err){
 
         alert(
             "Erro ao acessar câmera"
@@ -555,42 +593,70 @@ async function startCamera(){
 
 function recordRoute(){
 
+    clearInterval(navigationLoop);
+
+    recording = true;
+
+    navigating = false;
+
     route = [];
 
-    current = 0;
+    navigationIndex = 0;
 
-    guideTitle.innerText =
+    trackingText.innerText =
+    "Capturando ambiente";
+
+    directionText.innerHTML =
     "Gravando rota";
 
-    guideText.innerText =
+    subDirection.innerText =
     "Ande lentamente";
 
-    let interval =
+    let count = 0;
+
+    let recorder =
     setInterval(()=>{
 
-        if(route.length >= 12){
+        if(!recording){
 
-            clearInterval(interval);
-
-            guideTitle.innerText =
-            "Rota salva";
-
-            guideText.innerText =
-            "12 checkpoints";
-
+            clearInterval(recorder);
             return;
         }
 
+        count++;
+
         route.push({
 
-            id:route.length
+            checkpoint:count
 
         });
 
         checkpoint.innerText =
-        route.length + " / 12";
+        count + " / 12";
 
-    },1500);
+        trackingText.innerText =
+        "Checkpoint " +
+        count +
+        " salvo";
+
+        if(count >= 12){
+
+            clearInterval(recorder);
+
+            recording = false;
+
+            trackingText.innerText =
+            "Rota salva";
+
+            directionText.innerHTML =
+            "Pronto para navegar";
+
+            subDirection.innerText =
+            "Clique em navegar";
+
+        }
+
+    },1400);
 
 }
 
@@ -605,76 +671,214 @@ function startNavigation(){
         return;
     }
 
-    simulateNavigation();
+    clearInterval(navigationLoop);
 
-}
+    navigating = true;
 
-function simulateNavigation(){
+    recording = false;
 
-    let steps = [
+    navigationIndex = 0;
+
+    const steps = [
 
         {
-            title:"Siga em frente",
-            text:"Ambiente alinhado"
+
+            direction:
+            "frente",
+
+            tracking:
+            "Ambiente alinhado",
+
+            subtitle:
+            "Continue andando"
+
         },
 
         {
-            title:"Ajuste para direita",
-            text:"Você desviou levemente"
+
+            direction:
+            "direita",
+
+            tracking:
+            "Desvio detectado",
+
+            subtitle:
+            "Ajuste suavemente"
+
         },
 
         {
-            title:"Volte um pouco",
-            text:"Você saiu da rota"
+
+            direction:
+            "frente",
+
+            tracking:
+            "Rota corrigida",
+
+            subtitle:
+            "Tracking estabilizado"
+
         },
 
         {
-            title:"Correto",
-            text:"Tracking estabilizado"
+
+            direction:
+            "esquerda",
+
+            tracking:
+            "Leve correção necessária",
+
+            subtitle:
+            "Movimente lentamente"
+
         },
 
         {
-            title:"Destino alcançado",
-            text:"Você chegou"
+
+            direction:
+            "frente",
+
+            tracking:
+            "Checkpoint encontrado",
+
+            subtitle:
+            "Continue"
+
+        },
+
+        {
+
+            direction:
+            "frente",
+
+            tracking:
+            "Destino próximo",
+
+            subtitle:
+            "Poucos metros restantes"
+
         }
 
     ];
 
-    let i = 0;
-
-    let loop =
+    navigationLoop =
     setInterval(()=>{
 
-        if(i >= steps.length){
+        if(!navigating){
 
-            clearInterval(loop);
+            clearInterval(
+            navigationLoop
+            );
+
             return;
         }
 
-        guideTitle.innerText =
-        steps[i].title;
+        if(
+        navigationIndex >=
+        steps.length
+        ){
 
-        guideText.innerText =
-        steps[i].text;
+            clearInterval(
+            navigationLoop
+            );
 
-        mainDirection.innerHTML =
-        steps[i].title;
+            trackingText.innerText =
+            "Navegação concluída";
+
+            directionText.innerHTML =
+            "✓ Destino alcançado";
+
+            subDirection.innerText =
+            "Você chegou";
+
+            checkpoint.innerText =
+            "12 / 12";
+
+            navigating = false;
+
+            return;
+        }
+
+        const current =
+        steps[navigationIndex];
 
         checkpoint.innerText =
-        (i+1) + " / 12";
+        (
+            navigationIndex + 1
+        ) +
+        " / 12";
 
-        i++;
+        trackingText.innerText =
+        current.tracking;
 
-    },3000);
+        subDirection.innerText =
+        current.subtitle;
+
+        if(
+        current.direction
+        === "frente"
+        ){
+
+            directionText.innerHTML =
+
+            `Siga em
+            <span class="green">
+            frente
+            </span>`;
+
+        }
+
+        if(
+        current.direction
+        === "direita"
+        ){
+
+            directionText.innerHTML =
+
+            `Ajuste para
+            <span class="highlight">
+            direita
+            </span>`;
+
+        }
+
+        if(
+        current.direction
+        === "esquerda"
+        ){
+
+            directionText.innerHTML =
+
+            `Ajuste para
+            <span class="highlight">
+            esquerda
+            </span>`;
+
+        }
+
+        navigationIndex++;
+
+    },3500);
 
 }
 
 function stopAR(){
 
-    guideTitle.innerText =
+    recording = false;
+
+    navigating = false;
+
+    clearInterval(
+    navigationLoop
+    );
+
+    trackingText.innerText =
     "Sistema parado";
 
-    guideText.innerText =
+    directionText.innerHTML =
+    "AR pausado";
+
+    subDirection.innerText =
     "";
 
 }
