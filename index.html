@@ -315,9 +315,23 @@ html,body{width:100%;height:100dvh;overflow:hidden;background:#000;font-family:"
 var _ok=['col_locs','col2_locs','col3_locs','col4_locs'];for(var _ki=0;_ki<_ok.length;_ki++){localStorage.removeItem(_ok[_ki]);}
 var LSTORE='gpslocs_v2';
 
+// Campus quadrant - routes only recorded inside this area
+var QUAD_LAT_MIN=-23.197897, QUAD_LAT_MAX=-23.189695;
+var QUAD_LNG_MIN=-45.862771, QUAD_LNG_MAX=-45.856971;
+function insideQuadrant(lat,lng){
+  return lat>=QUAD_LAT_MIN&&lat<=QUAD_LAT_MAX&&lng>=QUAD_LNG_MIN&&lng<=QUAD_LNG_MAX;
+}
+
 // ── CATEGORIAS ──
-var CAT_COLOR={"Destino":"#00e676"};
-var CAT_ICON={"Destino":"🎯"};
+var CAT_COLOR={
+  "Auditório":"#5b6ef8","Sala":"#06b6d4","Elevador":"#f59e0b",
+  "Entrada":"#00e676","Alimentação":"#10b981","Banheiro":"#3d5a7a",
+  "Estacionamento":"#6b7280","Externo":"#22c55e","Outro":"#a855f7","Destino":"#00e676"
+};
+var CAT_ICON={
+  "Auditório":"🎤","Sala":"🚪","Elevador":"🛗","Entrada":"🏢",
+  "Alimentação":"🍽️","Banheiro":"🚻","Estacionamento":"🅿️","Externo":"🌳","Outro":"📍","Destino":"🎯"
+};
 var FLOOR_H={"Térreo":0,"1 andar":5,"2 andar":10,"3 andar":15};
 
 // ── WAYPOINTS DA ROTA ──
@@ -338,9 +352,23 @@ var CAMPUS_NODES=[[1, -23.219612, -45.885708], [2, -23.219687, -45.885613], [3, 
 var _ok=['col_locs','col2_locs','col3_locs','col4_locs'];for(var _ki=0;_ki<_ok.length;_ki++){localStorage.removeItem(_ok[_ki]);}
 var LSTORE='gpslocs_v2';
 
+// Campus quadrant - routes only recorded inside this area
+var QUAD_LAT_MIN=-23.197897, QUAD_LAT_MAX=-23.189695;
+var QUAD_LNG_MIN=-45.862771, QUAD_LNG_MAX=-45.856971;
+function insideQuadrant(lat,lng){
+  return lat>=QUAD_LAT_MIN&&lat<=QUAD_LAT_MAX&&lng>=QUAD_LNG_MIN&&lng<=QUAD_LNG_MAX;
+}
+
 // ── CATEGORIAS ──
-var CAT_COLOR={"Destino":"#00e676"};
-var CAT_ICON={"Destino":"🎯"};
+var CAT_COLOR={
+  "Auditório":"#5b6ef8","Sala":"#06b6d4","Elevador":"#f59e0b",
+  "Entrada":"#00e676","Alimentação":"#10b981","Banheiro":"#3d5a7a",
+  "Estacionamento":"#6b7280","Externo":"#22c55e","Outro":"#a855f7","Destino":"#00e676"
+};
+var CAT_ICON={
+  "Auditório":"🎤","Sala":"🚪","Elevador":"🛗","Entrada":"🏢",
+  "Alimentação":"🍽️","Banheiro":"🚻","Estacionamento":"🅿️","Externo":"🌳","Outro":"📍","Destino":"🎯"
+};
 var FLOOR_H={"Térreo":0,"1 andar":5,"2 andar":10,"3 andar":15};
 
 // ── WAYPOINTS DA ROTA ──
@@ -362,9 +390,23 @@ var CAMPUS_ADJ={"1": [[2, 12.8], [3, 24.7], [4, 35.2]], "2": [[1, 12.8], [3, 11.
 var _ok=['col_locs','col2_locs','col3_locs','col4_locs'];for(var _ki=0;_ki<_ok.length;_ki++){localStorage.removeItem(_ok[_ki]);}
 var LSTORE='gpslocs_v2';
 
+// Campus quadrant - routes only recorded inside this area
+var QUAD_LAT_MIN=-23.197897, QUAD_LAT_MAX=-23.189695;
+var QUAD_LNG_MIN=-45.862771, QUAD_LNG_MAX=-45.856971;
+function insideQuadrant(lat,lng){
+  return lat>=QUAD_LAT_MIN&&lat<=QUAD_LAT_MAX&&lng>=QUAD_LNG_MIN&&lng<=QUAD_LNG_MAX;
+}
+
 // ── CATEGORIAS ──
-var CAT_COLOR={"Destino":"#00e676"};
-var CAT_ICON={"Destino":"🎯"};
+var CAT_COLOR={
+  "Auditório":"#5b6ef8","Sala":"#06b6d4","Elevador":"#f59e0b",
+  "Entrada":"#00e676","Alimentação":"#10b981","Banheiro":"#3d5a7a",
+  "Estacionamento":"#6b7280","Externo":"#22c55e","Outro":"#a855f7","Destino":"#00e676"
+};
+var CAT_ICON={
+  "Auditório":"🎤","Sala":"🚪","Elevador":"🛗","Entrada":"🏢",
+  "Alimentação":"🍽️","Banheiro":"🚻","Estacionamento":"🅿️","Externo":"🌳","Outro":"📍","Destino":"🎯"
+};
 var FLOOR_H={"Térreo":0,"1 andar":5,"2 andar":10,"3 andar":15};
 
 // ── WAYPOINTS DA ROTA ──
@@ -385,9 +427,23 @@ var CAMPUS_NODES=[[1, -23.219612, -45.885708], [2, -23.219687, -45.885613], [3, 
 var _ok=['col_locs','col2_locs','col3_locs','col4_locs'];for(var _ki=0;_ki<_ok.length;_ki++){localStorage.removeItem(_ok[_ki]);}
 var LSTORE='gpslocs_v2';
 
+// Campus quadrant - routes only recorded inside this area
+var QUAD_LAT_MIN=-23.197897, QUAD_LAT_MAX=-23.189695;
+var QUAD_LNG_MIN=-45.862771, QUAD_LNG_MAX=-45.856971;
+function insideQuadrant(lat,lng){
+  return lat>=QUAD_LAT_MIN&&lat<=QUAD_LAT_MAX&&lng>=QUAD_LNG_MIN&&lng<=QUAD_LNG_MAX;
+}
+
 // ── CATEGORIAS ──
-var CAT_COLOR={"Destino":"#00e676"};
-var CAT_ICON={"Destino":"🎯"};
+var CAT_COLOR={
+  "Auditório":"#5b6ef8","Sala":"#06b6d4","Elevador":"#f59e0b",
+  "Entrada":"#00e676","Alimentação":"#10b981","Banheiro":"#3d5a7a",
+  "Estacionamento":"#6b7280","Externo":"#22c55e","Outro":"#a855f7","Destino":"#00e676"
+};
+var CAT_ICON={
+  "Auditório":"🎤","Sala":"🚪","Elevador":"🛗","Entrada":"🏢",
+  "Alimentação":"🍽️","Banheiro":"🚻","Estacionamento":"🅿️","Externo":"🌳","Outro":"📍","Destino":"🎯"
+};
 var FLOOR_H={"Térreo":0,"1 andar":5,"2 andar":10,"3 andar":15};
 
 // ── WAYPOINTS DA ROTA ──
@@ -743,6 +799,19 @@ function refreshHUD(){
 
 var floorInstructionShown=false;
 
+function showFloorPromptDynamic(targetFloor, instructions){
+  var overlay=document.getElementById('floor-prompt');
+  if(!overlay)return;
+  // Update floor prompt content dynamically
+  var floorEl=overlay.querySelector('[style*="font-size:42px"]');
+  if(floorEl)floorEl.textContent=targetFloor.replace(' andar','º ANDAR').replace('Térreo','TÉRREO');
+  var btnEl=overlay.querySelector('button');
+  if(btnEl)btnEl.textContent='✅ CHEGUEI NO '+targetFloor.replace(' andar','º ANDAR').toUpperCase();
+  overlay.style.display='flex';
+  // Pause route progression  
+  activeRoute=[];
+}
+
 // ── MAP STATE ──
 var mapZoom=18;        // zoom level (meters per pixel base)
 var mapOffX=0,mapOffY=0; // pan offset
@@ -754,12 +823,21 @@ var _swipeTouchStartX=0, _swipeTouchStartY=0, _swipeDragging=false;
 var floorConfirmed=false;
 function checkFloorInstruction(){
   if(!dest||!uLat)return;
-  if(dest.id!==4)return; // only for Entrada Principal
   if(floorConfirmed)return;
-  var distToTrigger=geodist(uLat,uLng,FLOOR_TRIGGER_LAT,FLOOR_TRIGGER_LNG);
-  if(distToTrigger<=15&&!floorInstructionShown){
-    floorInstructionShown=true;
-    showFloorPrompt();
+  // Check elevator trigger from location data
+  if(dest.elevatorLat&&!isNaN(dest.elevatorLat)){
+    var distToElev=geodist(uLat,uLng,dest.elevatorLat,dest.elevatorLng);
+    if(distToElev<=15&&!floorInstructionShown){
+      floorInstructionShown=true;
+      showFloorPromptDynamic(dest.targetFloor||'2 andar',dest.instructions||'');
+    }
+  } else if(dest.navType==='elevator_up'||dest.navType==='elevator_down'){
+    // Use fixed trigger
+    var distToTrigger=geodist(uLat,uLng,FLOOR_TRIGGER_LAT,FLOOR_TRIGGER_LNG);
+    if(distToTrigger<=15&&!floorInstructionShown){
+      floorInstructionShown=true;
+      showFloorPrompt();
+    }
   }
 }
 
@@ -1370,6 +1448,51 @@ function loadMapsKeyInput(){
 
 // ── NAV ──
 function startNav(loc){
+  // Ask which floor user is on if location requires it
+  if(loc.askFloor==='yes'){
+    showFloorSelector(function(floor){
+      loc._startFloor=floor;
+      doStartNav(loc);
+    });
+    return;
+  }
+  doStartNav(loc);
+}
+
+var _floorCallback=null;
+function showFloorSelector(callback){
+  _floorCallback=callback;
+  var overlay=document.createElement('div');
+  overlay.id='floor-selector-overlay';
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px';
+  var floors=['Terreo','1 andar','2 andar','3 andar','4 andar','5 andar'];
+  var btns=floors.map(function(f,i){
+    return '<button data-floor="'+f+'" onclick="pickFloor(this.dataset.floor)" style="padding:12px 6px;background:#111e2f;border:1px solid #1a2d46;border-radius:10px;color:#dceeff;font-family:Rajdhani,sans-serif;font-size:13px;font-weight:600;cursor:pointer">'+(i===0?'Terreo':i+'andar')+'</button>';
+  });
+  overlay.innerHTML='<div style="background:#0d1623;border:1.5px solid #00e5ff;border-radius:20px;padding:24px;width:100%;max-width:340px;text-align:center">'
+    +'<div style="font-family:Orbitron,monospace;font-size:15px;font-weight:700;color:#00e5ff;margin-bottom:6px">EM QUAL ANDAR VOCE ESTA?</div>'
+    +'<div style="font-size:12px;color:#3d5a7a;margin-bottom:18px">Selecione seu andar atual</div>'
+    +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px" id="floor-sel-grid"></div></div>';
+  document.body.appendChild(overlay);
+  var grid=document.getElementById('floor-sel-grid');
+  var flist=['Terreo','1 andar','2 andar','3 andar','4 andar','5 andar'];
+  var flabels=['Terreo','1 Andar','2 Andar','3 Andar','4 Andar','5 Andar'];
+  for(var fi=0;fi<flist.length;fi++){
+    var btn=document.createElement('button');
+    btn.textContent=flabels[fi];
+    btn.dataset.floor=flist[fi];
+    btn.style.cssText='padding:12px 6px;background:#111e2f;border:1px solid #1a2d46;border-radius:10px;color:#dceeff;font-family:Rajdhani,sans-serif;font-size:13px;font-weight:600;cursor:pointer';
+    btn.addEventListener('click',function(){pickFloor(this.dataset.floor);});
+    grid.appendChild(btn);
+  }
+}
+function pickFloor(floor){
+  var ov=document.getElementById('floor-selector-overlay');
+  if(ov&&ov.parentNode)ov.parentNode.removeChild(ov);
+  if(_floorCallback){_floorCallback(floor);_floorCallback=null;}
+}
+
+function doStartNav(loc){
   dest=loc;arrivedShown=false;selectedRoute=0;activeRoute=[];routeStep=0;
   document.getElementById('dname').textContent=loc.name;
   document.getElementById('dfloor').textContent=loc.floor+' · '+loc.category;
@@ -1389,8 +1512,8 @@ function startNav(loc){
   showScreen('ar');
   startCamera();
   refreshHUD();
-  // Start recording user trace
-  startTrace(loc.id);
+  // Start recording user trace (only if in quadrant)
+  startTrace(loc.id||loc.name);
   // Check if refined route exists and use it
   var refined=getRefinedRoute(loc.id);
   if(refined&&refined.length>=3){
@@ -1930,11 +2053,13 @@ function startTrace(destId){
   if(traceInterval)clearInterval(traceInterval);
   traceInterval=setInterval(function(){
     if(!uLat||!uAcc)return;
-    if(uAcc>TRACE_MIN_ACCURACY)return; // skip bad GPS
+    if(uAcc>TRACE_MIN_ACCURACY)return;
+    // Only record if inside campus quadrant
+    if(!insideQuadrant(uLat,uLng))return;
     var last=tracePoints[tracePoints.length-1];
     if(last){
       var d=geodist(uLat,uLng,last.lat,last.lng);
-      if(d<TRACE_MIN_MOVE)return; // didn't move enough
+      if(d<TRACE_MIN_MOVE)return;
     }
     tracePoints.push({
       lat:parseFloat(uLat.toFixed(7)),
@@ -2082,6 +2207,65 @@ function loadRouteStats(destId, callback){
     callback({
       total:traces.length,
       completed:traces.filter(function(t){return t.completed;}).length
+    });
+  });
+}
+
+// ── LOAD LOCAIS FROM FIREBASE ──
+function loadLocaisFromFirebase(){
+  if(!fbReady||!fbDb){
+    // Firebase not ready yet, retry in 1s
+    setTimeout(loadLocaisFromFirebase, 1000);
+    return;
+  }
+  fbDb.ref('locais').once('value', function(snap){
+    var data=snap.val();
+    if(data&&Object.keys(data).length>0){
+      // Convert Firebase locais to app format
+      locs=[];
+      Object.entries(data).forEach(function(entry){
+        var id=entry[0], loc=entry[1];
+        locs.push({
+          id:id,
+          name:loc.name,
+          lat:loc.lat,
+          lng:loc.lng,
+          category:loc.category||'Destino',
+          floor:loc.floor||'Térreo',
+          navType:loc.navType||'direct',
+          instructions:loc.instructions||'',
+          askFloor:loc.askFloor||'no',
+          inQuadrant:loc.inQuadrant!==false,
+          photo:loc.photo||null,
+          elevatorLat:loc.elevatorLat||null,
+          elevatorLng:loc.elevatorLng||null,
+          targetFloor:loc.targetFloor||null,
+          complementRoute:loc.complementRoute||null
+        });
+      });
+      saveLocs();
+    }
+    renderCats();
+    renderList();
+    // Listen for real-time updates
+    fbDb.ref('locais').on('value', function(snap2){
+      var d2=snap2.val();
+      if(d2){
+        locs=[];
+        Object.entries(d2).forEach(function(e2){
+          var id2=e2[0], l2=e2[1];
+          locs.push({id:id2,name:l2.name,lat:l2.lat,lng:l2.lng,
+            category:l2.category||'Destino',floor:l2.floor||'Térreo',
+            navType:l2.navType||'direct',instructions:l2.instructions||'',
+            askFloor:l2.askFloor||'no',inQuadrant:l2.inQuadrant!==false,
+            photo:l2.photo||null,elevatorLat:l2.elevatorLat||null,
+            elevatorLng:l2.elevatorLng||null,targetFloor:l2.targetFloor||null,
+            complementRoute:l2.complementRoute||null});
+        });
+        saveLocs();
+        renderCats();
+        renderList();
+      }
     });
   });
 }
@@ -2138,11 +2322,13 @@ function startTrace(destId){
   if(traceInterval)clearInterval(traceInterval);
   traceInterval=setInterval(function(){
     if(!uLat||!uAcc)return;
-    if(uAcc>TRACE_MIN_ACCURACY)return; // skip bad GPS
+    if(uAcc>TRACE_MIN_ACCURACY)return;
+    // Only record if inside campus quadrant
+    if(!insideQuadrant(uLat,uLng))return;
     var last=tracePoints[tracePoints.length-1];
     if(last){
       var d=geodist(uLat,uLng,last.lat,last.lng);
-      if(d<TRACE_MIN_MOVE)return; // didn't move enough
+      if(d<TRACE_MIN_MOVE)return;
     }
     tracePoints.push({
       lat:parseFloat(uLat.toFixed(7)),
@@ -2294,6 +2480,65 @@ function loadRouteStats(destId, callback){
   });
 }
 
+// ── LOAD LOCAIS FROM FIREBASE ──
+function loadLocaisFromFirebase(){
+  if(!fbReady||!fbDb){
+    // Firebase not ready yet, retry in 1s
+    setTimeout(loadLocaisFromFirebase, 1000);
+    return;
+  }
+  fbDb.ref('locais').once('value', function(snap){
+    var data=snap.val();
+    if(data&&Object.keys(data).length>0){
+      // Convert Firebase locais to app format
+      locs=[];
+      Object.entries(data).forEach(function(entry){
+        var id=entry[0], loc=entry[1];
+        locs.push({
+          id:id,
+          name:loc.name,
+          lat:loc.lat,
+          lng:loc.lng,
+          category:loc.category||'Destino',
+          floor:loc.floor||'Térreo',
+          navType:loc.navType||'direct',
+          instructions:loc.instructions||'',
+          askFloor:loc.askFloor||'no',
+          inQuadrant:loc.inQuadrant!==false,
+          photo:loc.photo||null,
+          elevatorLat:loc.elevatorLat||null,
+          elevatorLng:loc.elevatorLng||null,
+          targetFloor:loc.targetFloor||null,
+          complementRoute:loc.complementRoute||null
+        });
+      });
+      saveLocs();
+    }
+    renderCats();
+    renderList();
+    // Listen for real-time updates
+    fbDb.ref('locais').on('value', function(snap2){
+      var d2=snap2.val();
+      if(d2){
+        locs=[];
+        Object.entries(d2).forEach(function(e2){
+          var id2=e2[0], l2=e2[1];
+          locs.push({id:id2,name:l2.name,lat:l2.lat,lng:l2.lng,
+            category:l2.category||'Destino',floor:l2.floor||'Térreo',
+            navType:l2.navType||'direct',instructions:l2.instructions||'',
+            askFloor:l2.askFloor||'no',inQuadrant:l2.inQuadrant!==false,
+            photo:l2.photo||null,elevatorLat:l2.elevatorLat||null,
+            elevatorLng:l2.elevatorLng||null,targetFloor:l2.targetFloor||null,
+            complementRoute:l2.complementRoute||null});
+        });
+        saveLocs();
+        renderCats();
+        renderList();
+      }
+    });
+  });
+}
+
 // ── EVENTS ──
 document.getElementById('sinput').addEventListener('input',renderList);
 document.getElementById('fab').addEventListener('click',function(){
@@ -2310,7 +2555,7 @@ document.getElementById('rp-cancel').addEventListener('click',function(){documen
 document.getElementById('rp-go').addEventListener('click',function(){selectRoute(selectedRoute);});
 
 // ── INIT ──
-startGPS();renderCats();renderList();initFirebase();
+startGPS();initFirebase();loadLocaisFromFirebase();
 </script>
 </body>
 </html>
