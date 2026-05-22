@@ -134,6 +134,9 @@ html,body{width:100%;height:100dvh;overflow:hidden;background:#000;font-family:"
 .toast{position:fixed;top:60px;left:50%;transform:translateX(-50%);background:rgba(0,229,255,.12);border:1px solid rgba(0,229,255,.35);backdrop-filter:blur(10px);border-radius:999px;padding:9px 20px;font-size:13px;font-weight:600;z-index:500;opacity:0;pointer-events:none;transition:opacity .3s;white-space:nowrap;color:#00e5ff}
 .toast.show{opacity:1}
 </style>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
 <body>
 <div class="screen active" id="home">
@@ -282,6 +285,16 @@ html,body{width:100%;height:100dvh;overflow:hidden;background:#000;font-family:"
       <button onclick="saveMapsKey()" style="padding:9px 16px;background:#00e5ff;border:none;border-radius:9px;color:#000;font-family:Rajdhani,sans-serif;font-size:13px;font-weight:700;cursor:pointer">Salvar</button>
     </div>
     <div style="font-size:11px;color:#3d5a7a;margin-top:6px">Ative: Maps JS API + Directions API no Google Cloud</div>
+  </div>
+  <!-- Firebase status -->
+  <div style="padding:14px 16px 14px;border-top:1px solid #1a2d46">
+    <div style="font-size:9px;color:rgba(0,229,255,.5);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;font-family:Orbitron,monospace">Firebase · Aprendizado de Rota</div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+      <div style="width:10px;height:10px;border-radius:50%;background:#3d5a7a;flex-shrink:0" id="fb-dot"></div>
+      <div id="fb-status" style="font-size:12px;color:#3d5a7a">Inicializando...</div>
+    </div>
+    <div id="fb-stats" style="font-size:11px;color:#3d5a7a;line-height:1.7"></div>
+    <div style="font-size:10px;color:#1a2d46;margin-top:6px">MapsCampusColina · Realtime DB</div>
   </div>
 </div>
 
@@ -718,6 +731,7 @@ function refreshHUD(){
   updateFloorIndicator();
   if(d!=null&&d<8&&!arrivedShown){
     arrivedShown=true;
+    stopTrace(dest.id, true); // save completed trace
     document.getElementById('arrsub').textContent=dest.name+' · '+dest.floor;
     var av=document.getElementById('arrived');av.style.display='flex';
     setTimeout(function(){av.style.display='none';},7000);
@@ -1319,6 +1333,29 @@ function stopCamera(){
 }
 
 // ── MAPS API KEY ──
+function saveFbConfig(){
+  var key=document.getElementById('fbKeyInput').value.trim();
+  var url=document.getElementById('fbUrlInput').value.trim();
+  localStorage.setItem('fbApiKey',key);
+  localStorage.setItem('fbDbUrl',url);
+  toast(key&&url?'Firebase salvo ✓':'Firebase removido');
+  var s=document.getElementById('fb-status');
+  if(s)s.textContent=key&&url?'Configurado ✓':'Não configurado';
+  if(key&&url){initFirebase();}
+}
+function loadFbConfigInputs(){
+  var ki=document.getElementById('fbKeyInput');
+  var ui=document.getElementById('fbUrlInput');
+  if(ki)ki.value=localStorage.getItem('fbApiKey')||'';
+  if(ui)ui.value=localStorage.getItem('fbDbUrl')||'';
+  var s=document.getElementById('fb-status');
+  var k=localStorage.getItem('fbApiKey');
+  var u=localStorage.getItem('fbDbUrl');
+  if(s)s.textContent=(k&&u)?'Configurado ✓':'Não configurado';
+  if(s&&fbReady)s.textContent='Conectado ✓';
+  if(s&&fbReady)s.style.color='#00e676';
+}
+
 function saveMapsKey(){
   var inp=document.getElementById('mapsKeyInput');
   if(!inp)return;
@@ -1352,6 +1389,14 @@ function startNav(loc){
   showScreen('ar');
   startCamera();
   refreshHUD();
+  // Start recording user trace
+  startTrace(loc.id);
+  // Check if refined route exists and use it
+  var refined=getRefinedRoute(loc.id);
+  if(refined&&refined.length>=3){
+    activeRoute=refined;
+    toast('Usando rota refinada por usuários anteriores');
+  }
   // Mostra picker imediatamente com rota direta, depois atualiza com Maps
   setTimeout(function(){
     if(uLat!=null){
@@ -1361,7 +1406,11 @@ function startNav(loc){
     }
   },800);
 }
-function goHome(){stopCamera();dest=null;activeRoute=[];routeStep=0;showScreen('home');}
+function goHome(){
+  if(dest)stopTrace(dest.id, false); // save incomplete trace
+  stopCamera();dest=null;activeRoute=[];routeStep=0;
+  showScreen('home');
+}
 function showScreen(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});document.getElementById(id).classList.add('active');}
 
 // ── HOME ──
@@ -1829,10 +1878,426 @@ function updateSwipeTabs(t){
   if(tm){tm.style.background=t>0.5?'#00e5ff':'rgba(0,229,255,0.25)';tm.style.boxShadow=t>0.5?'0 0 6px #00e5ff':'';}
 }
 
-// ── EVENTS ──// ── EVENTS ──
+// ── ROUTE LEARNING SYSTEM ──
+// Firebase config - user must fill in their own project
+var FB_CONFIG={
+  apiKey:"AIzaSyAtuQBcGt8-XQHYKC4X962LzswJiRRDwFY",
+  authDomain:"mapscampuscolina.firebaseapp.com",
+  databaseURL:"https://mapscampuscolina-default-rtdb.firebaseio.com",
+  projectId:"mapscampuscolina",
+  storageBucket:"mapscampuscolina.firebasestorage.app",
+  messagingSenderId:"373417006191",
+  appId:"1:373417006191:web:8d6306b148362e0315a99a"
+};
+var fbApp=null, fbDb=null, fbReady=false;
+
+function initFirebase(){
+  try{
+    if(typeof firebase==='undefined'){
+      setTimeout(initFirebase,1000);return;
+    }
+    fbApp=firebase.initializeApp(FB_CONFIG,'gpslearn');
+    fbDb=firebase.database(fbApp);
+    fbReady=true;
+    loadRefinedWaypoints();
+    uploadPendingTraces(); // upload any traces saved offline
+    var s=document.getElementById('fb-status');
+    if(s){s.textContent='Conectado ✓';s.style.color='#00e676';}
+    var d=document.getElementById('fb-dot');
+    if(d){d.style.background='#00e676';d.style.boxShadow='0 0 8px #00e676';}
+    // Load stats for admin
+    loadRouteStats(4,function(stats){
+      var el=document.getElementById('fb-stats');
+      if(el&&stats)el.innerHTML='Rotas salvas: <strong style="color:#00e5ff">'+stats.total+'</strong> &nbsp;·&nbsp; Completas: <strong style="color:#00e676">'+stats.completed+'</strong>';
+    });
+    console.log('Firebase ready');
+  }catch(e){
+    console.log('Firebase init error:',e);
+    var s=document.getElementById('fb-status');
+    if(s){s.textContent='Erro: '+e.message;s.style.color='#ff6b6b';}
+  }
+}
+
+// ── RECORD USER TRACE ──
+var tracePoints=[];
+var traceInterval=null;
+var TRACE_INTERVAL_MS=3000; // record position every 3s
+var TRACE_MIN_ACCURACY=25;  // only record if GPS accuracy <= 25m
+var TRACE_MIN_MOVE=3;       // only record if moved >= 3m from last point
+
+function startTrace(destId){
+  tracePoints=[];
+  if(traceInterval)clearInterval(traceInterval);
+  traceInterval=setInterval(function(){
+    if(!uLat||!uAcc)return;
+    if(uAcc>TRACE_MIN_ACCURACY)return; // skip bad GPS
+    var last=tracePoints[tracePoints.length-1];
+    if(last){
+      var d=geodist(uLat,uLng,last.lat,last.lng);
+      if(d<TRACE_MIN_MOVE)return; // didn't move enough
+    }
+    tracePoints.push({
+      lat:parseFloat(uLat.toFixed(7)),
+      lng:parseFloat(uLng.toFixed(7)),
+      acc:uAcc,
+      t:Date.now()
+    });
+  },TRACE_INTERVAL_MS);
+}
+
+function stopTrace(destId, completed){
+  if(traceInterval){clearInterval(traceInterval);traceInterval=null;}
+  if(tracePoints.length<3)return; // too short to be useful
+  saveTrace(destId, completed);
+}
+
+function saveTrace(destId, completed){
+  if(!fbReady||!fbDb){
+    // Save locally as fallback
+    var stored=JSON.parse(localStorage.getItem('pending_traces')||'[]');
+    stored.push({destId:destId,pts:tracePoints,completed:completed,ts:Date.now()});
+    if(stored.length>50)stored=stored.slice(-50); // keep last 50
+    localStorage.setItem('pending_traces',JSON.stringify(stored));
+    return;
+  }
+  var ref=fbDb.ref('traces/'+destId);
+  ref.push({
+    pts:tracePoints,
+    completed:completed?1:0,
+    ts:Date.now(),
+    cnt:tracePoints.length
+  }).then(function(){
+    // Try to upload any pending local traces
+    uploadPendingTraces();
+    // Trigger refinement if enough traces accumulated
+    checkAndRefine(destId);
+  }).catch(function(e){console.log('Save trace error:',e);});
+}
+
+function uploadPendingTraces(){
+  if(!fbReady)return;
+  var stored=JSON.parse(localStorage.getItem('pending_traces')||'[]');
+  if(!stored.length)return;
+  var batch=stored.splice(0,5); // upload 5 at a time
+  batch.forEach(function(t){
+    fbDb.ref('traces/'+t.destId).push({pts:t.pts,completed:t.completed?1:0,ts:t.ts,cnt:t.pts.length});
+  });
+  localStorage.setItem('pending_traces',JSON.stringify(stored));
+}
+
+// ── ROUTE REFINEMENT ──
+// After N traces, compute median path and update waypoints
+var REFINE_THRESHOLD=5; // refine after every 5 new traces
+
+function checkAndRefine(destId){
+  if(!fbReady)return;
+  fbDb.ref('traces/'+destId).once('value',function(snap){
+    var data=snap.val();
+    if(!data)return;
+    var traces=Object.values(data);
+    var completed=traces.filter(function(t){return t.completed;});
+    if(completed.length>=REFINE_THRESHOLD&&completed.length%REFINE_THRESHOLD===0){
+      refineWaypoints(destId, completed);
+    }
+  });
+}
+
+function refineWaypoints(destId, traces){
+  // Collect all points from completed traces
+  var allPts=[];
+  traces.forEach(function(t){
+    if(t.pts)t.pts.forEach(function(p){allPts.push(p);});
+  });
+  if(allPts.length<10)return;
+
+  // Cluster points spatially (grid-based density)
+  // Grid resolution: ~3m cells
+  var CELL=0.00003; // ~3m in degrees
+  var grid={};
+  allPts.forEach(function(p){
+    var gx=Math.round(p.lat/CELL);
+    var gy=Math.round(p.lng/CELL);
+    var key=gx+','+gy;
+    if(!grid[key])grid[key]={lat:0,lng:0,cnt:0};
+    grid[key].lat+=p.lat;
+    grid[key].lng+=p.lng;
+    grid[key].cnt++;
+  });
+
+  // Keep cells with enough density (>= traces/4 visits)
+  var threshold=Math.max(2, Math.floor(traces.length/4));
+  var densePts=[];
+  Object.values(grid).forEach(function(cell){
+    if(cell.cnt>=threshold){
+      densePts.push({lat:cell.lat/cell.cnt,lng:cell.lng/cell.cnt,w:cell.cnt});
+    }
+  });
+  if(densePts.length<3)return;
+
+  // Sort by sequence (approximate: sort by distance from first trace start)
+  var startPt=traces[0].pts[0];
+  densePts.sort(function(a,b){
+    return geodist(startPt.lat,startPt.lng,a.lat,a.lng)-
+           geodist(startPt.lat,startPt.lng,b.lat,b.lng);
+  });
+
+  // Save refined waypoints to Firebase
+  var refined=densePts.map(function(p,i){
+    return{id:i+1,lat:parseFloat(p.lat.toFixed(7)),lng:parseFloat(p.lng.toFixed(7)),w:p.w};
+  });
+  fbDb.ref('refined/'+destId).set({
+    pts:refined,
+    traceCount:traces.length,
+    updatedAt:Date.now()
+  });
+  console.log('Refined',refined.length,'waypoints from',traces.length,'traces');
+  toast('Rota refinada com '+traces.length+' usuários!');
+}
+
+function loadRefinedWaypoints(){
+  if(!fbReady)return;
+  // Load refined waypoints for all known destinations
+  fbDb.ref('refined').once('value',function(snap){
+    var data=snap.val();
+    if(!data)return;
+    // Store refined data for use when navigating
+    window._refinedRoutes=data;
+    console.log('Refined routes loaded:',Object.keys(data).length);
+  });
+}
+
+function getRefinedRoute(destId){
+  var refined=window._refinedRoutes&&window._refinedRoutes[destId];
+  if(!refined||!refined.pts||refined.pts.length<3)return null;
+  return refined.pts.map(function(p){return{lat:p.lat,lng:p.lng};});
+}
+
+// ── STATS DISPLAY ──
+function loadRouteStats(destId, callback){
+  if(!fbReady){callback(null);return;}
+  fbDb.ref('traces/'+destId).once('value',function(snap){
+    var data=snap.val();
+    if(!data){callback({total:0,completed:0});return;}
+    var traces=Object.values(data);
+    callback({
+      total:traces.length,
+      completed:traces.filter(function(t){return t.completed;}).length
+    });
+  });
+}
+
+// ── EVENTS ──// ── ROUTE LEARNING SYSTEM ──
+// Firebase config - user must fill in their own project
+var FB_CONFIG={
+  apiKey:"AIzaSyAtuQBcGt8-XQHYKC4X962LzswJiRRDwFY",
+  authDomain:"mapscampuscolina.firebaseapp.com",
+  databaseURL:"https://mapscampuscolina-default-rtdb.firebaseio.com",
+  projectId:"mapscampuscolina",
+  storageBucket:"mapscampuscolina.firebasestorage.app",
+  messagingSenderId:"373417006191",
+  appId:"1:373417006191:web:8d6306b148362e0315a99a"
+};
+var fbApp=null, fbDb=null, fbReady=false;
+
+function initFirebase(){
+  try{
+    if(typeof firebase==='undefined'){
+      setTimeout(initFirebase,1000);return;
+    }
+    fbApp=firebase.initializeApp(FB_CONFIG,'gpslearn');
+    fbDb=firebase.database(fbApp);
+    fbReady=true;
+    loadRefinedWaypoints();
+    uploadPendingTraces(); // upload any traces saved offline
+    var s=document.getElementById('fb-status');
+    if(s){s.textContent='Conectado ✓';s.style.color='#00e676';}
+    var d=document.getElementById('fb-dot');
+    if(d){d.style.background='#00e676';d.style.boxShadow='0 0 8px #00e676';}
+    // Load stats for admin
+    loadRouteStats(4,function(stats){
+      var el=document.getElementById('fb-stats');
+      if(el&&stats)el.innerHTML='Rotas salvas: <strong style="color:#00e5ff">'+stats.total+'</strong> &nbsp;·&nbsp; Completas: <strong style="color:#00e676">'+stats.completed+'</strong>';
+    });
+    console.log('Firebase ready');
+  }catch(e){
+    console.log('Firebase init error:',e);
+    var s=document.getElementById('fb-status');
+    if(s){s.textContent='Erro: '+e.message;s.style.color='#ff6b6b';}
+  }
+}
+
+// ── RECORD USER TRACE ──
+var tracePoints=[];
+var traceInterval=null;
+var TRACE_INTERVAL_MS=3000; // record position every 3s
+var TRACE_MIN_ACCURACY=25;  // only record if GPS accuracy <= 25m
+var TRACE_MIN_MOVE=3;       // only record if moved >= 3m from last point
+
+function startTrace(destId){
+  tracePoints=[];
+  if(traceInterval)clearInterval(traceInterval);
+  traceInterval=setInterval(function(){
+    if(!uLat||!uAcc)return;
+    if(uAcc>TRACE_MIN_ACCURACY)return; // skip bad GPS
+    var last=tracePoints[tracePoints.length-1];
+    if(last){
+      var d=geodist(uLat,uLng,last.lat,last.lng);
+      if(d<TRACE_MIN_MOVE)return; // didn't move enough
+    }
+    tracePoints.push({
+      lat:parseFloat(uLat.toFixed(7)),
+      lng:parseFloat(uLng.toFixed(7)),
+      acc:uAcc,
+      t:Date.now()
+    });
+  },TRACE_INTERVAL_MS);
+}
+
+function stopTrace(destId, completed){
+  if(traceInterval){clearInterval(traceInterval);traceInterval=null;}
+  if(tracePoints.length<3)return; // too short to be useful
+  saveTrace(destId, completed);
+}
+
+function saveTrace(destId, completed){
+  if(!fbReady||!fbDb){
+    // Save locally as fallback
+    var stored=JSON.parse(localStorage.getItem('pending_traces')||'[]');
+    stored.push({destId:destId,pts:tracePoints,completed:completed,ts:Date.now()});
+    if(stored.length>50)stored=stored.slice(-50); // keep last 50
+    localStorage.setItem('pending_traces',JSON.stringify(stored));
+    return;
+  }
+  var ref=fbDb.ref('traces/'+destId);
+  ref.push({
+    pts:tracePoints,
+    completed:completed?1:0,
+    ts:Date.now(),
+    cnt:tracePoints.length
+  }).then(function(){
+    // Try to upload any pending local traces
+    uploadPendingTraces();
+    // Trigger refinement if enough traces accumulated
+    checkAndRefine(destId);
+  }).catch(function(e){console.log('Save trace error:',e);});
+}
+
+function uploadPendingTraces(){
+  if(!fbReady)return;
+  var stored=JSON.parse(localStorage.getItem('pending_traces')||'[]');
+  if(!stored.length)return;
+  var batch=stored.splice(0,5); // upload 5 at a time
+  batch.forEach(function(t){
+    fbDb.ref('traces/'+t.destId).push({pts:t.pts,completed:t.completed?1:0,ts:t.ts,cnt:t.pts.length});
+  });
+  localStorage.setItem('pending_traces',JSON.stringify(stored));
+}
+
+// ── ROUTE REFINEMENT ──
+// After N traces, compute median path and update waypoints
+var REFINE_THRESHOLD=5; // refine after every 5 new traces
+
+function checkAndRefine(destId){
+  if(!fbReady)return;
+  fbDb.ref('traces/'+destId).once('value',function(snap){
+    var data=snap.val();
+    if(!data)return;
+    var traces=Object.values(data);
+    var completed=traces.filter(function(t){return t.completed;});
+    if(completed.length>=REFINE_THRESHOLD&&completed.length%REFINE_THRESHOLD===0){
+      refineWaypoints(destId, completed);
+    }
+  });
+}
+
+function refineWaypoints(destId, traces){
+  // Collect all points from completed traces
+  var allPts=[];
+  traces.forEach(function(t){
+    if(t.pts)t.pts.forEach(function(p){allPts.push(p);});
+  });
+  if(allPts.length<10)return;
+
+  // Cluster points spatially (grid-based density)
+  // Grid resolution: ~3m cells
+  var CELL=0.00003; // ~3m in degrees
+  var grid={};
+  allPts.forEach(function(p){
+    var gx=Math.round(p.lat/CELL);
+    var gy=Math.round(p.lng/CELL);
+    var key=gx+','+gy;
+    if(!grid[key])grid[key]={lat:0,lng:0,cnt:0};
+    grid[key].lat+=p.lat;
+    grid[key].lng+=p.lng;
+    grid[key].cnt++;
+  });
+
+  // Keep cells with enough density (>= traces/4 visits)
+  var threshold=Math.max(2, Math.floor(traces.length/4));
+  var densePts=[];
+  Object.values(grid).forEach(function(cell){
+    if(cell.cnt>=threshold){
+      densePts.push({lat:cell.lat/cell.cnt,lng:cell.lng/cell.cnt,w:cell.cnt});
+    }
+  });
+  if(densePts.length<3)return;
+
+  // Sort by sequence (approximate: sort by distance from first trace start)
+  var startPt=traces[0].pts[0];
+  densePts.sort(function(a,b){
+    return geodist(startPt.lat,startPt.lng,a.lat,a.lng)-
+           geodist(startPt.lat,startPt.lng,b.lat,b.lng);
+  });
+
+  // Save refined waypoints to Firebase
+  var refined=densePts.map(function(p,i){
+    return{id:i+1,lat:parseFloat(p.lat.toFixed(7)),lng:parseFloat(p.lng.toFixed(7)),w:p.w};
+  });
+  fbDb.ref('refined/'+destId).set({
+    pts:refined,
+    traceCount:traces.length,
+    updatedAt:Date.now()
+  });
+  console.log('Refined',refined.length,'waypoints from',traces.length,'traces');
+  toast('Rota refinada com '+traces.length+' usuários!');
+}
+
+function loadRefinedWaypoints(){
+  if(!fbReady)return;
+  // Load refined waypoints for all known destinations
+  fbDb.ref('refined').once('value',function(snap){
+    var data=snap.val();
+    if(!data)return;
+    // Store refined data for use when navigating
+    window._refinedRoutes=data;
+    console.log('Refined routes loaded:',Object.keys(data).length);
+  });
+}
+
+function getRefinedRoute(destId){
+  var refined=window._refinedRoutes&&window._refinedRoutes[destId];
+  if(!refined||!refined.pts||refined.pts.length<3)return null;
+  return refined.pts.map(function(p){return{lat:p.lat,lng:p.lng};});
+}
+
+// ── STATS DISPLAY ──
+function loadRouteStats(destId, callback){
+  if(!fbReady){callback(null);return;}
+  fbDb.ref('traces/'+destId).once('value',function(snap){
+    var data=snap.val();
+    if(!data){callback({total:0,completed:0});return;}
+    var traces=Object.values(data);
+    callback({
+      total:traces.length,
+      completed:traces.filter(function(t){return t.completed;}).length
+    });
+  });
+}
+
+// ── EVENTS ──
 document.getElementById('sinput').addEventListener('input',renderList);
 document.getElementById('fab').addEventListener('click',function(){
-  renderAdmin();loadMapsKeyInput();showScreen('admin');
+  renderAdmin();loadMapsKeyInput();showScreen('admin');loadRouteStats(4,function(stats){var el=document.getElementById('fb-stats');if(el&&stats)el.innerHTML='Rotas salvas: <strong style="color:#00e5ff">'+stats.total+'</strong> &nbsp;·&nbsp; Completas: <strong style="color:#00e676">'+stats.completed+'</strong>';});
 });
 document.getElementById('admback').addEventListener('click',function(){showScreen('home');});
 document.getElementById('arback').addEventListener('click',goHome);
@@ -1845,7 +2310,7 @@ document.getElementById('rp-cancel').addEventListener('click',function(){documen
 document.getElementById('rp-go').addEventListener('click',function(){selectRoute(selectedRoute);});
 
 // ── INIT ──
-startGPS();renderCats();renderList();
+startGPS();renderCats();renderList();initFirebase();
 </script>
 </body>
 </html>
