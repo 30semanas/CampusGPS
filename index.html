@@ -3,9 +3,13 @@
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport"
+content="width=device-width,
+initial-scale=1.0,
+maximum-scale=1.0,
+user-scalable=no">
 
-<title>Futuristic AR Navigation</title>
+<title>AR Indoor Navigation</title>
 
 <style>
 
@@ -13,7 +17,7 @@
     margin:0;
     padding:0;
     box-sizing:border-box;
-    font-family:Arial, Helvetica, sans-serif;
+    font-family:Arial,sans-serif;
 }
 
 body{
@@ -30,137 +34,63 @@ video{
     z-index:1;
 }
 
-canvas{
-    position:fixed;
-    inset:0;
-    z-index:2;
-    pointer-events:none;
-}
-
-.ui{
+.overlay{
     position:fixed;
     inset:0;
     z-index:5;
     pointer-events:none;
 }
 
-.panel{
-
-    background:rgba(10,10,10,0.55);
-
-    border:2px solid rgba(255,255,255,0.15);
-
-    backdrop-filter:blur(14px);
-
-    border-radius:28px;
-
-    box-shadow:
-    0 0 25px rgba(0,255,180,0.15),
-    inset 0 0 25px rgba(255,255,255,0.04);
-
-    color:white;
-}
-
-.top{
+.topbar{
 
     position:absolute;
 
-    top:22px;
-    left:22px;
-    right:22px;
+    top:14px;
+    left:14px;
+    right:14px;
 
     display:flex;
-    gap:14px;
+    gap:10px;
 }
 
 .card{
 
     flex:1;
 
-    min-height:120px;
+    background:rgba(0,0,0,0.45);
 
-    padding:20px;
+    backdrop-filter:blur(10px);
+
+    border-radius:20px;
+
+    border:1px solid rgba(255,255,255,0.08);
+
+    padding:14px;
+
+    color:white;
 }
 
-.card-title{
+.label{
 
-    opacity:0.8;
+    font-size:12px;
 
-    font-size:22px;
+    opacity:0.7;
 }
 
-.green{
+.value{
 
-    color:#00ff99;
+    margin-top:6px;
+
+    font-size:20px;
+
+    color:#00ff9d;
 
     font-weight:bold;
 
-    margin-top:10px;
-
-    font-size:42px;
-
-    text-shadow:0 0 18px #00ff99;
+    text-shadow:0 0 10px #00ff9d;
 }
 
-.small{
-
-    font-size:26px;
-}
-
-.side-left{
-
-    position:absolute;
-
-    left:22px;
-    top:210px;
-
-    width:180px;
-
-    padding:25px;
-}
-
-.side-left .section{
-
-    margin-bottom:40px;
-}
-
-.side-left .label{
-
-    font-size:22px;
-
-    opacity:0.8;
-}
-
-.side-left .value{
-
-    margin-top:10px;
-
-    color:#00ff99;
-
-    font-size:52px;
-
-    text-shadow:0 0 18px #00ff99;
-}
-
-.side-right{
-
-    position:absolute;
-
-    right:22px;
-    top:260px;
-
-    width:240px;
-
-    padding:22px;
-}
-
-.next{
-
-    font-size:26px;
-    line-height:1.4;
-}
-
-.center-box{
+.center-guide{
 
     position:absolute;
 
@@ -169,28 +99,110 @@ canvas{
 
     transform:translate(-50%,-50%);
 
-    width:330px;
+    display:flex;
 
-    padding:26px;
+    flex-direction:column;
+
+    align-items:center;
+}
+
+.path{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:10px;
+
+    align-items:center;
+}
+
+.chevron{
+
+    width:60px;
+    height:60px;
+
+    border-left:5px solid #5fffd2;
+    border-top:5px solid #5fffd2;
+
+    transform:rotate(45deg);
+
+    filter:
+    drop-shadow(0 0 8px #5fffd2)
+    drop-shadow(0 0 16px #5fffd2);
+
+    animation:flow 1.2s infinite;
+}
+
+.chevron:nth-child(2){
+
+    transform:rotate(45deg) scale(0.8);
+    opacity:0.7;
+}
+
+.chevron:nth-child(3){
+
+    transform:rotate(45deg) scale(0.6);
+    opacity:0.5;
+}
+
+@keyframes flow{
+
+    0%{
+        opacity:0.2;
+        transform:rotate(45deg) translateY(0);
+    }
+
+    50%{
+        opacity:1;
+        transform:rotate(45deg) translateY(-6px);
+    }
+
+    100%{
+        opacity:0.2;
+        transform:rotate(45deg) translateY(0);
+    }
+
+}
+
+.align-box{
+
+    margin-top:20px;
+
+    background:rgba(0,0,0,0.5);
+
+    padding:16px 20px;
+
+    border-radius:18px;
+
+    border:1px solid rgba(0,255,180,0.3);
+
+    color:white;
 
     text-align:center;
+
+    min-width:240px;
+
+    backdrop-filter:blur(8px);
 }
 
-.center-box h1{
+.align-box h2{
 
-    font-size:28px;
+    font-size:22px;
 
-    margin-top:15px;
+    margin-bottom:6px;
 
-    line-height:1.4;
+    color:#00ff9d;
 }
 
-.center-box .highlight{
+.align-box p{
 
-    color:#ffd94d;
+    font-size:15px;
+
+    opacity:0.85;
 }
 
-.bottom-main{
+.bottom{
 
     position:absolute;
 
@@ -198,44 +210,54 @@ canvas{
 
     transform:translateX(-50%);
 
-    bottom:200px;
+    bottom:110px;
 
-    width:86%;
+    width:88%;
 
-    max-width:700px;
+    background:rgba(0,0,0,0.5);
 
-    padding:28px;
+    border-radius:24px;
+
+    backdrop-filter:blur(12px);
+
+    border:1px solid rgba(255,255,255,0.08);
+
+    padding:18px;
 
     text-align:center;
+
+    color:white;
 }
 
-.bottom-main h1{
-
-    font-size:54px;
-
-    margin-bottom:12px;
-}
-
-.bottom-main p{
+.bottom h1{
 
     font-size:28px;
+
+    margin-bottom:8px;
 }
 
-.yellow{
+.bottom p{
 
-    color:#ffd94d;
+    font-size:16px;
+
+    opacity:0.9;
 }
 
-.green-text{
+.highlight{
 
-    color:#00ff99;
+    color:#ffd84d;
+}
+
+.green{
+
+    color:#00ff9d;
 }
 
 .controls{
 
     position:absolute;
 
-    bottom:65px;
+    bottom:18px;
 
     left:50%;
 
@@ -243,9 +265,9 @@ canvas{
 
     display:flex;
 
-    gap:24px;
+    gap:10px;
 
-    z-index:30;
+    z-index:20;
 
     pointer-events:auto;
 }
@@ -256,221 +278,50 @@ button{
 
     border-radius:999px;
 
-    padding:26px 38px;
+    padding:14px 18px;
 
-    font-size:28px;
+    font-size:15px;
+
+    font-weight:bold;
 
     color:white;
 
     cursor:pointer;
-
-    font-weight:bold;
-
-    min-width:240px;
 }
 
 .stop{
 
-    background:linear-gradient(135deg,#ff5b5b,#d61b1b);
-
-    box-shadow:0 0 25px rgba(255,0,0,0.4);
+    background:#ff4040;
 }
 
-.pause{
+.record{
 
-    background:linear-gradient(135deg,#00ff99,#00b96b);
+    background:#1b1b1b;
+}
 
-    box-shadow:0 0 25px rgba(0,255,150,0.4);
+.start{
 
+    background:#00ff9d;
     color:black;
-}
-
-.mark{
-
-    background:rgba(0,0,0,0.7);
-
-    border:2px solid rgba(255,255,255,0.15);
-}
-
-.tip{
-
-    position:absolute;
-
-    left:22px;
-    right:22px;
-    bottom:18px;
-
-    display:flex;
-
-    justify-content:space-between;
-
-    gap:20px;
-
-    padding:26px;
-}
-
-.tip-section{
-
-    flex:1;
-}
-
-.tip-title{
-
-    color:#00ff99;
-
-    font-size:28px;
-
-    margin-bottom:14px;
-}
-
-.tip-text{
-
-    font-size:24px;
-
-    line-height:1.5;
-}
-
-.arrow-left,
-.arrow-right{
-
-    position:absolute;
-
-    bottom:430px;
-
-    font-size:120px;
-
-    font-weight:bold;
-}
-
-.arrow-left{
-
-    left:80px;
-
-    color:#ffd94d;
-
-    text-shadow:0 0 30px #ffd94d;
-}
-
-.arrow-right{
-
-    right:80px;
-
-    color:#00ff99;
-
-    text-shadow:0 0 30px #00ff99;
-}
-
-.path{
-
-    position:absolute;
-
-    left:50%;
-
-    bottom:350px;
-
-    transform:translateX(-50%);
-
-    display:flex;
-
-    flex-direction:column;
-
-    align-items:center;
-
-    gap:18px;
-}
-
-.chevron{
-
-    width:120px;
-    height:120px;
-
-    border-left:10px solid #72ffe1;
-    border-top:10px solid #72ffe1;
-
-    transform:rotate(45deg);
-
-    filter:
-    drop-shadow(0 0 14px #72ffe1)
-    drop-shadow(0 0 24px #72ffe1);
-
-    animation:flow 1.5s infinite;
-}
-
-.chevron:nth-child(2){
-
-    transform:rotate(45deg) scale(0.8);
-
-    opacity:0.8;
-}
-
-.chevron:nth-child(3){
-
-    transform:rotate(45deg) scale(0.6);
-
-    opacity:0.6;
-}
-
-.chevron:nth-child(4){
-
-    transform:rotate(45deg) scale(0.4);
-
-    opacity:0.4;
-}
-
-@keyframes flow{
-
-    0%{
-
-        opacity:0.3;
-        transform:rotate(45deg) translateY(0);
-
-    }
-
-    50%{
-
-        opacity:1;
-        transform:rotate(45deg) translateY(-10px);
-
-    }
-
-    100%{
-
-        opacity:0.3;
-        transform:rotate(45deg) translateY(0);
-
-    }
-
 }
 
 .radar{
 
-    width:220px;
-    height:220px;
+    position:absolute;
+
+    right:16px;
+    top:130px;
+
+    width:90px;
+    height:90px;
 
     border-radius:50%;
 
-    border:2px solid rgba(0,255,180,0.5);
-
-    margin:20px auto 0;
-
-    position:relative;
+    border:2px solid rgba(0,255,180,0.4);
 
     overflow:hidden;
 
-    box-shadow:0 0 25px rgba(0,255,180,0.3);
-}
-
-.radar::before{
-
-    content:"";
-
-    position:absolute;
-
-    inset:0;
-
-    background:
-    radial-gradient(circle, transparent 60%, rgba(0,255,180,0.1));
-
+    box-shadow:0 0 20px rgba(0,255,180,0.3);
 }
 
 .scan{
@@ -480,7 +331,7 @@ button{
     width:50%;
     height:2px;
 
-    background:#00ff99;
+    background:#00ff9d;
 
     top:50%;
     left:50%;
@@ -489,7 +340,7 @@ button{
 
     animation:radar 2s linear infinite;
 
-    box-shadow:0 0 20px #00ff99;
+    box-shadow:0 0 10px #00ff9d;
 }
 
 @keyframes radar{
@@ -504,165 +355,106 @@ button{
 
 }
 
+.status-dot{
+
+    display:inline-block;
+
+    width:10px;
+    height:10px;
+
+    border-radius:50%;
+
+    background:#00ff9d;
+
+    margin-right:6px;
+
+    box-shadow:0 0 10px #00ff9d;
+}
+
 </style>
 
 </head>
 
 <body>
 
-<video id="video" autoplay playsinline muted></video>
+<video
+id="video"
+autoplay
+playsinline
+muted>
+</video>
 
-<canvas id="canvas"></canvas>
+<div class="overlay">
 
-<div class="ui">
+    <div class="topbar">
 
-    <div class="top">
+        <div class="card">
 
-        <div class="panel card">
-
-            <div class="card-title">
+            <div class="label">
                 SISTEMA
             </div>
 
-            <div class="green">
-                AR TRACKING
-            </div>
-
-            <div class="green small">
-                ATIVO
+            <div class="value">
+                <span class="status-dot"></span>
+                AR ATIVO
             </div>
 
         </div>
 
-        <div class="panel card">
+        <div class="card">
 
-            <div class="card-title">
+            <div class="label">
                 CHECKPOINT
             </div>
 
-            <div class="green">
-                3 / 12
-            </div>
+            <div
+            class="value"
+            id="checkpoint">
 
-        </div>
+                0 / 12
 
-        <div class="panel card">
-
-            <div class="card-title">
-                QUALIDADE
-            </div>
-
-            <div class="green">
-                78%
-            </div>
-
-            <div class="green small">
-                ● Ótimo
             </div>
 
         </div>
 
     </div>
 
-    <div class="panel side-left">
+    <div class="radar">
 
-        <div class="section">
+        <div class="scan"></div>
 
-            <div class="label">
-                DISTÂNCIA
-            </div>
+    </div>
 
-            <div class="value">
-                18m
-            </div>
+    <div class="center-guide">
 
-        </div>
+        <div class="path">
 
-        <div class="section">
-
-            <div class="label">
-                DIREÇÃO
-            </div>
-
-            <div class="value">
-                ↑
-            </div>
+            <div class="chevron"></div>
+            <div class="chevron"></div>
+            <div class="chevron"></div>
 
         </div>
 
-        <div class="section">
+        <div class="align-box">
 
-            <div class="label">
-                PROGRESSO
-            </div>
+            <h2 id="guideTitle">
+                Siga em frente
+            </h2>
 
-            <div class="value">
-                25%
-            </div>
+            <p id="guideText">
+                Ambiente alinhado
+            </p>
 
         </div>
 
     </div>
 
-    <div class="panel side-right">
+    <div class="bottom">
 
-        <div class="next">
-            📍 PRÓXIMO<br><br>
-
-            Vire à direita<br>
-            em 18m
-        </div>
-
-        <div class="radar">
-
-            <div class="scan"></div>
-
-        </div>
-
-    </div>
-
-    <div class="path">
-
-        <div class="chevron"></div>
-        <div class="chevron"></div>
-        <div class="chevron"></div>
-        <div class="chevron"></div>
-
-    </div>
-
-    <div class="panel center-box">
-
-        <div style="font-size:40px">
-            ⌖
-        </div>
-
-        <h1>
-
-            Ajuste levemente<br>
-
-            para a
-            <span class="highlight">
-                direita
-            </span>
-
-        </h1>
-
-    </div>
-
-    <div class="arrow-left">
-        ←
-    </div>
-
-    <div class="arrow-right">
-        →
-    </div>
-
-    <div class="panel bottom-main">
-
-        <h1>
+        <h1 id="mainDirection">
 
             Ajuste para a
-            <span class="yellow">
+            <span class="highlight">
                 direita
             </span>
 
@@ -670,9 +462,8 @@ button{
 
         <p>
 
-            Em seguida:
-            siga em
-            <span class="green-text">
+            Depois siga em
+            <span class="green">
                 frente
             </span>
 
@@ -682,51 +473,29 @@ button{
 
     <div class="controls">
 
-        <button class="stop">
-            ■ PARAR
+        <button
+        class="stop"
+        onclick="stopAR()">
+
+            Parar
+
         </button>
 
-        <button class="mark">
-            📍 MARCAR PONTO
+        <button
+        class="record"
+        onclick="recordRoute()">
+
+            Gravar
+
         </button>
 
-        <button class="pause">
-            ❚❚ PAUSAR
+        <button
+        class="start"
+        onclick="startNavigation()">
+
+            Navegar
+
         </button>
-
-    </div>
-
-    <div class="panel tip">
-
-        <div class="tip-section">
-
-            <div class="tip-title">
-                💡 DICA
-            </div>
-
-            <div class="tip-text">
-
-                Mova o celular lentamente
-                para melhor precisão.
-
-            </div>
-
-        </div>
-
-        <div class="tip-section">
-
-            <div class="tip-title">
-                📶 SENSORES
-            </div>
-
-            <div class="tip-text">
-
-                Câmera • Giroscópio<br>
-                Acelerômetro
-
-            </div>
-
-        </div>
 
     </div>
 
@@ -734,12 +503,33 @@ button{
 
 <script>
 
+const video =
+document.getElementById("video");
+
+const guideTitle =
+document.getElementById("guideTitle");
+
+const guideText =
+document.getElementById("guideText");
+
+const mainDirection =
+document.getElementById("mainDirection");
+
+const checkpoint =
+document.getElementById("checkpoint");
+
+let route = [];
+
+let current = 0;
+
 async function startCamera(){
 
     try{
 
         const stream =
-        await navigator.mediaDevices.getUserMedia({
+        await navigator
+        .mediaDevices
+        .getUserMedia({
 
             video:{
                 facingMode:"environment"
@@ -749,9 +539,7 @@ async function startCamera(){
 
         });
 
-        document
-        .getElementById("video")
-        .srcObject = stream;
+        video.srcObject = stream;
 
     }
 
@@ -762,6 +550,132 @@ async function startCamera(){
         );
 
     }
+
+}
+
+function recordRoute(){
+
+    route = [];
+
+    current = 0;
+
+    guideTitle.innerText =
+    "Gravando rota";
+
+    guideText.innerText =
+    "Ande lentamente";
+
+    let interval =
+    setInterval(()=>{
+
+        if(route.length >= 12){
+
+            clearInterval(interval);
+
+            guideTitle.innerText =
+            "Rota salva";
+
+            guideText.innerText =
+            "12 checkpoints";
+
+            return;
+        }
+
+        route.push({
+
+            id:route.length
+
+        });
+
+        checkpoint.innerText =
+        route.length + " / 12";
+
+    },1500);
+
+}
+
+function startNavigation(){
+
+    if(route.length === 0){
+
+        alert(
+        "Grave uma rota primeiro"
+        );
+
+        return;
+    }
+
+    simulateNavigation();
+
+}
+
+function simulateNavigation(){
+
+    let steps = [
+
+        {
+            title:"Siga em frente",
+            text:"Ambiente alinhado"
+        },
+
+        {
+            title:"Ajuste para direita",
+            text:"Você desviou levemente"
+        },
+
+        {
+            title:"Volte um pouco",
+            text:"Você saiu da rota"
+        },
+
+        {
+            title:"Correto",
+            text:"Tracking estabilizado"
+        },
+
+        {
+            title:"Destino alcançado",
+            text:"Você chegou"
+        }
+
+    ];
+
+    let i = 0;
+
+    let loop =
+    setInterval(()=>{
+
+        if(i >= steps.length){
+
+            clearInterval(loop);
+            return;
+        }
+
+        guideTitle.innerText =
+        steps[i].title;
+
+        guideText.innerText =
+        steps[i].text;
+
+        mainDirection.innerHTML =
+        steps[i].title;
+
+        checkpoint.innerText =
+        (i+1) + " / 12";
+
+        i++;
+
+    },3000);
+
+}
+
+function stopAR(){
+
+    guideTitle.innerText =
+    "Sistema parado";
+
+    guideText.innerText =
+    "";
 
 }
 
