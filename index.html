@@ -11,7 +11,7 @@ initial-scale=1,
 maximum-scale=1,
 user-scalable=no">
 
-<title>AR Indoor Navigation</title>
+<title>Advanced AR Indoor Navigation</title>
 
 <style>
 
@@ -69,13 +69,13 @@ video{
 
     flex:1;
 
-    background:rgba(0,0,0,0.42);
+    background:rgba(0,0,0,0.45);
 
     border:1px solid rgba(255,255,255,0.08);
 
-    backdrop-filter:blur(10px);
-
     border-radius:18px;
+
+    backdrop-filter:blur(10px);
 
     padding:14px;
 
@@ -86,18 +86,18 @@ video{
 
     font-size:11px;
 
-    opacity:0.65;
+    opacity:0.7;
 }
 
 .value{
 
     margin-top:6px;
 
-    color:#00ff9d;
-
-    font-size:19px;
+    font-size:18px;
 
     font-weight:bold;
+
+    color:#00ff9d;
 
     text-shadow:0 0 10px #00ff9d;
 }
@@ -123,20 +123,20 @@ video{
     position:absolute;
 
     top:110px;
-    right:15px;
+    right:14px;
 
-    width:84px;
-    height:84px;
+    width:82px;
+    height:82px;
 
     border-radius:50%;
 
-    border:2px solid rgba(0,255,180,0.35);
-
     overflow:hidden;
 
-    background:rgba(0,0,0,0.25);
+    border:2px solid rgba(0,255,180,0.35);
 
-    box-shadow:0 0 18px rgba(0,255,180,0.25);
+    background:rgba(0,0,0,0.3);
+
+    box-shadow:0 0 18px rgba(0,255,180,0.3);
 }
 
 .scan{
@@ -211,7 +211,7 @@ video{
     drop-shadow(0 0 8px #5fffd2)
     drop-shadow(0 0 16px #5fffd2);
 
-    animation:flow 1.3s infinite;
+    animation:flow 1.2s infinite;
 }
 
 .chevron:nth-child(2){
@@ -225,7 +225,7 @@ video{
 
     transform:rotate(45deg) scale(0.6);
 
-    opacity:0.45;
+    opacity:0.4;
 }
 
 @keyframes flow{
@@ -237,7 +237,7 @@ video{
 
     50%{
         opacity:1;
-        transform:rotate(45deg) translateY(-8px);
+        transform:rotate(45deg) translateY(-7px);
     }
 
     100%{
@@ -251,17 +251,17 @@ video{
 
     margin-top:22px;
 
-    min-width:240px;
+    min-width:250px;
 
-    background:rgba(0,0,0,0.5);
+    padding:16px 20px;
 
-    border:1px solid rgba(0,255,180,0.25);
+    background:rgba(0,0,0,0.48);
 
     border-radius:18px;
 
-    backdrop-filter:blur(10px);
+    border:1px solid rgba(0,255,180,0.28);
 
-    padding:16px 20px;
+    backdrop-filter:blur(10px);
 
     text-align:center;
 
@@ -281,7 +281,7 @@ video{
 
     font-size:14px;
 
-    opacity:0.82;
+    opacity:0.85;
 }
 
 .bottom{
@@ -370,9 +370,9 @@ button{
 
     font-weight:bold;
 
-    color:white;
-
     cursor:pointer;
+
+    color:white;
 
     min-width:100px;
 }
@@ -384,7 +384,7 @@ button{
 
 .record{
 
-    background:#1f1f1f;
+    background:#1e1e1e;
 }
 
 .start{
@@ -430,14 +430,14 @@ muted>
         <div class="card">
 
             <div class="label">
-                CHECKPOINT
+                CHECKPOINTS
             </div>
 
             <div
             class="value"
             id="checkpoint">
 
-                0 / 12
+                0 pontos
 
             </div>
 
@@ -463,8 +463,7 @@ muted>
 
         <div class="align-box">
 
-            <div
-            class="align-title">
+            <div class="align-title">
 
                 TRACKING
 
@@ -474,7 +473,7 @@ muted>
             class="align-text"
             id="trackingText">
 
-                Ambiente alinhado
+                Sistema aguardando
 
             </div>
 
@@ -552,13 +551,15 @@ document.getElementById("checkpoint");
 
 let route = [];
 
-let navigationLoop = null;
-
-let navigationIndex = 0;
-
 let recording = false;
 
 let navigating = false;
+
+let routeRecorder = null;
+
+let navigationLoop = null;
+
+let currentCheckpoint = 0;
 
 async function startCamera(){
 
@@ -593,15 +594,17 @@ async function startCamera(){
 
 function recordRoute(){
 
+    clearInterval(routeRecorder);
+
     clearInterval(navigationLoop);
+
+    route = [];
 
     recording = true;
 
     navigating = false;
 
-    route = [];
-
-    navigationIndex = 0;
+    currentCheckpoint = 0;
 
     trackingText.innerText =
     "Capturando ambiente";
@@ -612,51 +615,35 @@ function recordRoute(){
     subDirection.innerText =
     "Ande lentamente";
 
-    let count = 0;
-
-    let recorder =
+    routeRecorder =
     setInterval(()=>{
 
         if(!recording){
 
-            clearInterval(recorder);
+            clearInterval(routeRecorder);
             return;
         }
 
-        count++;
+        const checkpointData = {
 
-        route.push({
+            id:route.length + 1,
 
-            checkpoint:count
+            timestamp:Date.now()
 
-        });
+        };
+
+        route.push(checkpointData);
 
         checkpoint.innerText =
-        count + " / 12";
+        route.length + " pontos";
 
         trackingText.innerText =
+
         "Checkpoint " +
-        count +
+        route.length +
         " salvo";
 
-        if(count >= 12){
-
-            clearInterval(recorder);
-
-            recording = false;
-
-            trackingText.innerText =
-            "Rota salva";
-
-            directionText.innerHTML =
-            "Pronto para navegar";
-
-            subDirection.innerText =
-            "Clique em navegar";
-
-        }
-
-    },1400);
+    },1500);
 
 }
 
@@ -673,93 +660,17 @@ function startNavigation(){
 
     clearInterval(navigationLoop);
 
-    navigating = true;
-
     recording = false;
 
-    navigationIndex = 0;
+    navigating = true;
 
-    const steps = [
+    currentCheckpoint = 0;
 
-        {
+    trackingText.innerText =
+    "Analisando ambiente";
 
-            direction:
-            "frente",
-
-            tracking:
-            "Ambiente alinhado",
-
-            subtitle:
-            "Continue andando"
-
-        },
-
-        {
-
-            direction:
-            "direita",
-
-            tracking:
-            "Desvio detectado",
-
-            subtitle:
-            "Ajuste suavemente"
-
-        },
-
-        {
-
-            direction:
-            "frente",
-
-            tracking:
-            "Rota corrigida",
-
-            subtitle:
-            "Tracking estabilizado"
-
-        },
-
-        {
-
-            direction:
-            "esquerda",
-
-            tracking:
-            "Leve correção necessária",
-
-            subtitle:
-            "Movimente lentamente"
-
-        },
-
-        {
-
-            direction:
-            "frente",
-
-            tracking:
-            "Checkpoint encontrado",
-
-            subtitle:
-            "Continue"
-
-        },
-
-        {
-
-            direction:
-            "frente",
-
-            tracking:
-            "Destino próximo",
-
-            subtitle:
-            "Poucos metros restantes"
-
-        }
-
-    ];
+    subDirection.innerText =
+    "Navegação iniciada";
 
     navigationLoop =
     setInterval(()=>{
@@ -774,8 +685,8 @@ function startNavigation(){
         }
 
         if(
-        navigationIndex >=
-        steps.length
+        currentCheckpoint >=
+        route.length
         ){
 
             clearInterval(
@@ -783,41 +694,43 @@ function startNavigation(){
             );
 
             trackingText.innerText =
-            "Navegação concluída";
+            "Destino alcançado";
 
             directionText.innerHTML =
-            "✓ Destino alcançado";
+            "✓ Você chegou";
 
             subDirection.innerText =
-            "Você chegou";
-
-            checkpoint.innerText =
-            "12 / 12";
+            "Rota concluída";
 
             navigating = false;
 
             return;
         }
 
-        const current =
-        steps[navigationIndex];
+        const random =
+        Math.random();
 
-        checkpoint.innerText =
-        (
-            navigationIndex + 1
-        ) +
-        " / 12";
+        let direction = "frente";
 
-        trackingText.innerText =
-        current.tracking;
+        if(random < 0.25){
 
-        subDirection.innerText =
-        current.subtitle;
+            direction = "esquerda";
 
-        if(
-        current.direction
-        === "frente"
-        ){
+        }
+
+        else if(random < 0.5){
+
+            direction = "direita";
+
+        }
+
+        else{
+
+            direction = "frente";
+
+        }
+
+        if(direction === "frente"){
 
             directionText.innerHTML =
 
@@ -826,12 +739,15 @@ function startNavigation(){
             frente
             </span>`;
 
+            trackingText.innerText =
+            "Ambiente alinhado";
+
+            subDirection.innerText =
+            "Continue andando";
+
         }
 
-        if(
-        current.direction
-        === "direita"
-        ){
+        if(direction === "direita"){
 
             directionText.innerHTML =
 
@@ -840,12 +756,15 @@ function startNavigation(){
             direita
             </span>`;
 
+            trackingText.innerText =
+            "Desvio detectado";
+
+            subDirection.innerText =
+            "Corrija suavemente";
+
         }
 
-        if(
-        current.direction
-        === "esquerda"
-        ){
+        if(direction === "esquerda"){
 
             directionText.innerHTML =
 
@@ -854,9 +773,21 @@ function startNavigation(){
             esquerda
             </span>`;
 
+            trackingText.innerText =
+            "Leve desalinhamento";
+
+            subDirection.innerText =
+            "Movimente lentamente";
+
         }
 
-        navigationIndex++;
+        currentCheckpoint++;
+
+        checkpoint.innerText =
+
+        currentCheckpoint +
+        " / " +
+        route.length;
 
     },3500);
 
@@ -868,18 +799,20 @@ function stopAR(){
 
     navigating = false;
 
-    clearInterval(
-    navigationLoop
-    );
+    clearInterval(routeRecorder);
+
+    clearInterval(navigationLoop);
 
     trackingText.innerText =
-    "Sistema parado";
+    "Sistema pausado";
 
     directionText.innerHTML =
-    "AR pausado";
+    "AR parado";
 
     subDirection.innerText =
-    "";
+
+    route.length +
+    " checkpoints salvos";
 
 }
 
