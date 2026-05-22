@@ -1,18 +1,26 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>AR Indoor Navigation</title>
+<title>ORB Indoor Navigation</title>
+
+<script async src="https://docs.opencv.org/4.x/opencv.js"></script>
 
 <style>
 
-body{
+*{
     margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial;
+}
+
+body{
     overflow:hidden;
     background:black;
-    font-family:Arial;
 }
 
 video{
@@ -21,9 +29,16 @@ video{
     width:100%;
     height:100%;
     object-fit:cover;
+    z-index:1;
 }
 
-.overlay{
+canvas{
+    position:fixed;
+    inset:0;
+    z-index:2;
+}
+
+.ui{
     position:fixed;
     inset:0;
     z-index:5;
@@ -36,15 +51,16 @@ video{
     left:20px;
     right:20px;
     display:flex;
-    gap:10px;
+    gap:12px;
 }
 
 .card{
-    background:rgba(0,0,0,0.6);
+    background:rgba(0,0,0,0.65);
     color:white;
-    padding:15px;
-    border-radius:18px;
-    min-width:160px;
+    padding:16px;
+    border-radius:20px;
+    backdrop-filter:blur(10px);
+    min-width:180px;
 }
 
 .green{
@@ -54,21 +70,22 @@ video{
 
 .bottom{
     position:absolute;
+    bottom:35px;
     left:50%;
     transform:translateX(-50%);
-    bottom:40px;
-    width:85%;
+    width:90%;
     max-width:420px;
 
-    background:rgba(0,0,0,0.6);
-    border-radius:24px;
-    padding:24px;
-    text-align:center;
+    background:rgba(0,0,0,0.65);
     color:white;
+    padding:24px;
+    border-radius:24px;
+    text-align:center;
 }
 
 .bottom h1{
     color:#00ff88;
+    margin-bottom:10px;
 }
 
 .arrow{
@@ -78,25 +95,28 @@ video{
     transform:translate(-50%, -50%);
     font-size:180px;
     color:#00ff88;
-    text-shadow:0 0 20px #00ff88;
+    text-shadow:0 0 30px #00ff88;
 }
 
 .controls{
     position:fixed;
     right:20px;
     bottom:20px;
+    z-index:20;
+
     display:flex;
     flex-direction:column;
     gap:12px;
-    z-index:10;
 }
 
 button{
     border:none;
-    padding:18px;
     border-radius:18px;
+    padding:18px 24px;
     font-size:18px;
     font-weight:bold;
+    cursor:pointer;
+    pointer-events:auto;
 }
 
 .record{
@@ -114,26 +134,36 @@ button{
 }
 
 </style>
+
 </head>
 
 <body>
 
 <video id="video" autoplay playsinline muted></video>
 
-<div class="overlay">
+<canvas id="canvas"></canvas>
+
+<div class="ui">
 
     <div class="top">
 
         <div class="card">
-            <div>Sistema</div>
+            <div>Status</div>
             <div class="green" id="status">
-                Iniciando...
+                Inicializando...
             </div>
         </div>
 
         <div class="card">
             <div>Checkpoint</div>
             <div class="green" id="checkpoint">
+                0
+            </div>
+        </div>
+
+        <div class="card">
+            <div>Matches</div>
+            <div class="green" id="matches">
                 0
             </div>
         </div>
@@ -147,11 +177,11 @@ button{
     <div class="bottom">
 
         <h1 id="instruction">
-            Aguardando
+            Aguardando...
         </h1>
 
         <p id="details">
-            Grave uma rota primeiro
+            Grave uma rota
         </p>
 
     </div>
@@ -160,7 +190,7 @@ button{
 
 <div class="controls">
 
-    <button class="record" onclick="recordRoute()">
+    <button class="record" onclick="startRecording()">
         Gravar
     </button>
 
@@ -177,11 +207,14 @@ button{
 <script>
 
 const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
 
 const statusEl = document.getElementById("status");
+const checkpointEl = document.getElementById("checkpoint");
+const matchesEl = document.getElementById("matches");
 const instructionEl = document.getElementById("instruction");
 const detailsEl = document.getElementById("details");
-const checkpointEl = document.getElementById("checkpoint");
 const arrowEl = document.getElementById("arrow");
 
 let checkpoints = [];
@@ -191,49 +224,89 @@ let navigating = false;
 
 let currentCheckpoint = 0;
 
-async function initCamera(){
+let orb;
+let bf;
 
-    try{
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
-        const stream =
-            await navigator.mediaDevices.getUserMedia({
+async function init(){
 
-                video:{
-                    facingMode:"environment"
-                },
+    const stream =
+        await navigator.mediaDevices.getUserMedia({
 
-                audio:false
+            video:{
+                facingMode:"environment"
+            },
 
-            });
+            audio:false
 
-        video.srcObject = stream;
+        });
 
-        statusEl.innerText = "Câmera ativa";
+    video.srcObject = stream;
 
-    }catch(err){
+    statusEl.innerText = "Câmera ativa";
 
-        alert("Erro câmera");
+}
 
+function waitOpenCV(){
+
+    if(typeof cv === "undefined"){
+
+        setTimeout(waitOpenCV,500);
+        return;
     }
 
-}
+    orb = new cv.ORB();
 
-function captureFrame(){
+    bf = new cv.BFMatcher(cv.NORM_HAMMING, true);
 
-    const canvas = document.createElement("canvas");
-
-    canvas.width = 160;
-    canvas.height = 120;
-
-    const ctx = canvas.getContext("2d");
-
-    ctx.drawImage(video,0,0,160,120);
-
-    return canvas.toDataURL("image/jpeg",0.4);
+    statusEl.innerText = "OpenCV pronto";
 
 }
 
-function recordRoute(){
+function captureMat(){
+
+    const temp = document.createElement("canvas");
+
+    temp.width = 320;
+    temp.height = 240;
+
+    const tctx = temp.getContext("2d");
+
+    tctx.drawImage(video,0,0,320,240);
+
+    return cv.imread(temp);
+
+}
+
+function extractFeatures(mat){
+
+    const gray = new cv.Mat();
+
+    cv.cvtColor(mat, gray, cv.COLOR_RGBA2GRAY);
+
+    const keypoints = new cv.KeyPointVector();
+
+    const descriptors = new cv.Mat();
+
+    orb.detectAndCompute(
+        gray,
+        new cv.Mat(),
+        keypoints,
+        descriptors
+    );
+
+    gray.delete();
+
+    return {
+        keypoints,
+        descriptors
+    };
+
+}
+
+function startRecording(){
 
     checkpoints = [];
 
@@ -243,28 +316,66 @@ function recordRoute(){
 
     statusEl.innerText = "Gravando";
 
-    instructionEl.innerText = "Ande lentamente";
+    instructionEl.innerText =
+        "Ande lentamente";
 
     detailsEl.innerText =
-        "Checkpoint salvo a cada 2 segundos";
+        "Capturando pontos únicos";
 
-    const recordLoop = setInterval(()=>{
+    const loop = setInterval(()=>{
 
         if(!recording){
 
-            clearInterval(recordLoop);
+            clearInterval(loop);
             return;
-
         }
 
-        const frame = captureFrame();
+        const frame = captureMat();
 
-        checkpoints.push(frame);
+        const features =
+            extractFeatures(frame);
+
+        checkpoints.push(features);
 
         checkpointEl.innerText =
             checkpoints.length;
 
+        frame.delete();
+
     },2000);
+
+}
+
+function compareDescriptors(desc1, desc2){
+
+    if(
+        desc1.empty() ||
+        desc2.empty()
+    ){
+        return 0;
+    }
+
+    const matches = new cv.DMatchVector();
+
+    bf.match(desc1, desc2, matches);
+
+    let good = 0;
+
+    for(let i=0; i<matches.size(); i++){
+
+        const m = matches.get(i);
+
+        if(m.distance < 40){
+
+            good++;
+
+        }
+
+    }
+
+    matches.delete();
+
+    return good;
 
 }
 
@@ -272,31 +383,19 @@ function startNavigation(){
 
     if(checkpoints.length === 0){
 
-        alert("Grave uma rota antes");
-
+        alert("Grave uma rota primeiro");
         return;
-
     }
 
-    navigating = true;
-
     recording = false;
+    navigating = true;
 
     statusEl.innerText = "Navegando";
 
     instructionEl.innerText =
-        "Siga em frente";
-
-    detailsEl.innerText =
-        "Procurando checkpoint";
+        "Analisando ambiente";
 
     navigationLoop();
-
-}
-
-function fakeSimilarity(){
-
-    return Math.random() * 100;
 
 }
 
@@ -304,18 +403,43 @@ function navigationLoop(){
 
     if(!navigating) return;
 
-    const similarity = fakeSimilarity();
+    const currentFrame = captureMat();
 
-    if(similarity > 75){
+    const currentFeatures =
+        extractFeatures(currentFrame);
 
-        currentCheckpoint++;
+    let bestMatch = 0;
+    let bestIndex = 0;
 
-        checkpointEl.innerText =
-            currentCheckpoint + "/" +
-            checkpoints.length;
+    for(let i=0; i<checkpoints.length; i++){
+
+        const score =
+            compareDescriptors(
+
+                currentFeatures.descriptors,
+                checkpoints[i].descriptors
+
+            );
+
+        if(score > bestMatch){
+
+            bestMatch = score;
+            bestIndex = i;
+
+        }
+
+    }
+
+    matchesEl.innerText = bestMatch;
+
+    checkpointEl.innerText =
+        bestIndex + "/" +
+        checkpoints.length;
+
+    if(bestMatch > 80){
 
         instructionEl.innerText =
-            "Checkpoint encontrado";
+            "Você está na rota";
 
         detailsEl.innerText =
             "Continue andando";
@@ -324,13 +448,15 @@ function navigationLoop(){
 
     }
 
-    else if(similarity > 45){
+    else if(bestMatch > 40){
 
         instructionEl.innerText =
-            "Você está próximo";
+            "Quase alinhado";
 
         detailsEl.innerText =
             "Ajuste a câmera";
+
+        arrowEl.innerHTML = "↻";
 
     }
 
@@ -340,13 +466,14 @@ function navigationLoop(){
             "Você saiu da rota";
 
         detailsEl.innerText =
-            "Volte para o último ponto";
+            "Retorne ao último ponto";
 
         arrowEl.innerHTML = "↺";
 
     }
 
-    if(currentCheckpoint >= checkpoints.length){
+    if(bestIndex >= checkpoints.length - 1
+       && bestMatch > 80){
 
         instructionEl.innerText =
             "Destino alcançado";
@@ -358,11 +485,44 @@ function navigationLoop(){
 
         navigating = false;
 
-        return;
-
     }
 
-    setTimeout(navigationLoop,1500);
+    drawDebug(bestMatch);
+
+    currentFrame.delete();
+
+    requestAnimationFrame(navigationLoop);
+
+}
+
+function drawDebug(score){
+
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    ctx.strokeStyle = "#00ff88";
+
+    ctx.lineWidth = 10;
+
+    ctx.shadowBlur = 20;
+
+    ctx.shadowColor = "#00ff88";
+
+    ctx.strokeRect(
+        canvas.width/2 - 120,
+        canvas.height/2 - 120,
+        240,
+        240
+    );
+
+    ctx.font = "30px Arial";
+
+    ctx.fillStyle = "#00ff88";
+
+    ctx.fillText(
+        "Score: " + score,
+        40,
+        canvas.height - 40
+    );
 
 }
 
@@ -373,13 +533,15 @@ function stopAll(){
 
     statusEl.innerText = "Parado";
 
-    instructionEl.innerText = "Sistema parado";
+    instructionEl.innerText =
+        "Sistema parado";
 
     detailsEl.innerText = "";
 
 }
 
-initCamera();
+init();
+waitOpenCV();
 
 </script>
 
