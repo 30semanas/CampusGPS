@@ -232,8 +232,9 @@ html,body{width:100%;height:100dvh;overflow:hidden;background:#000;font-family:"
       </div>
 
       <!-- Zoom buttons -->
-      <div style="position:absolute;right:14px;bottom:80px;z-index:20;display:flex;flex-direction:column;gap:8px">
+      <div style="position:absolute;right:14px;bottom:80px;z-index:20;display:flex;flex-direction:column;gap:8px;align-items:center">
         <button onclick="satZoomIn()" style="width:44px;height:44px;background:rgba(0,0,0,.75);border:1.5px solid rgba(0,229,255,.4);border-radius:12px;color:#00e5ff;font-size:22px;font-weight:700;cursor:pointer">+</button>
+        <div id="zoom-level-lbl" style="font-family:Orbitron,monospace;font-size:10px;color:rgba(0,229,255,.7);text-align:center;line-height:1.2;background:rgba(0,0,0,.6);padding:3px 6px;border-radius:6px;border:1px solid rgba(0,229,255,.2)">z18</div>
         <button onclick="satZoomOut()" style="width:44px;height:44px;background:rgba(0,0,0,.75);border:1.5px solid rgba(0,229,255,.4);border-radius:12px;color:#00e5ff;font-size:22px;font-weight:700;cursor:pointer">−</button>
         <button onclick="satCenter()" style="width:44px;height:44px;background:rgba(0,0,0,.75);border:1.5px solid rgba(0,229,255,.4);border-radius:12px;color:#00e5ff;font-size:18px;cursor:pointer">◎</button>
       </div>
@@ -1520,13 +1521,21 @@ function renderSatMap(){
   var tY1=Math.ceil(cy+H/(2*tileSize))+1;
   var maxTile=Math.pow(2,satZoom)-1;
 
-  // Remove old tiles that are too far
+  // Remove old tiles - keep buffer of 2 tiles, remove different zoom levels when current loaded
   var kids=container.children;
+  var currentZoomCount=0;
+  for(var ki2=0;ki2<kids.length;ki2++){if(parseInt(kids[ki2].dataset.tz)===satZoom)currentZoomCount++;}
   for(var ki=kids.length-1;ki>=0;ki--){
     var kid=kids[ki];
     var kx=parseInt(kid.dataset.tx||'0');
     var ky=parseInt(kid.dataset.ty||'0');
-    if(kx<tX0-1||kx>tX1+1||ky<tY0-1||ky>tY1+1){
+    var kz=parseInt(kid.dataset.tz||'0');
+    // Remove tiles far from viewport
+    if(kz===satZoom&&(kx<tX0-2||kx>tX1+2||ky<tY0-2||ky>tY1+2)){
+      container.removeChild(kid);
+    }
+    // Remove old zoom tiles only if we have enough current zoom tiles loaded
+    if(kz!==satZoom&&currentZoomCount>4){
       container.removeChild(kid);
     }
   }
@@ -1549,21 +1558,52 @@ function renderSatMap(){
     }
   }
 
-  // Position all tiles
+  // Position all tiles - keep old zoom tiles visible as background
   var allTiles=container.querySelectorAll('img');
+  var hasCurrentZoom=false;
   for(var ti=0;ti<allTiles.length;ti++){
     var t=allTiles[ti];
     var ttx=parseInt(t.dataset.tx);
     var tty=parseInt(t.dataset.ty);
     var ttz=parseInt(t.dataset.tz);
-    if(ttz!==satZoom){t.style.display='none';continue;}
-    t.style.display='block';
-    var px=W/2+(ttx-cx)*tileSize;
-    var py=H/2+(tty-cy)*tileSize;
-    t.style.left=Math.round(px)+'px';
-    t.style.top=Math.round(py)+'px';
+    if(ttz===satZoom){hasCurrentZoom=true;break;}
+  }
+  for(var ti2=0;ti2<allTiles.length;ti2++){
+    var t2=allTiles[ti2];
+    var ttx2=parseInt(t2.dataset.tx);
+    var tty2=parseInt(t2.dataset.ty);
+    var ttz2=parseInt(t2.dataset.tz);
+    if(ttz2!==satZoom){
+      // Keep adjacent zoom levels visible as fallback background
+      var zDiff=Math.abs(ttz2-satZoom);
+      if(zDiff<=2){
+        // Scale and position tile from different zoom level
+        var zScale=Math.pow(2,ttz2-satZoom);
+        var px2=(W/2+(ttx2-cx/Math.pow(2,ttz2-satZoom))*tileSize*zScale);
+        t2.style.display='block';
+        t2.style.opacity='0.5';
+        t2.style.width=Math.round(tileSize*zScale)+'px';
+        t2.style.height=Math.round(tileSize*zScale)+'px';
+        // Simpler: just hide non-current zoom
+        t2.style.display='none';
+      } else {
+        t2.style.display='none';
+      }
+      continue;
+    }
+    t2.style.display='block';
+    t2.style.opacity='1';
+    t2.style.width='256px';
+    t2.style.height='256px';
+    var px3=W/2+(ttx2-cx)*tileSize;
+    var py3=H/2+(tty2-cy)*tileSize;
+    t2.style.left=Math.round(px3)+'px';
+    t2.style.top=Math.round(py3)+'px';
   }
 
+  // Update zoom level label
+  var zll=document.getElementById('zoom-level-lbl');
+  if(zll)zll.textContent='z'+satZoom;
   renderMapOverlay(cLat,cLng,W,H);
 }
 
@@ -1643,14 +1683,33 @@ function startMapLoop(){
   loop();
 }
 
+// ESRI World Imagery supports zoom 1-23, tiles exist up to level 23
+var SAT_ZOOM_MIN=2;
+var SAT_ZOOM_MAX=23;
+
 function satZoomIn(){
-  satZoom=Math.min(satZoom+1,20);
-  var c2=document.getElementById('sat-map');if(c2)c2.innerHTML='';
+  if(satZoom>=SAT_ZOOM_MAX)return;
+  satZoom=satZoom+1;
+  // Clear only tiles from old zoom level
+  var c2=document.getElementById('sat-map');
+  if(c2){
+    var imgs=c2.querySelectorAll('img');
+    for(var i=0;i<imgs.length;i++){
+      if(parseInt(imgs[i].dataset.tz)!==satZoom)imgs[i].style.opacity='0.3';
+    }
+  }
   renderSatMap();
 }
 function satZoomOut(){
-  satZoom=Math.max(satZoom-1,14);
-  var c2=document.getElementById('sat-map');if(c2)c2.innerHTML='';
+  if(satZoom<=SAT_ZOOM_MIN)return;
+  satZoom=satZoom-1;
+  var c2=document.getElementById('sat-map');
+  if(c2){
+    var imgs=c2.querySelectorAll('img');
+    for(var i=0;i<imgs.length;i++){
+      if(parseInt(imgs[i].dataset.tz)!==satZoom)imgs[i].style.opacity='0.3';
+    }
+  }
   renderSatMap();
 }
 function satCenter(){
@@ -1669,6 +1728,7 @@ function initMapPan(){
   var mp=document.getElementById('map-panel');
   if(!mp)return;
   var sx=0,sy=0,sLat=0,sLng=0,dragging=false;
+  var lastPinchDist=0,pinching=false;
   var metersPerPxFn=function(){return 156543.03392*Math.cos((satCenterLat||uLat||-23.22)*Math.PI/180)/Math.pow(2,satZoom);};
   var degPerPx=function(){return metersPerPxFn()/111320;};
 
@@ -1679,20 +1739,73 @@ function initMapPan(){
     dragging=true;
   }
   function panMove(px,py){
-    if(!dragging)return;
+    if(!dragging||pinching)return;
     var dpp=degPerPx();
     satCenterLat=sLat+(py-sy)*dpp;
     satCenterLng=sLng-(px-sx)*dpp*Math.cos(sLat*Math.PI/180);
     renderSatMap();
   }
-  function panEnd(){dragging=false;}
+  function panEnd(){dragging=false;pinching=false;}
 
-  mp.addEventListener('touchstart',function(e){if(e.touches.length===1){panStart(e.touches[0].clientX,e.touches[0].clientY);}},{passive:true});
-  mp.addEventListener('touchmove',function(e){if(e.touches.length===1&&dragging){var dx=e.touches[0].clientX-sx;if(Math.abs(dx)>8){e.stopPropagation();}panMove(e.touches[0].clientX,e.touches[0].clientY);}},{passive:true});
-  mp.addEventListener('touchend',panEnd,{passive:true});
+  function getPinchDist(e){
+    var dx=e.touches[0].clientX-e.touches[1].clientX;
+    var dy=e.touches[0].clientY-e.touches[1].clientY;
+    return Math.sqrt(dx*dx+dy*dy);
+  }
+
+  mp.addEventListener('touchstart',function(e){
+    if(e.touches.length===1){panStart(e.touches[0].clientX,e.touches[0].clientY);}
+    else if(e.touches.length===2){pinching=true;dragging=false;lastPinchDist=getPinchDist(e);}
+  },{passive:true});
+
+  mp.addEventListener('touchmove',function(e){
+    if(e.touches.length===2){
+      pinching=true;dragging=false;
+      var newDist=getPinchDist(e);
+      var ratio=newDist/lastPinchDist;
+      if(ratio>1.15&&satZoom<SAT_ZOOM_MAX){
+        satZoom++;
+        var c2=document.getElementById('sat-map');
+        if(c2){var imgs=c2.querySelectorAll('img');for(var i=0;i<imgs.length;i++){if(parseInt(imgs[i].dataset.tz)!==satZoom)imgs[i].style.display='none';}}
+        lastPinchDist=newDist;
+        renderSatMap();
+      } else if(ratio<0.85&&satZoom>SAT_ZOOM_MIN){
+        satZoom--;
+        var c3=document.getElementById('sat-map');
+        if(c3){var imgs2=c3.querySelectorAll('img');for(var i2=0;i2<imgs2.length;i2++){if(parseInt(imgs2[i2].dataset.tz)!==satZoom)imgs2[i2].style.display='none';}}
+        lastPinchDist=newDist;
+        renderSatMap();
+      }
+      return;
+    }
+    if(e.touches.length===1&&dragging&&!pinching){
+      var dx=e.touches[0].clientX-sx;
+      if(Math.abs(dx)>8){e.stopPropagation();}
+      panMove(e.touches[0].clientX,e.touches[0].clientY);
+    }
+  },{passive:true});
+
+  mp.addEventListener('touchend',function(e){if(e.touches.length===0)panEnd();},{passive:true});
+
+  // Mouse support (desktop)
   mp.addEventListener('mousedown',function(e){panStart(e.clientX,e.clientY);});
   window.addEventListener('mousemove',function(e){if(dragging)panMove(e.clientX,e.clientY);});
   window.addEventListener('mouseup',panEnd);
+
+  // Mouse wheel zoom
+  mp.addEventListener('wheel',function(e){
+    e.preventDefault();
+    if(e.deltaY<0&&satZoom<SAT_ZOOM_MAX){
+      satZoom++;
+      var c4=document.getElementById('sat-map');
+      if(c4){var imgs3=c4.querySelectorAll('img');for(var i3=0;i3<imgs3.length;i3++){if(parseInt(imgs3[i3].dataset.tz)!==satZoom)imgs3[i3].style.display='none';}}
+    } else if(e.deltaY>0&&satZoom>SAT_ZOOM_MIN){
+      satZoom--;
+      var c5=document.getElementById('sat-map');
+      if(c5){var imgs4=c5.querySelectorAll('img');for(var i4=0;i4<imgs4.length;i4++){if(parseInt(imgs4[i4].dataset.tz)!==satZoom)imgs4[i4].style.display='none';}}
+    }
+    renderSatMap();
+  },{passive:false});
 }
 
 // ── SWIPE BETWEEN AR AND MAP ──
